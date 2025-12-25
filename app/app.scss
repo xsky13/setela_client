@@ -1,16 +1,45 @@
-/* @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import "../node_modules/bootstrap/scss/functions";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+$btn-font-size: .9rem;
+$btn-font-weight: 500;
+$btn-padding-y: .28rem;
+$btn-padding-x: .6rem;
+
+$input-padding-y: .45rem;
+$input-padding-x: .8rem;
+$input-font-size: .9rem;
+
+$primary: #5f3ad9;
+$form-floating-padding-y: .8rem;
+
+$input-focus-bg: none;
+$input-focus-width: 0;
+$input-focus-box-shadow: 0 0 0 rgb(255,0,0);
+
+@import "../node_modules/bootstrap/scss/variables";
+
+$form-floating-height: add(3rem, $input-height-border);
+
+
+
+@import "../node_modules/bootstrap/scss/mixins";
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+h1,h2,h3,h4,h5,h6 {
+	font-family: "Rubik", sans-serif;
 }
 
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
+* {
+	font-family: "Roboto", sans-serif;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
-} */
-@import "../node_modules/bootstrap/scss/bootstrap";
+
+.btn.btn-primary:hover {
+ 	box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
+}
+
+.btn.btn-primary:focus, .form-control:focus {
+	outline: 2px solid $primary;
+  	outline-offset: 1px; 
+}
