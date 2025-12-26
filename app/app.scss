@@ -1,5 +1,4 @@
 @import "../node_modules/bootstrap/scss/functions";
-
 $border-light: rgb(223, 223, 223);
 
 $btn-font-size: 0.875rem;
@@ -15,15 +14,19 @@ $input-focus-bg: none;
 $input-focus-width: 0;
 $input-border-color: rgb(195, 195, 195);
 
-$primary: #5f3ad9;
+$primary: #284C79;
+$secondary: #C9A961;
+//#5f3ad9
 
 $form-floating-padding-y: .7rem;
 $form-floating-input-padding-t: 1.4rem;
 
 $card-border-color: $border-light;
+// $card-border-radius: 0;
 
 
 @import "../node_modules/bootstrap/scss/variables";
+@import "../node_modules/bootstrap-icons/font/bootstrap-icons.css";
 
 $form-floating-height: add(2.9rem, $input-height-border);
 
@@ -33,11 +36,16 @@ $btn-border-radius: $border-radius-sm;
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 h1,h2,h3,h4,h5,h6 {
-	font-family: "Rubik", sans-serif;
+	font-family: "Crimson Text", serif;
+	font-weight: bold;
 }
 
 * {
 	font-family: "Roboto", sans-serif;
+}
+
+html, body {
+	font-size: 15.5px;
 }
 
 
