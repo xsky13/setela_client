@@ -1,4 +1,4 @@
-import type { CourseSimple } from "./course";
+import type { CourseSimple, ProfessorCourse } from "./course";
 
 export type User = {
     id: number;
@@ -12,7 +12,7 @@ export type FullUser = {
     name: string;
     email: string;
     roles: number[];
-    profesorCourses: CourseSimple[];
+    professorCourses: ProfessorCourse[];
     enrollments: CourseSimple[];
 }
 

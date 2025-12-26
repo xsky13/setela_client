@@ -3,3 +3,11 @@ export type CourseSimple = {
     courseTitle: string,
     courseDescription: string   
 }
+
+export type ProfessorCourse = {
+    id: number,
+    title: string,
+    students: number,
+    examsToGrade: number,   
+    assignmentsToGrade: number   
+}

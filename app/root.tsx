@@ -18,6 +18,8 @@ import { isAxiosError } from "axios";
 import { AuthContext } from "./context/AuthContext";
 import Header from "./Components/Header";
 
+// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
 
 const queryClient = new QueryClient()
 export const links: Route.LinksFunction = () => [
@@ -29,7 +31,7 @@ export const links: Route.LinksFunction = () => [
 	},
 	{
 		rel: "stylesheet",
-		href: "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap",
+		href: "https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap",
 	},
 ];
 
@@ -69,7 +71,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
 	return (
 		<AuthContext value={user}>
 			<Header />
-			<div style={{ paddingTop: '7rem' }}>
+			<div style={{ paddingTop: '5.51rem' }}>
 				{children}
 			</div>
 		</AuthContext>
