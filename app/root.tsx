@@ -9,9 +9,17 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.scss";
-// import 'bootstrap/dist/css/bootstrap.min.css';
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import api from "./api";
+import Authenticate from "./Components/Auth/Authenticate";
+import LoadingScreen from "./Components/LoadingScreen";
+import ErrorScreen from "./Components/ErrorScreen";
+import { isAxiosError } from "axios";
+import { AuthContext } from "./context/AuthContext";
+import Header from "./Components/Header";
 
 
+const queryClient = new QueryClient()
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 	{
@@ -21,7 +29,7 @@ export const links: Route.LinksFunction = () => [
 	},
 	{
 		rel: "stylesheet",
-		href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+		href: "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap",
 	},
 ];
 
@@ -35,12 +43,38 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				<Links />
 			</head>
 			<body>
-				{children}
-				<ScrollRestoration />
-				<Scripts />
+				<QueryClientProvider client={queryClient}>
+					<AppContent>{children}</AppContent>
+					<ScrollRestoration />
+					<Scripts />
+				</QueryClientProvider>
 			</body>
 		</html>
 	);
+}
+
+function AppContent({ children }: { children: React.ReactNode }) {
+	const { data: user, isLoading: userLoading, isError, error } = useQuery({ queryKey: ['todos'], 
+		queryFn: async () => {
+			const response = await api.get('/auth/user')
+			return response.data;
+		},
+		retry: 0
+	});
+
+
+	if (userLoading) return <LoadingScreen />
+	if (isAxiosError(error) && error.response?.status !== 401) return <ErrorScreen />;
+	if (user == undefined) return <Authenticate />
+	return (
+		<AuthContext value={user}>
+			<Header />
+			<div style={{ paddingTop: '7rem' }}>
+				{children}
+			</div>
+		</AuthContext>
+	);
+	
 }
 
 export default function App() {

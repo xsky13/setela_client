@@ -1,50 +1,25 @@
-import LoginForm from "~/Components/Auth/LoginForm";
-import type { Route } from "./+types/home";
-import './home.css';
-import { useState } from "react";
+import { useContext } from "react";
+import type { Route } from "../+types/root";
+import { AuthContext } from "~/context/AuthContext";
+import LoadingButton from "~/Components/LoadingButton";
 
 export function meta({ }: Route.MetaArgs) {
-	return [
-		{ title: "New React Router App" },
-		{ name: "description", content: "Welcome to React Router!" },
-	];
+    return [
+        { title: "Setela" },
+        { name: "description", content: "Cursos teologicos" },
+    ];
 }
 
+
 export default function Home() {
-	const [active, setActive] = useState<string>("login");
+    const user = useContext(AuthContext);
 
-	return (
-		<div className="main">
-			<div className="w-25">
-				<ul className="nav nav-underline">
-					<li className="nav-item">
-						<button
-							className={`nav-link ${active == "login" && "active"}`}
-							aria-current="page"
-							onClick={() => setActive("login")}
-						>
-							Iniciar sesión
-						</button>
-					</li>
-					<li className="nav-item">
-						<button
-							className={`nav-link ${active == "register" && "active"}`}
-							onClick={() => setActive("register")}
-						>
-							Registrarse
-						</button>
-					</li>
-				</ul>
+    console.log(user);
+    
 
-				<div className="my-3">
-					{
-						active == "login" ?
-							<LoginForm />
-							:
-							''
-					}
-				</div>
-			</div>
-		</div>
-	)
+    return (
+        <div className="container">
+            <h1>Bienvenido {user?.name}</h1>
+        </div>
+    );
 }
