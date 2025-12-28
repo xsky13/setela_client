@@ -1,3 +1,4 @@
+import { Link, NavLink } from 'react-router';
 import './styles/HeaderStyles.css'
 
 export default function Header() {
@@ -19,23 +20,23 @@ export default function Header() {
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item d-flex align-items-center ">
                             {/* <i className="bi bi-house-fill text-white"></i> */}
-                            <a className="nav-link active" aria-current="page" href="#">Inicio</a>
+                            <NavLink className="nav-link active" aria-current="page" to="/">Inicio</NavLink>
                         </li>
                         <li className="nav-item d-flex align-items-center ">
                             {/* <i className="bi bi-journal-text text-body-tertiary"></i> */}
-                            <a className="nav-link" href="#">Cursos</a>
+                            <NavLink className="nav-link" to="/cursos">Cursos</NavLink>
                         </li>
                         <li className="nav-item d-flex align-items-center ">
                             {/* <i className="bi bi-calendar3 text-body-tertiary"></i> */}
-                            <a className="nav-link" href="#">Calendario</a>
+                            <NavLink className="nav-link" to="/calendario">Calendario</NavLink>
                         </li>
                     </ul>
                     <ul className="navbar-nav">
                         <li className="nav-item">
-                            <a href="/cuenta" className="mx-4 d-flex align-items-center nav-link">
+                            <NavLink to="/cuenta" className="mx-4 d-flex align-items-center nav-link">
                                 <i className="bi bi-person-circle me-1 text-body-tertiary"></i>
                                 Mi cuenta
-                            </a>
+                            </NavLink>
                         </li>
                         <li className="nav-item my-1">
                             <button onClick={logout} className="btn btn-secondary">
