@@ -3,6 +3,8 @@ import type { Route } from "../+types/root";
 import { AuthContext } from "~/context/AuthContext";
 import ProfessorView from "~/Components/Views/Home/ProfessorView";
 import StudentView from "~/Components/Views/Home/StudentView";
+import AdminView from "~/Components/Views/Home/AdminView";
+import './home.css'
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -34,17 +36,18 @@ export default function Home() {
                     <p>{getMaxUserRole()} Panel de control académico</p>
                 </div>
             </div>
-            <div className="container my-4">
+            {
+                maxUserRole() == 1 &&
+                <div className="container admin-panel">
+                    <AdminView />
+                </div>
+            }
+            <div className="container mt-4 mb-5">
                 {
-                    user?.roles.includes(2) &&
-                    <div>
-                        <h2>Materias enseñadas</h2>
-                        <p>Gestiona y accede a tus cursos académicos</p>
-                        <ProfessorView courses={user.professorCourses} />
-                    </div>
+                    user?.roles.includes(2) && <ProfessorView courses={user.professorCourses} />
                 }
             </div>
-            {
+                {
                 maxUserRole() == 3 ?
                     <StudentView courses={user.enrollments} />
                     :

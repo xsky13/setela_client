@@ -4,6 +4,8 @@ import type { ProfessorCourse } from "~/types/course";
 export default function ProfessorView({ courses }: { courses: ProfessorCourse[] }) {
     return (
         <div>
+            <h2>Materias enseñadas</h2>
+            <p>Gestiona y accede a tus cursos académicos</p>
             <div className="row">
                 {
                     courses.length != 0 ?
