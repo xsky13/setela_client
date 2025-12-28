@@ -11,3 +11,10 @@ export type ProfessorCourse = {
     examsToGrade: number,   
     assignmentsToGrade: number   
 }
+
+export type StudentCourse = {
+    id: number,
+    title: string,
+    year: number,
+    progress: number 
+}
