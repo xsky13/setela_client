@@ -82,7 +82,7 @@ export default function Cuenta() {
                     </div>
 
                     <div className="my-2">
-                        <div className="fw-semibold text-uppercase text-muted">Opcional</div>
+                        <div className="fw-semibold text-uppercase text-muted small">Opcional</div>
                     </div>
                     <div className="form-floating mb-4">
                         <input
