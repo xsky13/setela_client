@@ -6,6 +6,14 @@ import api from "~/api";
 import LoadingButton from "~/Components/LoadingButton";
 import { AuthContext } from "~/context/AuthContext";
 import { getErrors } from "~/utils/error";
+import type { Route } from "./+types/cuenta";
+
+export function meta({ }: Route.MetaArgs) {
+    return [
+        { title: "Mi cuenta  | Setela" },
+        { name: "description", content: "Cursos teologicos" },
+    ];
+}
 
 export default function Cuenta() {
     const user = useContext(AuthContext);
