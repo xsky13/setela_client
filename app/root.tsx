@@ -18,6 +18,7 @@ import ErrorScreen from "./Components/ErrorScreen";
 import { isAxiosError } from "axios";
 import { AuthContext } from "./context/AuthContext";
 import Header from "./Components/Header";
+import { Toaster } from "sonner";
 
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -72,6 +73,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
 	if (user == undefined) return <Authenticate />
 	return (
 		<AuthContext value={user}>
+			<Toaster />
 			<Header />
 			<div style={{ paddingTop: '5.51rem' }}>
 				{children}
