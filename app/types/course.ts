@@ -14,7 +14,7 @@ export type ProfessorCourse = {
 
 export type StudentCourse = {
     id: number,
-    title: string,
+    courseTitle: string,
     year: number,
     progress: number 
 }

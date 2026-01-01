@@ -2,6 +2,8 @@ import type { ProfessorCourse, StudentCourse } from "~/types/course";
 
 
 export default function StudentView({ courses }: { courses: StudentCourse[] }) {
+    console.log(courses);
+    
     return (
         <div className="container">
             <h2>Materias inscriptas</h2>
@@ -14,7 +16,7 @@ export default function StudentView({ courses }: { courses: StudentCourse[] }) {
                             <div className="col-md-6 col-lg-4">
                                 <div className="card border-2 border-primary h-100 p-3">
                                     <div className="card-header border-0 bg-white ">
-                                        <h5 className="card-title mb-0">{course.title}</h5>
+                                        <h5 className="card-title mb-0">{course.courseTitle}</h5>
                                         <small>Primer año</small>
                                     </div>
                                     <div className="card-body">
