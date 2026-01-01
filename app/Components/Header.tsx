@@ -20,7 +20,7 @@ export default function Header() {
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item d-flex align-items-center ">
                             {/* <i className="bi bi-house-fill text-white"></i> */}
-                            <NavLink className="nav-link active" aria-current="page" to="/">Inicio</NavLink>
+                            <NavLink className="nav-link" aria-current="page" to="/">Inicio</NavLink>
                         </li>
                         <li className="nav-item d-flex align-items-center ">
                             {/* <i className="bi bi-journal-text text-body-tertiary"></i> */}
