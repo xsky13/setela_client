@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
+import { useContext } from "react";
 import { Link } from "react-router";
 import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
+import { AuthContext } from "~/context/AuthContext";
 import type { Profesor } from "~/types/user";
 
 export default function Index() {
+    const user = useContext(AuthContext);
+    if (!user) throw new Error("Usuario no existe.");
+
     const { data: courseData, isLoading, error } = useQuery({
         queryKey: ['getCoursesQuery'],
         queryFn: async () => {
@@ -40,13 +45,15 @@ export default function Index() {
                             <Link to={`/cursos/` + course.id} className="btn btn-secondary">
                                 Ir al curso
                                 <i className="bi bi-chevron-right ms-1"></i>
-
                             </Link>
                         </div>
-                        <Link to={`/cursos/${course.id}/editar`} className="position-absolute small text-muted fw-semibold unstyled" style={{ bottom: 10, right: 20 }}>
-                            <i className="bi bi-pencil me-1"></i>
-                            Editar
-                        </Link>
+                        {
+                            (user.roles.includes(1) || user.professorCourses.find(c => c.id == course.id)) &&
+                            <Link to={`/cursos/${course.id}/editar`} className="position-absolute small text-muted fw-semibold unstyled" style={{ bottom: 10, right: 20 }}>
+                                <i className="bi bi-pencil me-1"></i>
+                                Editar
+                            </Link>
+                        }
                     </div>
                 ))
             }
