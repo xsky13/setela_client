@@ -41,7 +41,7 @@ export default function AdminView() {
                                     </p>
                                 </div>
                             </div>
-                            <Link to="/administracion/cursos" className="btn btn-light w-100">
+                            <Link to="/cursos" className="btn btn-light w-100">
                                 Administrar cursos <i className="bi bi-arrow-right"></i>
                             </Link>
                         </div>
