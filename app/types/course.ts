@@ -19,7 +19,8 @@ export type StudentCourse = {
     courseId: number,
     courseTitle: string,
     year: number,
-    progress: number
+    progress: number,
+    valid: boolean
 }
 
 export type FullCourse = {

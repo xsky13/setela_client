@@ -26,8 +26,7 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
 
     const disenrollStudent = (userId: number) => {
         disenrollStudentMutation.mutate({ userId });
-    }
-
+    }  
 
     return (
         <div className="position-relative d-flex flex-column flex-shrink-0 p-3 bg-dark text-bg-dark border-top border-4 border-dark position-fixed z-3 h-100 sidebar" >
@@ -52,7 +51,7 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                 </li>
                 <li className="nav-item">
                     {
-                        user?.enrollments.some(e => e.courseId == courseData?.id) ?
+                        user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ?
                             <span
                                 className="nav-link text-danger"
                                 onClick={() => disenrollStudent(user.id)}

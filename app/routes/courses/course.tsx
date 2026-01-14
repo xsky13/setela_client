@@ -40,7 +40,7 @@ export default function Course() {
 
         if (user?.roles.includes(UserRole.admin) || user?.roles.includes(UserRole.professor)) {
             setUserCanAccessCourse(true);
-        } else if (user?.enrollments.some(e => e.courseId == courseData?.id)) {
+        } else if (user?.enrollments.some(e => e.courseId == courseData?.id && e.valid)) {
             setUserCanAccessCourse(true);
         }
     }, [courseData]);

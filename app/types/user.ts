@@ -1,4 +1,5 @@
 import type { CourseSimple, ProfessorCourse, StudentCourse } from "./course";
+import type { UserRole } from "./roles";
 
 export type User = {
     id: number;
