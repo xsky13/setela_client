@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
@@ -33,29 +33,32 @@ export default function Course() {
         retry: 0
     });
 
+    const changeAccess = (value: boolean) => setUserCanAccessCourse(value);
+
     useEffect(() => {
         if (courseData != undefined) document.title = `${courseData?.title} | Setela`;
-    }, [courseData])
+
+        if (user?.roles.includes(UserRole.admin) || user?.roles.includes(UserRole.professor)) {
+            setUserCanAccessCourse(true);
+        } else if (user?.enrollments.some(e => e.courseId == courseData?.id)) {
+            setUserCanAccessCourse(true);
+        }
+    }, [courseData]);
 
     /** 
      * ! POSIBLE BUG: I DONT KNOW IF THE ID PROPERTY OF PROFESSORCOURSE IS FROM THE ACTUAL COURSE OR INTERMEDIARY TABLE
      * TODO: findout sometime i geuss
      */
 
-    useEffect(() => {
-        if (user?.roles.includes(UserRole.admin) || user?.roles.includes(UserRole.professor)) {
-            setUserCanAccessCourse(true);
-        } else if (user?.enrollments.some(e => e.courseId == courseData?.id)) {
-            setUserCanAccessCourse(true);
-        }
-    }, []);
-
     if (isLoading) return <LoadingSegment />
     if (isError) return <ErrorSegment />
 
     return (
         <div className="d-flex">
-            <Sidebar courseData={courseData!} />
+            <Sidebar
+                postEnrollmentFunc={changeAccess}
+                courseData={courseData!}
+            />
             <div className="main p-4 px-5">
                 {
                     userCanAccessCourse ?
