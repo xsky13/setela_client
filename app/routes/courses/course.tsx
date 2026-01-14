@@ -5,9 +5,12 @@ import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
 import type { FullCourse } from "~/types/course";
 import './styles/courseStyles.css'
+import { useContext, useEffect } from "react";
+import { AuthContext } from "~/context/AuthContext";
 
 export default function Course() {
     const params = useParams();
+    const user = useContext(AuthContext);
 
     const { data: courseData, isError, isLoading, error } = useQuery<FullCourse>({
         queryKey: ['getCourseQuery'],
@@ -43,13 +46,15 @@ export default function Course() {
                             }
                         </ul>
                     </li>
+                    <li className="nav-item">
+                        {
+                            user?.enrollments.some(e => e.courseId == courseData?.id) ?
+                                <span className="nav-link text-danger" role="button">Darse de baja del curso</span>
+                                :
+                                <span className="nav-link text-secondary" role="button">Inscribirse en el curso</span>
+                        }
+                    </li>
                 </ul>
-                <div className="border-top border-secondary position-absolute bottom-0 left-0">
-                    <button className="btn btn-outline-secondary  w-100 text-start">
-                        <i className="bi bi-box-arrow-right me-2"></i>
-                        Darse de baja del curso
-                    </button>
-                </div>
             </div>
 
             <div className="main p-4 px-5">

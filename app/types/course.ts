@@ -16,6 +16,7 @@ export type ProfessorCourse = {
 
 export type StudentCourse = {
     id: number,
+    courseId: number,
     courseTitle: string,
     year: number,
     progress: number
