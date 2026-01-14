@@ -7,6 +7,14 @@ import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
 import { AuthContext } from "~/context/AuthContext";
 import type { Profesor } from "~/types/user";
+import type { Route } from "./+types/course";
+
+export function meta({ }: Route.MetaArgs) {
+    return [
+        { title: "Cursos | Setela" },
+        { name: "description", content: "Cursos teologicos" },
+    ];
+}
 
 export default function Index() {
     const user = useContext(AuthContext);
