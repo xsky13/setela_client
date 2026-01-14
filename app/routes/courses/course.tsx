@@ -34,8 +34,8 @@ export default function Course() {
     });
 
     useEffect(() => {
-        document.title = `${courseData?.title} | Setela`;
-    }, [])
+        if (courseData != undefined) document.title = `${courseData?.title} | Setela`;
+    }, [courseData])
 
     /** 
      * ! POSIBLE BUG: I DONT KNOW IF THE ID PROPERTY OF PROFESSORCOURSE IS FROM THE ACTUAL COURSE OR INTERMEDIARY TABLE
