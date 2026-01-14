@@ -7,6 +7,11 @@ export type User = {
     roles: number[];
 }
 
+export type UserSimple = {
+    id: number;
+    name: string;
+}
+
 export type FullUser = {
     id: number;
     name: string;
@@ -14,6 +19,14 @@ export type FullUser = {
     roles: UserRole[];
     professorCourses: ProfessorCourse[];
     enrollments: StudentCourse[];
+}
+
+export type Enrollment = {
+    id: number;
+    user: UserSimple;
+    enrollmentDate: string,
+    valid: boolean;
+    grade: number | null;
 }
 
 export type Profesor = {

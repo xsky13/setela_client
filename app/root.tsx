@@ -20,8 +20,9 @@ import { AuthContext } from "./context/AuthContext";
 import Header from "./Components/Header";
 import { Toaster } from "sonner";
 
-// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
+if (typeof document !== 'undefined') {
+  	import('bootstrap/dist/js/bootstrap.bundle.min.js');
+}
 
 const queryClient = new QueryClient()
 export const links: Route.LinksFunction = () => [

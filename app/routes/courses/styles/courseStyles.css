@@ -1,0 +1,12 @@
+.sidebar {
+    width: 280px;
+}
+
+.main {
+    margin-left: 280px;
+}
+
+
+ul.nav.flex-column .nav-item .nav-link {
+    padding: var(--bs-nav-link-padding-y) 0 !important;
+}
