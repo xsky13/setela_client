@@ -1,5 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
-import { useContext } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext, useState } from "react";
 import { NavLink, useParams } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
@@ -9,20 +9,42 @@ import type { FullCourse } from "~/types/course";
 export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData: FullCourse, postEnrollmentFunc: (value: boolean) => void }) {
     const user = useContext(AuthContext);
     const params = useParams();
+    const queryClient = useQueryClient()
+    const [enrollmentStatus, setEnrollmentStatus] = useState(user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ? "enrolled" : "disenrolled");
 
     const disenrollStudentMutation = useMutation<any, Error, { userId: number }>({
         mutationFn: async data => {
             const response = await api.post("/course/" + courseData?.id + "/disenroll", data);
             return response.data;
         },
-        onSuccess() {
+        async onSuccess() {
             postEnrollmentFunc(false);
+            setEnrollmentStatus("disenrolled");
+            await queryClient.invalidateQueries({ queryKey: ['get_user_data']});
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");
             console.log(error);
         },
     });
+
+    const enrollStudentMutation = useMutation<any, Error, { userId: number }>({
+        mutationFn: async data => {
+            const response = await api.post("/course/" + courseData?.id + "/enroll", data);
+            return response.data;
+        },
+        async onSuccess() {
+            postEnrollmentFunc(true);
+            setEnrollmentStatus("enrolled");
+            await queryClient.invalidateQueries({ queryKey: ['get_user_data']});
+        },
+        onError(error) {
+            toast("Hubo un error. Por favor intente nuevamente.");
+            console.log(error);
+        },
+    });
+
+    const enrollStudent = (userId: number) => enrollStudentMutation.mutate({ userId });
 
     const disenrollStudent = (userId: number) => {
         disenrollStudentMutation.mutate({ userId });
@@ -51,10 +73,10 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                 </li>
                 <li className="nav-item">
                     {
-                        user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ?
+                        enrollmentStatus == "enrolled" ?
                             <span
                                 className="nav-link text-danger"
-                                onClick={() => disenrollStudent(user.id)}
+                                onClick={() => disenrollStudent(user!.id)}
                                 role="button"
                             >
                                 {
@@ -66,7 +88,19 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                                 }
                             </span>
                             :
-                            <span className="nav-link text-secondary" role="button">Inscribirse en el curso</span>
+                            <span
+                                className="nav-link text-secondary"
+                                onClick={() => enrollStudent(user!.id)}
+                                role="button"
+                            >
+                                {
+                                    enrollStudentMutation.isPending ?
+                                        <div className="spinner-border spinner-border-sm" role="status">
+                                        </div>
+                                        :
+                                        'Inscribirse en el curso'
+                                }
+                            </span>
                     }
                 </li>
             </ul>

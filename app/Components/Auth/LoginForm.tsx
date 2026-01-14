@@ -10,6 +10,7 @@ export default function LoginForm() {
     const [error, setError] = useState("");
 
     const loginMutation = useMutation<any, Error, { email: string, password: string }>({
+        mutationKey: ["get_user_data"],
         mutationFn: async data => {
             const response = await api.post("auth/login", data);
             return response.data;
