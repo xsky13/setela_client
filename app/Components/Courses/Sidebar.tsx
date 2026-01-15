@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
-import { NavLink, useParams } from "react-router";
+import { NavLink } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import { AuthContext } from "~/context/AuthContext";
@@ -8,7 +8,6 @@ import type { FullCourse } from "~/types/course";
 
 export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData: FullCourse, postEnrollmentFunc: (value: boolean) => void }) {
     const user = useContext(AuthContext);
-    const params = useParams();
     const queryClient = useQueryClient()
     const [enrollmentStatus, setEnrollmentStatus] = useState(user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ? "enrolled" : "disenrolled");
 
@@ -56,10 +55,10 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
             <div className="small">Primer año</div>
             <ul className="nav flex-column flex-grow-1 mt-4" data-bs-theme="dark">
                 <li className="nav-item">
-                    <NavLink className={"nav-link " + (params.id != "calificaciones" ? "text-bg-dark" : "text-muted")} to={`/cursos/${courseData.id}`}>Curso</NavLink>
+                    <NavLink className={"nav-link " + ((!window.location.href.includes("calificaciones") && !window.location.href.includes("participantes")) ? "text-bg-dark" : "text-muted")} to={`/cursos/${courseData.id}`}>Curso</NavLink>
                 </li>
                 <li className="nav-item">
-                    <NavLink className={"nav-link " + (params.id?.includes("calificaciones") ? "text-bg-dark" : "text-muted")} to="./calificaciones">Calificaciones</NavLink>
+                    <NavLink className={"nav-link " + (window.location.href.includes("calificaciones") ? "text-bg-dark" : "text-muted")} to={`/cursos/${courseData.id}/calificaciones`}>Calificaciones</NavLink>
                 </li>
                 <li className="nav-item dropdown">
                     <a className="nav-link text-muted dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Profesores</a>
@@ -70,6 +69,9 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                             )
                         }
                     </ul>
+                </li>
+                <li className="nav-item">
+                    <NavLink className={"nav-link " + (window.location.href.includes("participantes") ? "text-bg-dark" : "text-muted")} to={`/cursos/${courseData.id}/participantes`}>Participantes</NavLink>
                 </li>
                 <li className="nav-item">
                     {

@@ -1,15 +1,16 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router";
+import { Outlet, useParams } from "react-router";
 import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
 import type { FullCourse } from "~/types/course";
-import './styles/courseStyles.css';
+import '../styles/courseStyles.css';
 import Sidebar from "~/Components/Courses/Sidebar";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "~/context/AuthContext";
 import { UserRole } from "~/types/roles";
 import type { Route } from "./+types/course";
+import { CourseContext } from "~/context/CourseContext";
 
 
 export function meta({ }: Route.MetaArgs) {
@@ -19,7 +20,7 @@ export function meta({ }: Route.MetaArgs) {
     ];
 }
 
-export default function Course() {
+export default function CourseLayout() {
     const params = useParams();
     const user = useContext(AuthContext);
     const [userCanAccessCourse, setUserCanAccessCourse] = useState(false);
@@ -62,10 +63,9 @@ export default function Course() {
             <div className="main p-4 px-5">
                 {
                     userCanAccessCourse ?
-                        <div>
-                            <h1>{courseData?.title}</h1>
-                            <p>{courseData?.description}</p>
-                        </div>
+                        <CourseContext value={courseData}>
+                            <Outlet />
+                        </CourseContext>
                         :
                         <h1 className=" text-center">Debe inscribirse al curso antes de poder acceder a el.</h1>
                 }
