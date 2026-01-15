@@ -7,7 +7,7 @@ import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
 import { AuthContext } from "~/context/AuthContext";
 import type { Profesor } from "~/types/user";
-import type { Route } from "./+types/course";
+import type { Route } from "./+types";
 
 export function meta({ }: Route.MetaArgs) {
     return [

@@ -24,7 +24,7 @@ export type FullUser = {
 
 export type Enrollment = {
     id: number;
-    user: UserSimple;
+    sysUser: UserSimple;
     enrollmentDate: string,
     valid: boolean;
     grade: number | null;

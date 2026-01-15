@@ -35,7 +35,9 @@ export type FullCourse = {
     exams: Exam[]
 }
 
-
+export type CourseDataView = FullCourse & {
+    currentUserIsOwner: boolean;
+}
 
 
 

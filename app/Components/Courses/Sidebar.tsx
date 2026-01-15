@@ -43,10 +43,14 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
         },
     });
 
-    const enrollStudent = (userId: number) => enrollStudentMutation.mutate({ userId });
+    const enrollStudent = (userId: number) => {
+        enrollStudentMutation.mutate({ userId });
+        window.location.reload();
+    };
 
     const disenrollStudent = (userId: number) => {
         disenrollStudentMutation.mutate({ userId });
+        window.location.reload();
     }  
 
     return (

@@ -1,4 +1,4 @@
 import { createContext } from "react";
-import type { FullCourse } from "~/types/course";
+import type { CourseDataView, FullCourse } from "~/types/course";
 
-export const CourseContext = createContext<FullCourse | undefined | null>(null);
+export const CourseContext = createContext<CourseDataView | undefined | null>(null);

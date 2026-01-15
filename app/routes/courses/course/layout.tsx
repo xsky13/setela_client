@@ -24,6 +24,7 @@ export default function CourseLayout() {
     const params = useParams();
     const user = useContext(AuthContext);
     const [userCanAccessCourse, setUserCanAccessCourse] = useState(false);
+    const [isOwner, setIsOwner] = useState(false);
 
     const { data: courseData, isError, isLoading } = useQuery<FullCourse>({
         queryKey: ['getCourseQuery'],
@@ -34,10 +35,14 @@ export default function CourseLayout() {
         retry: 0
     });
 
-    const changeAccess = (value: boolean) => setUserCanAccessCourse(value);
+    const changeAccess = (value: boolean) => !isOwner && setUserCanAccessCourse(value);
 
     useEffect(() => {
         if (courseData != undefined) document.title = `${courseData?.title} | Setela`;
+
+        if (user?.roles.includes(UserRole.admin) || user?.professorCourses.some(c => c.id == courseData?.id)) {
+            setIsOwner(true);
+        }
 
         if (user?.roles.includes(UserRole.admin) || user?.roles.includes(UserRole.professor)) {
             setUserCanAccessCourse(true);
@@ -63,7 +68,7 @@ export default function CourseLayout() {
             <div className="main p-4 px-5">
                 {
                     userCanAccessCourse ?
-                        <CourseContext value={courseData}>
+                        <CourseContext value={{ ...courseData!, currentUserIsOwner: isOwner }}>
                             <Outlet />
                         </CourseContext>
                         :
