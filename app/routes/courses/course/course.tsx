@@ -11,6 +11,9 @@ import type { IOrderable } from '~/interfaces/IOrderable';
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
     id: number;
+
+    key: string;
+
     title?: string;
 
     dueDate?: string;
@@ -31,11 +34,11 @@ export default function Course() {
         if (!course) return;
 
         const allItems: CourseItem[] = [
-            ...(course.topicSeparators?.map(ts => ({ ...ts, type: 'topicSeparator' as const })) || []),
-            ...(course.modules?.map(m => ({ ...m, type: 'module' as const })) || []),
-            ...(course.resources?.map(r => ({ ...r, type: 'resource' as const })) || []),
-            ...(course.exams?.map(e => ({ ...e, type: 'exam' as const })) || []),
-            ...(course.assignments?.map(a => ({ ...a, type: 'assignment' as const })) || [])
+            ...(course.topicSeparators?.map(ts => ({ ...ts, key: `ts-${ts.id}`, type: 'topicSeparator' as const })) || []),
+            ...(course.modules?.map(m => ({ ...m, key: `m-${m.id}`, type: 'module' as const })) || []),
+            ...(course.resources?.map(r => ({ ...r, key: `r-${r.id}`, type: 'resource' as const })) || []),
+            ...(course.exams?.map(e => ({ ...e, key: `e-${e.id}`, type: 'exam' as const })) || []),
+            ...(course.assignments?.map(a => ({ ...a, key: `a-${a.id}`, type: 'assignment' as const })) || [])
         ];
 
         const sortedItems = allItems.sort((a, b) => a.displayOrder - b.displayOrder);
@@ -43,7 +46,11 @@ export default function Course() {
 
         console.log(course);
 
-    }, [course])
+    }, [course]);
+
+    const removeItemFromListing = (itemKey: string) => {
+        setCourseData(prevData => prevData.filter(item => item.key != itemKey));
+    }
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -110,6 +117,8 @@ export default function Course() {
                                     key={i}
                                     id={item.id}
                                     title={item.title!}
+                                    currentUserIsOwner={course!.currentUserIsOwner}
+                                    removeItemFromListing={removeItemFromListing}
                                 />
                             case 'resource':
                                 return <ResourceListing
