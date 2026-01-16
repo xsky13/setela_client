@@ -1,4 +1,4 @@
-import type { Enrollment, Profesor } from "./user"
+import type { Enrollment, Profesor, UserSimple } from "./user"
 
 export type CourseSimple = {
     id: number,
@@ -28,6 +28,7 @@ export type FullCourse = {
     title: string,
     description: string,
     enrollments: Enrollment[],
+    resources: ResourceListing[],
     professors: Profesor[],
     topicSeparators: TopicSeparator[],
     modules: Module[],
@@ -58,6 +59,16 @@ export type Module = {
     visible: boolean,
     creationDate: string,
     courseId: number,
+    displayOrder: number
+}
+
+export type ResourceListing = {
+    id: number,
+    url: string,
+    linkText: string,
+    resourceType: number,
+    creationDate: string,
+    sysUser: UserSimple,
     displayOrder: number
 }
 
