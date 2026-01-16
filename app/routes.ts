@@ -7,7 +7,10 @@ export default [
         index("routes/courses/index.tsx"),
         layout("routes/courses/course/layout.tsx", [
             route(":id", "routes/courses/course/course.tsx"),
-            route(":id/participantes", "routes/courses/course/participantes.tsx")
+            route(":id/participantes", "routes/courses/course/participantes.tsx"),
+            route(":id/m/crear", "routes/courses/course/module/create/index.tsx"),
+
+            route(":id/m/:moduleId/recursos/editar", "routes/courses/course/module/resources/edit.tsx")
         ]),
     ]),
 ] satisfies RouteConfig;

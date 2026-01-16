@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import type { ProfessorCourse } from "~/types/course";
 
 
@@ -42,9 +43,9 @@ export default function ProfessorView({ courses }: { courses: ProfessorCourse[] 
                                         </div>
                                     </div>
                                     <div className="card-footer border-0 bg-white text-center">
-                                        <button className="btn btn-primary my-1 w-100">
+                                        <NavLink to={`cursos/${course.id}`} className="btn btn-primary my-1 w-100">
                                             <i className="bi bi-box-arrow-in-right"></i> Ir al curso
-                                        </button>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>

@@ -1,9 +1,8 @@
+import { NavLink } from "react-router";
 import type { ProfessorCourse, StudentCourse } from "~/types/course";
 
 
 export default function StudentView({ courses }: { courses: StudentCourse[] }) {
-    console.log(courses);
-    
     return (
         <div className="container">
             <h2>Materias inscriptas</h2>
@@ -34,23 +33,18 @@ export default function StudentView({ courses }: { courses: StudentCourse[] }) {
                                         <div className="progress progress-secondary" aria-label="Example 1px high" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} role="progressbar" style={{ height: '3px' }}>
                                             <div className="progress-bar w-75"></div>
                                         </div>
-                                        {/* <hr className="mt-4"/>
-                                        <h6 className="text-muted mb-2"><i className="bi bi-person-fill"></i> Profesor(es)</h6>
-                                        {
-                                            course.
-                                        } */}
                                     </div>
                                     <div className="card-footer border-0 bg-white text-center">
-                                        <button className="btn btn-primary my-1 w-100">
+                                        <NavLink to={`cursos/${course.courseId}`} className="btn btn-primary my-1 w-100">
                                             <i className="bi bi-box-arrow-in-right"></i> Ir al curso
-                                        </button>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
                         ))
                         :
                         <div>
-
+                            
                         </div>
                 }
             </div>

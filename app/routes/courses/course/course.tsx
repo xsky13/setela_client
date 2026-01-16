@@ -70,8 +70,31 @@ export default function Course() {
 
     return (
         <div>
-            <h1>{course?.title}</h1>
-            <p>{course?.description}</p>
+            <div className="d-flex justify-content-between">
+                <div>
+                    <h1>{course?.title}</h1>
+                    <p>{course?.description}</p>
+                </div>
+                {
+                    course?.currentUserIsOwner &&
+                    <div className="dropdown">
+                        <button
+                            className="btn btn-primary dropdown-toggle d-flex align-items-center"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <span className="me-2">Crear</span>
+                        </button>
+                        <ul className="dropdown-menu">
+                            <li><NavLink className="dropdown-item" to="./m/crear">Modulo</NavLink></li>
+                            <li><NavLink className="dropdown-item" to="./r/crear">Recurso</NavLink></li>
+                            <li><NavLink className="dropdown-item" to="./tp/crear">Trabajo practico</NavLink></li>
+                            <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
+                        </ul>
+                    </div>
+                }
+            </div>
             <div className="mt-4">
                 {
                     courseData.map((item, i) => {
