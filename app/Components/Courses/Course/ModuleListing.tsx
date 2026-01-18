@@ -39,8 +39,8 @@ export default function ModuleListing({ id, title, currentUserIsOwner, removeIte
                 </div>
                 <NavLink to={`./m/${id}`} className="h5 card-title text-decoration-none">{title}</NavLink>
             </div>
-            <div>
-                <button className="btn btn-light float-end mb-2">
+            <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
+                <button className="btn btn-light mb-2">
                     <i className='bi bi-check-circle me-2'></i>
                     Marcar finalizado
                 </button>
@@ -57,10 +57,12 @@ export default function ModuleListing({ id, title, currentUserIsOwner, removeIte
                             <span className="me-2">Configuraciones</span>
                         </button>
                         <ul className="dropdown-menu">
-                            <li><NavLink className="dropdown-item" to="./m/crear">
-                                <i className="bi bi-pencil me-2" />
-                                Editar
-                            </NavLink></li>
+                            <li>
+                                <NavLink className="dropdown-item" to={`./m/${id}/editar`}>
+                                    <i className="bi bi-pencil me-2" />
+                                    Editar
+                                </NavLink>
+                            </li>
                             <li><button className="dropdown-item text-danger" onClick={deleteModule}>
                                 <i className="bi bi-trash-fill me-2" />
                                 Eliminar</button></li>
