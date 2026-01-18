@@ -16,6 +16,8 @@ type CourseItem = IOrderable & {
 
     title?: string;
 
+    visible?: boolean;
+
     dueDate?: string;
 
     startTime?: string;
@@ -117,6 +119,7 @@ export default function Course() {
                                     key={i}
                                     id={item.id}
                                     title={item.title!}
+                                    itemVisibility={item.visible!}
                                     currentUserIsOwner={course!.currentUserIsOwner}
                                     removeItemFromListing={removeItemFromListing}
                                 />

@@ -1,10 +1,14 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { NavLink } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
+import LoadingButton from "~/Components/LoadingButton";
 import { getErrors } from "~/utils/error";
 
-export default function ModuleListing({ id, title, currentUserIsOwner, removeItemFromListing }: { id: number, title: string, currentUserIsOwner: boolean, removeItemFromListing: (itemKey: string) => void }) {
+export default function ModuleListing({ id, title, itemVisibility, currentUserIsOwner, removeItemFromListing }: { id: number, title: string, itemVisibility: boolean, currentUserIsOwner: boolean, removeItemFromListing: (itemKey: string) => void }) {
+    const [visible, setVisible] = useState(itemVisibility);
+    const queryClient = useQueryClient();
 
     const deleteModuleMutation = useMutation<any, Error>({
         mutationKey: ['delete_module_command'],
@@ -23,11 +27,40 @@ export default function ModuleListing({ id, title, currentUserIsOwner, removeIte
         retry: 1
     });
 
+    const changeVisibilityMutation = useMutation<any, Error, { visible: boolean }>({
+        mutationKey: ['change_visibility_command'],
+        mutationFn: async data => {
+            const response = await api.put("/module/" + id, data);
+            return response.data;
+        },
+        async onSuccess() {
+            /**
+             * * FOR SOME REASON, WHEN I INVALIDATE THE INDIVIDUAL MODULE QUERY, THE MODULE DOESNT GET UPDATED WHEN I ENTER THE EDIT PAGE
+             * * DOING THE COURSE QUERY WORKS IDK WHY:
+             * * await queryClient.invalidateQueries({ queryKey: ['getModuleQuery']})
+             */ 
+            await queryClient.invalidateQueries({ queryKey: ['getCourseQuery']})
+            setVisible(!visible)
+        },
+        onError: error => {
+            const errors = getErrors(error);
+            console.log(errors);
+            toast(error.message);
+        },
+        retry: 1
+    });
+
     const deleteModule = () => {
         if (confirm("Esta seguro que quiere eliminar este modulo? Esta acción es irreversible")) {
             deleteModuleMutation.mutate();
         }
     }
+
+    const changeVisibility = () => {
+        changeVisibilityMutation.mutate({ visible: !visible })
+    }
+
+
     return (
         <div className="d-flex justify-content-between rounded-2 border border  p-4 my-3">
             <div>
@@ -46,27 +79,24 @@ export default function ModuleListing({ id, title, currentUserIsOwner, removeIte
                 </button>
                 {
                     currentUserIsOwner &&
-                    <div className="dropdown">
-                        <button
-                            className="btn btn-primary dropdown-toggle d-flex align-items-center"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
-                            <i className="bi bi-gear-fill me-2" />
-                            <span className="me-2">Configuraciones</span>
-                        </button>
-                        <ul className="dropdown-menu">
-                            <li>
-                                <NavLink className="dropdown-item" to={`./m/${id}/editar`}>
-                                    <i className="bi bi-pencil me-2" />
-                                    Editar
-                                </NavLink>
-                            </li>
-                            <li><button className="dropdown-item text-danger" onClick={deleteModule}>
-                                <i className="bi bi-trash-fill me-2" />
-                                Eliminar</button></li>
-                        </ul>
+                    <div className="d-flex">
+                        <LoadingButton onClick={changeVisibility} loading={changeVisibilityMutation.isPending} className="p-0 bg-white border-0 text-center small">
+                            {
+                                visible ?
+                                    <><i className="bi bi-eye" /><span className="d-block">Visible</span></>
+                                    :
+                                    <><i className="bi bi-eye-slash" /><span className="d-block">No visible</span></>
+
+                            }
+                        </LoadingButton>
+                        <LoadingButton onClick={deleteModule} loading={deleteModuleMutation.isPending} className="p-0 bg-white border-0 text-danger text-center small mx-4">
+                            <i className="bi bi-trash-fill" />
+                            <span className="d-block">Eliminar</span>
+                        </LoadingButton>
+                        <NavLink to={`./m/${id}/editar`} className="text-center small text-decoration-none" role="button">
+                            <i className="bi bi-pencil" />
+                            <span className="d-block">Editar</span>
+                        </NavLink>
                     </div>
                 }
             </div>

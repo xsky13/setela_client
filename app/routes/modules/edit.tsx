@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
 import { Navigate, NavLink, useParams } from "react-router";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ export default function EditModule() {
     const [textContent, setTextContent] = useState(moduleData?.textContent);
     const [visible, setVisible] = useState(moduleData.visible);
     const [error, setError] = useState("");
+    const queryClient = useQueryClient();
 
     const [serverErrors, setServerErrors] = useState<any[]>([]);
     const editModuleMutation = useMutation<any, Error, { title: string, textContent: string, visible: boolean }>({
@@ -27,7 +28,11 @@ export default function EditModule() {
             const response = await api.put("/module/" + moduleData.id, data);
             return response.data;
         },
-        onSuccess() {
+        async onSuccess() {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['getModuleQuery'] }),
+                queryClient.invalidateQueries({ queryKey: ['getCourseQuery'] }),
+            ]);
             toast("Sus cambios fueron guardados.")
         },
         onError: error => {
