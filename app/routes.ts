@@ -12,6 +12,7 @@ export default [
 
             route(":id/m/crear", "routes/modules/create.tsx"),
             layout("routes/modules/layout.tsx", [
+                route(":id/m/:moduleId", "routes/modules/module.tsx"),
                 route(":id/m/:moduleId/editar", "routes/modules/edit.tsx"),
                 route(":id/m/:moduleId/recursos/agregar", "routes/modules/addResources.tsx"),
             ]),
