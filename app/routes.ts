@@ -8,10 +8,13 @@ export default [
         layout("routes/courses/course/layout.tsx", [
             route(":id", "routes/courses/course/course.tsx"),
             route(":id/participantes", "routes/courses/course/participantes.tsx"),
-            route(":id/m/crear", "routes/courses/course/module/create/index.tsx"),
 
-            route(":id/m/:moduleId/editar", "routes/courses/course/module/edit.tsx"),
-            route(":id/m/:moduleId/recursos/agregar", "routes/courses/course/module/addResources.tsx"),
+
+            route(":id/m/crear", "routes/modules/create.tsx"),
+            layout("routes/modules/layout.tsx", [
+                route(":id/m/:moduleId/editar", "routes/modules/edit.tsx"),
+                route(":id/m/:moduleId/recursos/agregar", "routes/modules/addResources.tsx"),
+            ]),
         ]),
     ]),
 ] satisfies RouteConfig;
