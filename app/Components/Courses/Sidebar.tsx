@@ -66,13 +66,15 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                 </li>
                 <li className="nav-item dropdown">
                     <a className="nav-link text-muted dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Profesores</a>
-                    <ul className="dropdown-menu" data-bs-theme="dark">
+                    {
+                        courseData.professors != undefined && <ul className="dropdown-menu" data-bs-theme="dark">
                         {
-                            courseData?.professors.map((professor, i) =>
+                            courseData.professors.map((professor, i) =>
                                 <li key={i}><span className="dropdown-item">{professor.name}</span></li>
                             )
                         }
                     </ul>
+                    }
                 </li>
                 <li className="nav-item">
                     <NavLink className={"nav-link " + (window.location.href.includes("participantes") ? "text-bg-dark" : "text-muted")} to={`/cursos/${courseData.id}/participantes`}>Participantes</NavLink>
