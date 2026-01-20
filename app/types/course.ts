@@ -1,3 +1,4 @@
+import type { ResourceParentType } from "./resourceTypes"
 import type { Enrollment, Profesor, UserSimple } from "./user"
 
 export type CourseSimple = {
@@ -68,6 +69,7 @@ export type ResourceListing = {
     url: string,
     linkText: string,
     resourceType: number,
+    parentType: ResourceParentType
     creationDate: string,
     sysUser: UserSimple,
     displayOrder: number

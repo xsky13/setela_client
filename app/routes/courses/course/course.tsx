@@ -7,6 +7,7 @@ import ModuleListing from '~/Components/Courses/Course/ModuleListing';
 import ResourceListing from '~/Components/Courses/Course/ResourceListing';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
+import type { ResourceListing as ResourceListingType } from '~/types/course';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -45,8 +46,6 @@ export default function Course() {
 
         const sortedItems = allItems.sort((a, b) => a.displayOrder - b.displayOrder);
         setCourseData(sortedItems);
-
-        console.log(course);
 
     }, [course]);
 
@@ -126,10 +125,9 @@ export default function Course() {
                             case 'resource':
                                 return <ResourceListing
                                     key={i}
-                                    id={item.id}
-                                    url={item.url!}
-                                    linkText={item.linkText!}
-                                    resourceType={item.resourceType!}
+                                    resource={item as unknown as ResourceListingType}
+                                    currentUserIsOwner={course!.currentUserIsOwner}
+                                    resourceDeletionCallback={removeItemFromListing}
                                 />
                             case 'assignment':
                                 return <AssignmentListing

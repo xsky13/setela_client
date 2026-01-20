@@ -11,11 +11,15 @@ import { CourseContext } from "~/context/CourseContext";
 import { ModuleContext } from "~/context/ModuleContext";
 import { getErrors } from "~/utils/error";
 
-export default function EditModule() {
+export default function Module() {
     const moduleData = useContext(ModuleContext);
     const courseData = useContext(CourseContext);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    if (moduleData == undefined) throw new Error("Modulo no existe");
+
+    const [resources, setResources] = useState(moduleData.resources);
 
     if (moduleData == undefined || moduleData == null) throw new Error("Modulo no existe");
 
@@ -36,6 +40,10 @@ export default function EditModule() {
         },
         retry: 1
     });
+
+    const postResourceDeletion = (id: string) => {
+        setResources(prevResources => prevResources.filter(r => r.id != parseInt(id)));
+    }
 
     const deleteModule = () => {
         if (confirm("Esta seguro que quiere eliminar este modulo? Esta acción es irreversible")) {
@@ -70,7 +78,7 @@ export default function EditModule() {
                 {
                     courseData?.currentUserIsOwner &&
                     <div className="my-2 d-flex">
-                        <AddResourcesModal 
+                        <AddResourcesModal
                             parentId={moduleData.id}
                             courseId={moduleData.courseId}
                             type="module"
@@ -93,13 +101,12 @@ export default function EditModule() {
 
             <div className="mt-4">
                 {
-                    moduleData.resources.map((resource, i) => (
+                    resources.map((resource, i) => (
                         <ResourceListing
                             key={i}
-                            id={resource.id}
-                            url={resource.url!}
-                            linkText={resource.linkText!}
-                            resourceType={resource.resourceType!}
+                            resource={resource}
+                            currentUserIsOwner={courseData!.currentUserIsOwner}
+                            resourceDeletionCallback={postResourceDeletion}
                         />
                     ))
                 }
