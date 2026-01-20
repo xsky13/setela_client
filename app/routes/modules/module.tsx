@@ -3,6 +3,8 @@ import { useContext, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
+import AddResourcesModal from "~/Components/AddResourcesModal";
+import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import FormErrors from "~/Components/Error/FormErrors";
 import LoadingButton from "~/Components/LoadingButton";
 import { CourseContext } from "~/context/CourseContext";
@@ -24,7 +26,7 @@ export default function EditModule() {
             return response.data;
         },
         async onSuccess() {
-            await queryClient.invalidateQueries({ queryKey: ['getCourseQuery']});
+            await queryClient.invalidateQueries({ queryKey: ['getCourseQuery'] });
             navigate(`/cursos/${courseData?.id}`);
         },
         onError: error => {
@@ -68,11 +70,16 @@ export default function EditModule() {
                 {
                     courseData?.currentUserIsOwner &&
                     <div className="my-2 d-flex">
-                        <NavLink to="editar" className="btn btn-light"><i className="bi bi-pencil me-1" /> Editar</NavLink>
+                        <AddResourcesModal 
+                            parentId={moduleData.id}
+                            courseId={moduleData.courseId}
+                            type="module"
+                        />
+                        <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
                         <LoadingButton
                             loading={deleteModuleMutation.isPending}
                             onClick={deleteModule}
-                            className="btn btn-danger ms-2"
+                            className="btn btn-danger"
                         >
                             <i className="bi bi-trash me-1" />
                             Eliminar
@@ -83,6 +90,20 @@ export default function EditModule() {
             <div className="my-2">
                 {moduleData.textContent}
             </div>
-        </div >
+
+            <div className="mt-4">
+                {
+                    moduleData.resources.map((resource, i) => (
+                        <ResourceListing
+                            key={i}
+                            id={resource.id}
+                            url={resource.url!}
+                            linkText={resource.linkText!}
+                            resourceType={resource.resourceType!}
+                        />
+                    ))
+                }
+            </div>
+        </div>
     );
 }

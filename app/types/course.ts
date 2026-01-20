@@ -59,7 +59,8 @@ export type Module = {
     visible: boolean,
     creationDate: string,
     courseId: number,
-    displayOrder: number
+    displayOrder: number,
+    resources: ResourceListing[]
 }
 
 export type ResourceListing = {
