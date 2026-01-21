@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext, useState } from "react";
-import { NavLink, useNavigate, useParams } from "react-router";
+import { useContext, useEffect, useState } from "react";
+import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import AddResourcesModal from "~/Components/Resource/AddResourcesModal";

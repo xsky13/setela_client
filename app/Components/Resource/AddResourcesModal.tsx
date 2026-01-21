@@ -1,6 +1,6 @@
 "use client"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "~/api";
 import { ResourceType } from "~/types/resourceTypes";
 import LoadingButton from "../LoadingButton";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { closeModal } from "~/utils/modal";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { createPortal } from 'react-dom';
+import { useSearchParams } from "react-router";
 
 export default function AddResourcesModal({
     type,
@@ -24,6 +25,26 @@ export default function AddResourcesModal({
     const [url, setUrl] = useState('');
     const [error, setError] = useState('');
     const modalRef = useRef<HTMLDivElement>(null);
+    const openModalRef = useRef<HTMLButtonElement>(null);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+
+
+    const removeParam = (paramName: string) => {
+        const newSearchParams = new URLSearchParams(searchParams.toString());
+        newSearchParams.delete(paramName);
+        setSearchParams(newSearchParams);
+    };
+
+    useEffect(() => {
+        if (searchParams.get("resourceCreation")) {
+            if (openModalRef.current) {
+                openModalRef.current.click();
+                removeParam("resourceCreation");
+            }
+        }
+    }, [])
+
 
     const addResourceMutation = useMutation<ResourceListing, Error, {
         url: string, linkText: string, type: string, parentType: string, parentId: number, courseId: number
@@ -49,6 +70,8 @@ export default function AddResourcesModal({
                 default:
                     break;
             }
+            
+            removeParam('resourceCreation')
 
             setError('');
         },
@@ -103,7 +126,7 @@ export default function AddResourcesModal({
                         Recurso
                     </div>
                     :
-                    <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target={"#addResourceModal" + type + parentId}>
+                    <button type="button" ref={openModalRef} className="btn btn-primary" data-bs-toggle="modal" data-bs-target={"#addResourceModal" + type + parentId}>
                         <i className="bi bi-plus-circle me-1" /> Agregar recursos
                     </button>
             }

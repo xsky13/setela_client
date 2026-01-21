@@ -23,7 +23,7 @@ export default function CreateModule() {
             return response.data;
         },
         onSuccess(data) {
-            navigate(`/cursos/${params.id}/m/${data.id}/recursos/modificar`)
+            navigate(`/cursos/${params.id}/m/${data.id}?resourceCreation=true`)
         },
         onError: error => {
             const errors = getErrors(error);
