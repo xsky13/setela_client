@@ -50,10 +50,6 @@ export default function Course() {
 
     }, [course]);
 
-    const removeItemFromListing = (itemKey: string) => {
-        setCourseData(prevData => prevData.filter(item => item.key != itemKey));
-    }
-
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
 
@@ -121,7 +117,6 @@ export default function Course() {
                                     key={i}
                                     module={item as unknown as Module}
                                     currentUserIsOwner={course!.currentUserIsOwner}
-                                    removeItemFromListing={removeItemFromListing}
                                 />
                             case 'resource':
                                 return <ResourceListing

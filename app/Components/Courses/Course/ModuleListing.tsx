@@ -10,8 +10,7 @@ import { getErrors } from "~/utils/error";
 export default function ModuleListing({ 
     module, 
     currentUserIsOwner, 
-    removeItemFromListing 
-}: { module: Module, currentUserIsOwner: boolean, removeItemFromListing: (itemKey: string) => void }) {
+}: { module: Module, currentUserIsOwner: boolean }) {
     const queryClient = useQueryClient();
 
     const deleteModuleMutation = useMutation<any, Error>({
@@ -21,7 +20,9 @@ export default function ModuleListing({
             return response.data;
         },
         onSuccess() {
-            removeItemFromListing("m-" + module.id)
+            queryClient.setQueryData(['getCourseQuery', { courseId: Number(module.courseId) }], (old: FullCourse) => {
+                return { ...old, modules: old.modules.filter(m => m.id != module.id) }
+            });
         },
         onError: error => {
             const errors = getErrors(error);
