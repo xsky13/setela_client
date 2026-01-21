@@ -8,7 +8,7 @@ import ResourceListing from '~/Components/Courses/Course/ResourceListing';
 import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
-import type { ResourceListing as ResourceListingType } from '~/types/course';
+import type { Module, ResourceListing as ResourceListingType } from '~/types/course';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -119,9 +119,7 @@ export default function Course() {
                             case 'module':
                                 return <ModuleListing
                                     key={i}
-                                    id={item.id}
-                                    title={item.title!}
-                                    itemVisibility={item.visible!}
+                                    module={item as unknown as Module}
                                     currentUserIsOwner={course!.currentUserIsOwner}
                                     removeItemFromListing={removeItemFromListing}
                                 />
