@@ -27,7 +27,7 @@ export default function CourseLayout() {
     const [isOwner, setIsOwner] = useState(false);
 
     const { data: courseData, isError, isLoading } = useQuery<FullCourse>({
-        queryKey: ['getCourseQuery'],
+        queryKey: ['getCourseQuery', { courseId: Number(params.id)}],
         queryFn: async () => {
             const response = await api.get('course/' + params.id);
             return response.data;

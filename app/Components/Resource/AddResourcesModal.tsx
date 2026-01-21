@@ -3,8 +3,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import api from "~/api";
 import { ResourceType } from "~/types/resourceTypes";
-import LoadingButton from "./LoadingButton";
+import LoadingButton from "../LoadingButton";
 import { toast } from "sonner";
+import { closeModal } from "~/utils/modal";
+import type { FullCourse, Module, ResourceListing } from "~/types/course";
+import { createPortal } from 'react-dom';
 
 export default function AddResourcesModal({
     type,
@@ -22,7 +25,7 @@ export default function AddResourcesModal({
     const [error, setError] = useState('');
     const modalRef = useRef<HTMLDivElement>(null);
 
-    const addResourceMutation = useMutation<any, Error, {
+    const addResourceMutation = useMutation<ResourceListing, Error, {
         url: string, linkText: string, type: string, parentType: string, parentId: number, courseId: number
     }>({
         mutationKey: ['add_resource_command'],
@@ -30,16 +33,23 @@ export default function AddResourcesModal({
             const response = await api.post('/resource', data);
             return response.data;
         },
-        async onSuccess() {
-            if (modalRef.current) {
-                const closeButton = modalRef.current.querySelector('[data-bs-dismiss="modal"]') as HTMLButtonElement;
-                if (closeButton) {
-                    closeButton.click();
-                }
-                const formElement = modalRef.current.querySelector('form');
-                formElement?.reset();
+        async onSuccess(data) {
+            closeModal(modalRef);
+            switch (type) {
+                case "module":
+                    queryClient.setQueryData(['getModuleQuery', { moduleId: Number(parentId) }], (old: Module) => {
+                        return { ...old, resources: [...old.resources, data] }
+                    })
+                    break;
+                case "course":
+                    queryClient.setQueryData(['getCourseQuery', { courseId: Number(courseId) }], (old: FullCourse) => {
+                        return { ...old, resources: [...old.resources, data] }
+                    })
+                    break;
+                default:
+                    break;
             }
-            await queryClient.invalidateQueries({ queryKey: ['getModuleQuery'] });
+
             setError('');
         },
         onError(error) {
@@ -81,19 +91,31 @@ export default function AddResourcesModal({
 
     return (
         <div>
-            <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                <i className="bi bi-plus-circle me-1" /> Agregar recursos
-            </button>
-
-            <div ref={modalRef} className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
+            {
+                type == 'course'
+                    ?
+                    <div
+                        className="dropdown-item"
+                        data-bs-toggle="modal"
+                        data-bs-target={"#addResourceModal" + type + parentId}
+                        role="button"
+                    >
+                        Recurso
+                    </div>
+                    :
+                    <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target={"#addResourceModal" + type + parentId}>
+                        <i className="bi bi-plus-circle me-1" /> Agregar recursos
+                    </button>
+            }
+            {typeof document !== 'undefined' && createPortal(<div ref={modalRef} className="modal fade" id={"addResourceModal" + type + parentId} tabIndex={-1} aria-labelledby={"addResourceModal" + type + parentId + "Label"} aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Agregar recurso</h1>
+                            <h1 className="modal-title fs-5" id={"addResourceModal" + type + parentId + "Label"}>Agregar recurso</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                         </div>
                         <div className="modal-body">
-                            <form id="resourceForm" onSubmit={handleFormSubmit}>
+                            <form id={"addResourceForm" + type + parentId} onSubmit={handleFormSubmit}>
                                 <div className="mb-3">
                                     <ul className="nav nav-pills nav-fill">
                                         <li className="nav-item">
@@ -187,15 +209,17 @@ export default function AddResourcesModal({
                             <button type="button" className="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
                             <LoadingButton
                                 type="submit"
-                                form="resourceForm"
+                                form={"addResourceForm" + type + parentId}
                                 className="btn btn-primary"
+                                loading={addResourceMutation.isPending}
                             >
                                 Subir recurso
                             </LoadingButton>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>, document.body)}
+
         </div>
     )
 }

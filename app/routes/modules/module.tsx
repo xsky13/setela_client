@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
-import AddResourcesModal from "~/Components/AddResourcesModal";
+import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import FormErrors from "~/Components/Error/FormErrors";
 import LoadingButton from "~/Components/LoadingButton";
@@ -19,7 +19,6 @@ export default function Module() {
 
     if (moduleData == undefined) throw new Error("Modulo no existe");
 
-    const [resources, setResources] = useState(moduleData.resources);
 
     if (moduleData == undefined || moduleData == null) throw new Error("Modulo no existe");
 
@@ -40,10 +39,6 @@ export default function Module() {
         },
         retry: 1
     });
-
-    const postResourceDeletion = (id: string) => {
-        setResources(prevResources => prevResources.filter(r => r.id != parseInt(id)));
-    }
 
     const deleteModule = () => {
         if (confirm("Esta seguro que quiere eliminar este modulo? Esta acción es irreversible")) {
@@ -101,12 +96,11 @@ export default function Module() {
 
             <div className="mt-4">
                 {
-                    resources.map((resource, i) => (
+                    moduleData.resources.map((resource, i) => (
                         <ResourceListing
                             key={i}
                             resource={resource}
                             currentUserIsOwner={courseData!.currentUserIsOwner}
-                            resourceDeletionCallback={postResourceDeletion}
                         />
                     ))
                 }

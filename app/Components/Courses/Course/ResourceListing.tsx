@@ -3,17 +3,16 @@ import { NavLink } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import LoadingButton from "~/Components/LoadingButton";
-import type { ResourceListing } from "~/types/course";
+import EditResourceModal from "~/Components/Resource/EditResourceModal";
+import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { ResourceParentType } from "~/types/resourceTypes";
 
 export default function ResourceListing({
     resource,
     currentUserIsOwner,
-    resourceDeletionCallback
 }: {
     resource: ResourceListing
     currentUserIsOwner: boolean,
-    resourceDeletionCallback: (id: string) => void
 }) {
     const queryClient = useQueryClient();
     const deleteResourceMutation = useMutation({
@@ -23,12 +22,19 @@ export default function ResourceListing({
             return response.data;
         },
         async onSuccess() {
-            if (resource.parentType == ResourceParentType.Course) {
-                resourceDeletionCallback(`r-${resource.id}`);
-                await queryClient.invalidateQueries({ queryKey: ['getCourseQuery'] });
-            } else {
-                resourceDeletionCallback(resource.id.toString());
-                await queryClient.invalidateQueries({ queryKey: ['getModuleQuery'] });
+            switch (resource.parentType) {
+                case ResourceParentType.Course:
+                    queryClient.setQueryData(['getCourseQuery', { courseId: resource.parentId }], (old: FullCourse) => {
+                        return { ...old, resources: old.resources.filter((r: ResourceListing) => r.id != resource.id) }
+                    })
+                    break;
+                case ResourceParentType.Module:
+                    queryClient.setQueryData(['getModuleQuery', { moduleId: resource.parentId }], (old: Module) => {
+                        return { ...old, resources: old.resources.filter((r: ResourceListing) => r.id != resource.id) }
+                    })
+                    break;
+                default:
+                    break;
             }
         },
         onError(error) {
@@ -101,10 +107,10 @@ export default function ResourceListing({
                             <i className="bi bi-trash-fill" />
                             <span className="ms-2">Eliminar</span>
                         </LoadingButton>
-                        <NavLink to={`./m/${resource.id}/editar`} className="text-center small text-decoration-none" role="button">
-                            <i className="bi bi-pencil" />
-                            <span className="ms-2">Editar</span>
-                        </NavLink>
+                        <EditResourceModal
+                            resource={resource}
+                            currentUserIsOwner={currentUserIsOwner}
+                        />
                     </div>
                 }
             </div>

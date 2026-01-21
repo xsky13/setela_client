@@ -69,7 +69,8 @@ export type ResourceListing = {
     url: string,
     linkText: string,
     resourceType: number,
-    parentType: ResourceParentType
+    parentType: ResourceParentType,
+    parentId: number,
     creationDate: string,
     sysUser: UserSimple,
     displayOrder: number

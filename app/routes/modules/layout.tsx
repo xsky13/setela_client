@@ -10,7 +10,7 @@ export default function ModuleLayout() {
     const params = useParams();
 
     const { data: moduleData, isError, isLoading } = useQuery<Module>({
-        queryKey: ['getModuleQuery'],
+        queryKey: ['getModuleQuery', { moduleId: Number(params.moduleId) }],
         queryFn: async () => {
             const response = await api.get('module/' + params.moduleId);
             return response.data;

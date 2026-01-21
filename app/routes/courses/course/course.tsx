@@ -5,6 +5,7 @@ import AssignmentListing from '~/Components/Courses/Course/AssignmentListing';
 import ExamListing from '~/Components/Courses/Course/ExamListing';
 import ModuleListing from '~/Components/Courses/Course/ModuleListing';
 import ResourceListing from '~/Components/Courses/Course/ResourceListing';
+import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
 import type { ResourceListing as ResourceListingType } from '~/types/course';
@@ -96,7 +97,9 @@ export default function Course() {
                         </button>
                         <ul className="dropdown-menu">
                             <li><NavLink className="dropdown-item" to="./m/crear">Modulo</NavLink></li>
-                            <li><NavLink className="dropdown-item" to="./r/crear">Recurso</NavLink></li>
+                            <li>
+                                <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
+                            </li>
                             <li><NavLink className="dropdown-item" to="./tp/crear">Trabajo practico</NavLink></li>
                             <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
                         </ul>
@@ -127,7 +130,6 @@ export default function Course() {
                                     key={i}
                                     resource={item as unknown as ResourceListingType}
                                     currentUserIsOwner={course!.currentUserIsOwner}
-                                    resourceDeletionCallback={removeItemFromListing}
                                 />
                             case 'assignment':
                                 return <AssignmentListing
