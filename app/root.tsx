@@ -19,6 +19,7 @@ import { isAxiosError } from "axios";
 import { AuthContext } from "./context/AuthContext";
 import Header from "./Components/Header";
 import { Toaster } from "sonner";
+import { useEffect } from "react";
 
 if (typeof document !== 'undefined') {
   	import('bootstrap/dist/js/bootstrap.bundle.min.js');
@@ -109,6 +110,10 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 		details = error.message;
 		stack = error.stack;
 	}
+
+	useEffect(() => {
+		document.title = 'Error'
+	}, [])
 
 	return (
 		<main className="pt-16 p-4 container mx-auto">

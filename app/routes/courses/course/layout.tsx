@@ -11,6 +11,7 @@ import { AuthContext } from "~/context/AuthContext";
 import { UserRole } from "~/types/roles";
 import type { Route } from "./+types/course";
 import { CourseContext } from "~/context/CourseContext";
+import { isAxiosError } from "axios";
 
 
 export function meta({ }: Route.MetaArgs) {
@@ -26,7 +27,7 @@ export default function CourseLayout() {
     const [userCanAccessCourse, setUserCanAccessCourse] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
 
-    const { data: courseData, isError, isLoading } = useQuery<FullCourse>({
+    const { data: courseData, isError, isLoading, error } = useQuery<FullCourse>({
         queryKey: ['getCourseQuery', { courseId: Number(params.id)}],
         queryFn: async () => {
             const response = await api.get('course/' + params.id);
@@ -57,7 +58,7 @@ export default function CourseLayout() {
      */
 
     if (isLoading) return <LoadingSegment />
-    if (isError) return <ErrorSegment />
+    if (isError) return <ErrorSegment status={isAxiosError(error) && error.response?.status} />
 
     return (
         <div className="d-flex">
