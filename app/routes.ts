@@ -16,6 +16,10 @@ export default [
                 route(":id/m/:moduleId/editar", "routes/modules/edit.tsx"),
                 route(":id/m/:moduleId/recursos/modificar", "routes/modules/editResources.tsx"),
             ]),
+
+            layout("routes/assignments/layout.tsx", [
+                
+            ]),
         ]),
     ]),
 ] satisfies RouteConfig;
