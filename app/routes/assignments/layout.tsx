@@ -6,7 +6,7 @@ import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
 import { AssignmentContext } from "~/context/AssignmentContext";
-import type { Assignment } from "~/types/course";
+import type { Assignment } from "~/types/assignment";
 
 export default function AssignmentsLayout() {
     const params = useParams();

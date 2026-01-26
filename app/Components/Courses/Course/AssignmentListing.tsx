@@ -1,18 +1,17 @@
 import { NavLink } from "react-router";
+import { formatDate } from "~/utils/date";
 
 export default function AssignmentListing({
     id,
     title,
     dueDate,
-    formatDate
 }: {
     id: number,
     title: string,
     dueDate: string,
-    formatDate: (a: string) => any
 }) {
     return (
-        <div  className="d-flex justify-content-between rounded-2 border  p-4 my-3">
+        <div className="d-flex justify-content-between rounded-2 border  p-4 my-3">
             <div>
                 <div className="bg-white border-0 mb-2">
                     <span className="d-inline-flex rounded-1 px-3 py-2 fw-semibold text-success-emphasis bg-success-subtle text-uppercase small">

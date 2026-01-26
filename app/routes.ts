@@ -18,7 +18,7 @@ export default [
             ]),
 
             layout("routes/assignments/layout.tsx", [
-                
+                route(":id/a/:assignmentId", "routes/assignments/assignment.tsx"),
             ]),
         ]),
     ]),

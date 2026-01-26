@@ -130,7 +130,6 @@ export default function Course() {
                                     id={item.id}
                                     title={item.title!}
                                     dueDate={item.dueDate!}
-                                    formatDate={formatDate}
                                 />
                             case 'exam':
                                 return <ExamListing
@@ -139,8 +138,6 @@ export default function Course() {
                                     title={item.title!}
                                     startTime={item.startTime!}
                                     endTime={item.endTime!}
-                                    getMinutesDifference={getMinutesDifference}
-                                    formatDate={formatDate}
                                 />
                             default: ''
                         }
