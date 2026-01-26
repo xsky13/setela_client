@@ -7,6 +7,7 @@ import LoadingButton from "../LoadingButton";
 import { toast } from "sonner";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { closeModal } from "~/utils/modal";
+import type { Assignment } from "~/types/assignment";
 
 export default function EditResourceModal({
     resource,
@@ -44,6 +45,16 @@ export default function EditResourceModal({
                     break;
                 case ResourceParentType.Course:
                     queryClient.setQueryData(['getCourseQuery', { courseId: resource.parentId }], (old: FullCourse) => {
+                        return {
+                            ...old,
+                            resources: old.resources.map((r: ResourceListing) => r.id == resource.id ? {
+                                ...r, url: data.url, linkText: data.linkText
+                            } : r)
+                        }
+                    })
+                    break;
+                case ResourceParentType.Assignment:
+                    queryClient.setQueryData(['getAssignmentQuery', { assignmentId: resource.parentId }], (old: Assignment) => {
                         return {
                             ...old,
                             resources: old.resources.map((r: ResourceListing) => r.id == resource.id ? {

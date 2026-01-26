@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import AssignmentSubmissionListing from "~/Components/AssignmentSubmissions/AssignmentSubmissionListing";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
+import LoadingButton from "~/Components/LoadingButton";
 import { AssignmentContext } from "~/context/AssignmentContext";
 import { CourseContext } from "~/context/CourseContext";
 import { formatDate } from "~/utils/date";
@@ -22,7 +23,6 @@ export default function Assignment() {
         setTimeLeft(Math.floor(diffInMs / (1000 * 60 * 60 * 24)));
     }, [assignmentData])
 
-    console.log(assignmentData);
 
 
     return (
@@ -84,7 +84,7 @@ export default function Assignment() {
                 (courseData.currentUserIsOwner && assignmentData.assignmentSubmissions.length) &&
                 <div>
                     <h2>Entregas</h2>
-                    <table className="table table-striped">
+                    <table className="table table-striped align-middle">
                         <thead>
                             <tr>
                                 <th scope="col">Nro</th>
@@ -99,19 +99,11 @@ export default function Assignment() {
                         <tbody>
                             {
                                 assignmentData.assignmentSubmissions.map((assignmentSubmission, i) => (
-                                    <tr key={i} className="">
-                                        <th scope="row">{i + 1}</th>
-                                        <td>{assignmentSubmission.sysUser.name}</td>
-                                        <td>{formatDate(assignmentSubmission.creationDate)}</td>
-                                        <td>{formatDate(assignmentSubmission.lastUpdateDate)}</td>
-                                        <td>{assignmentSubmission.grade || <i>Sin calificar</i>}</td>
-                                        <td>{assignmentSubmission.grade ?
-                                            <span className="badge rounded-pill text-bg-primary">Corregida</span>
-                                            :
-                                            <span className="badge rounded-pill text-bg-danger">Pendiente</span>
-                                        }</td>
-                                        <td>Eliminar | Corregir</td>
-                                    </tr>
+                                    <AssignmentSubmissionListing
+                                        assignmentSubmission={assignmentSubmission}
+                                        assignment={assignmentData}
+                                        key={i}
+                                    />
                                 ))
 
                             }

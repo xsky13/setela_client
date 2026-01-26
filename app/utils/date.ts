@@ -7,8 +7,8 @@ export const formatDate = (dateString: string) => {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
-        day: '2-digit',
-        month: '2-digit',
+        day: 'numeric',
+        month: 'short',
         year: '2-digit'
     });
 };
