@@ -93,7 +93,7 @@ export default function Assignment() {
             {assignmentData.textContent && <p>{assignmentData.textContent}</p>}
             {
                 assignmentData.resources.length != 0 &&
-                <div className="my-5">
+                <div className="mt-5">
                     <h3>Recursos y materiales</h3>
                     {
                         assignmentData.resources.map(resource => (
@@ -104,7 +104,7 @@ export default function Assignment() {
             }
             {
                 (courseData.currentUserIsOwner && assignmentData.assignmentSubmissions.length) &&
-                <div>
+                <div className="mt-5">
                     <h2>Entregas</h2>
                     <table className="table table-striped align-middle">
                         <thead>
