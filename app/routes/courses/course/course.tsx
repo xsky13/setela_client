@@ -96,7 +96,7 @@ export default function Course() {
                             <li>
                                 <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
                             </li>
-                            <li><NavLink className="dropdown-item" to="./tp/crear">Trabajo practico</NavLink></li>
+                            <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
                             <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
                         </ul>
                     </div>
