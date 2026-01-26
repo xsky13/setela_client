@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
 import { NavLink } from "react-router";
 import { toast } from "sonner";
@@ -27,11 +27,15 @@ export default function EditAssignment() {
     const assignmentData = useContext(AssignmentContext);
     const courseData = useContext(CourseContext);
 
+    const queryClient = useQueryClient();
 
     if (assignmentData == undefined) throw new Error("Assignment doesnt exist");
+    if (courseData == undefined) throw new Error("Course doesnt exist");
 
     const [visible, setVisible] = useState(assignmentData.visible)
     const [closed, setClosed] = useState(assignmentData.closed)
+
+    const [redundantFormData, setRedundantFormData] = useState<AssignmentFormData>();
 
 
     const editAssignmentMutation = useMutation<Assignment, Error, AssignmentFormData>({
@@ -40,8 +44,16 @@ export default function EditAssignment() {
             const response = await api.put('/assignment/' + assignmentData?.id, data);
             return response.data;
         },
-        onSuccess(data) {
+        onSuccess() {
             setErrors([]);
+
+            queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
+                return {
+                    ...old,
+                    ...redundantFormData
+                }
+            })
+
             toast("Sus cambios fueron guardados");
         },
         onError(error) {
@@ -62,6 +74,8 @@ export default function EditAssignment() {
             setErrors(["No puede haber campos vacíos."]);
             return;
         }
+
+        setRedundantFormData(formValues);
 
         editAssignmentMutation.mutate({ ...formValues, visible, closed });
     }
@@ -177,7 +191,18 @@ export default function EditAssignment() {
                         Trabajo esta cerrado
                     </label>
                 </div>
-                <LoadingButton loading={editAssignmentMutation.isPending} className="btn btn-primary btn-block w-100">Actualizar</LoadingButton>
+                <div className="row">
+
+                    <div className="col">
+                        <NavLink to={"/cursos/" + courseData.id + "/a/" + assignmentData.id} className="btn btn-light btn-block w-100">
+                            <i className="bi bi-chevron-left" />
+                            <span className="ms-2">Volver a trabajo practico</span>
+                        </NavLink>
+                    </div>
+                    <div className="col">
+                        <LoadingButton loading={editAssignmentMutation.isPending} className="btn btn-primary btn-block w-100">Actualizar</LoadingButton>
+                    </div>
+                </div>
                 {
                     errors.length != 0 ?
                         <FormErrors serverErrors={errors} />
