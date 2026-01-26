@@ -1,5 +1,8 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext, useEffect, useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { toast } from "sonner";
+import api from "~/api";
 import AssignmentSubmissionListing from "~/Components/AssignmentSubmissions/AssignmentSubmissionListing";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import LoadingButton from "~/Components/LoadingButton";
@@ -7,10 +10,13 @@ import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
 import { AssignmentContext } from "~/context/AssignmentContext";
 import { CourseContext } from "~/context/CourseContext";
 import { formatDate } from "~/utils/date";
+import { getErrors } from "~/utils/error";
 
 export default function Assignment() {
     const assignmentData = useContext(AssignmentContext);
     const [timeLeft, setTimeLeft] = useState(0);
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const courseData = useContext(CourseContext);
 
@@ -24,6 +30,30 @@ export default function Assignment() {
         setTimeLeft(Math.floor(diffInMs / (1000 * 60 * 60 * 24)));
     }, [assignmentData])
 
+    const deleteAssignmentMutation = useMutation<any, Error>({
+        mutationKey: ['delete_assignment_command'],
+        mutationFn: async () => {
+            const response = await api.delete("/assignment/" + assignmentData.id);
+            return response.data;
+        },
+        async onSuccess() {
+            await queryClient.invalidateQueries({ queryKey: ['getCourseQuery'] });
+            navigate(`/cursos/${courseData?.id}`);
+        },
+        onError: error => {
+            const errors = getErrors(error);
+            console.log(errors);
+            toast(error.message);
+        },
+        retry: 1
+    });
+
+    const deleteAssignment = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (confirm("Esta seguro que quiere eliminar este trabajo práctico? Esta acción es irreversible")) {
+            deleteAssignmentMutation.mutate();
+        }
+    }
 
 
     return (
@@ -60,8 +90,8 @@ export default function Assignment() {
                         />
                         <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
                         <LoadingButton
-                            // loading={deleteModuleMutation.isPending}
-                            // onClick={deleteModule}
+                            loading={deleteAssignmentMutation.isPending}
+                            onClick={deleteAssignment}
                             className="btn btn-danger"
                         >
                             <i className="bi bi-trash me-1" />
