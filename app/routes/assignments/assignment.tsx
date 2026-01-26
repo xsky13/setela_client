@@ -83,14 +83,13 @@ export default function Assignment() {
             </div>
             {
                 assignmentData.textContent &&
-                <div className="my-5 px-3 py-2 m-0 rounded-1 bg-body-tertiary">
+                <div className="mt-5 px-3 py-2 m-0 rounded-1 bg-body-tertiary">
                     <h3>Consigna</h3>
                     <p>
                         {assignmentData.textContent}
                     </p>
                 </div>
             }
-            {assignmentData.textContent && <p>{assignmentData.textContent}</p>}
             {
                 assignmentData.resources.length != 0 &&
                 <div className="mt-5">
@@ -103,34 +102,41 @@ export default function Assignment() {
                 </div>
             }
             {
-                (courseData.currentUserIsOwner && assignmentData.assignmentSubmissions.length) &&
-                <div className="mt-5">
+                courseData.currentUserIsOwner &&
+                <div className="my-5">
                     <h2>Entregas</h2>
-                    <table className="table table-striped align-middle">
-                        <thead>
-                            <tr>
-                                <th scope="col">Nro</th>
-                                <th scope="col">Nombre</th>
-                                <th scope="col">Hora de entrega</th>
-                                <th scope="col">Ultima actualizacion</th>
-                                <th scope="col">Nota</th>
-                                <th scope="col">Estado</th>
-                                <th scope="col">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                assignmentData.assignmentSubmissions.map((assignmentSubmission, i) => (
-                                    <AssignmentSubmissionListing
-                                        assignmentSubmission={assignmentSubmission}
-                                        assignment={assignmentData}
-                                        key={i}
-                                    />
-                                ))
-
-                            }
-                        </tbody>
-                    </table>
+                    {
+                        assignmentData.assignmentSubmissions.length ?
+                            <table className="table table-striped align-middle">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nro</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Hora de entrega</th>
+                                        <th scope="col">Ultima actualizacion</th>
+                                        <th scope="col">Nota</th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        assignmentData.assignmentSubmissions.map((assignmentSubmission, i) => (
+                                            <AssignmentSubmissionListing
+                                                assignmentSubmission={assignmentSubmission}
+                                                assignment={assignmentData}
+                                                key={i}
+                                            />
+                                        ))
+                                    }
+                                </tbody>
+                            </table>
+                            :
+                            <i className="text-muted">
+                                <i className="bi bi-exclamation-triangle-fill"></i>
+                                <span className="ms-2">Todavía no hay entregas para este trabajo.</span>
+                            </i>
+                    }
                     {/* {
                         assignmentData.assignmentSubmissions.map(assignmentSubmission => (
                             <AssignmentSubmissionListing assignmentSubmission={assignmentSubmission} />
