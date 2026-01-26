@@ -10,6 +10,7 @@ export type Assignment = {
     displayOrder: number,
     resources: ResourceListing[],
     dueDate: string,
+    maxGrade: number,
     weight: number,
     courseId: number,
     assignmentSubmissions: AssignmentSubmission[]

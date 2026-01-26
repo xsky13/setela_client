@@ -20,6 +20,7 @@ export default [
             route(":id/a/crear", "routes/assignments/create.tsx"),
             layout("routes/assignments/layout.tsx", [
                 route(":id/a/:assignmentId", "routes/assignments/assignment.tsx"),
+                route(":id/a/:assignmentId/editar", "routes/assignments/edit.tsx"),
             ]),
         ]),
     ]),
