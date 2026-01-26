@@ -9,6 +9,7 @@ import { closeModal } from "~/utils/modal";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { createPortal } from 'react-dom';
 import { useSearchParams } from "react-router";
+import type { Assignment } from "~/types/assignment";
 
 export default function AddResourcesModal({
     type,
@@ -59,6 +60,11 @@ export default function AddResourcesModal({
             switch (type) {
                 case "module":
                     queryClient.setQueryData(['getModuleQuery', { moduleId: Number(parentId) }], (old: Module) => {
+                        return { ...old, resources: [...old.resources, data] }
+                    })
+                    break;
+                case "assignment":
+                    queryClient.setQueryData(['getAssignmentQuery', { assignmentId: Number(parentId) }], (old: Assignment) => {
                         return { ...old, resources: [...old.resources, data] }
                     })
                     break;

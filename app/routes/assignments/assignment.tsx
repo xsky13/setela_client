@@ -3,6 +3,7 @@ import { NavLink } from "react-router";
 import AssignmentSubmissionListing from "~/Components/AssignmentSubmissions/AssignmentSubmissionListing";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import LoadingButton from "~/Components/LoadingButton";
+import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
 import { AssignmentContext } from "~/context/AssignmentContext";
 import { CourseContext } from "~/context/CourseContext";
 import { formatDate } from "~/utils/date";
@@ -47,7 +48,28 @@ export default function Assignment() {
                     </li>
                 </ol>
             </nav>
-            <h1>{assignmentData.title}</h1>
+            <div className="d-flex justify-content-between align-items-center">
+                <h1>{assignmentData.title}</h1>
+                {
+                    courseData?.currentUserIsOwner &&
+                    <div className="my-2 d-flex">
+                        <AddResourcesModal
+                            parentId={assignmentData.id}
+                            courseId={assignmentData.courseId}
+                            type="assignment"
+                        />
+                        <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
+                        <LoadingButton
+                            // loading={deleteModuleMutation.isPending}
+                            // onClick={deleteModule}
+                            className="btn btn-danger"
+                        >
+                            <i className="bi bi-trash me-1" />
+                            Eliminar
+                        </LoadingButton>
+                    </div>
+                }
+            </div>
             <div className="mt-3">
                 <div className="alert alert-warning alert-warning-custom">
                     <div className="d-flex align-items-center gap-2">
@@ -70,7 +92,7 @@ export default function Assignment() {
             }
             {assignmentData.textContent && <p>{assignmentData.textContent}</p>}
             {
-                assignmentData.resources.length &&
+                assignmentData.resources.length != 0 &&
                 <div className="my-5">
                     <h3>Recursos y materiales</h3>
                     {
