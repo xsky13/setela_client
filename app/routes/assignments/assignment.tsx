@@ -8,13 +8,22 @@ import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import LoadingButton from "~/Components/LoadingButton";
 import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
 import { AssignmentContext } from "~/context/AssignmentContext";
+import { AuthContext } from "~/context/AuthContext";
 import { CourseContext } from "~/context/CourseContext";
+import type { AssignmentSubmission } from "~/types/assignment";
 import { formatDate } from "~/utils/date";
 import { getErrors } from "~/utils/error";
 
 export default function Assignment() {
     const assignmentData = useContext(AssignmentContext);
+    const currentUser = useContext(AuthContext);
+
     const [timeLeft, setTimeLeft] = useState(0);
+    const [expired, setExpired] = useState(false);
+
+    const [currentUserSubmitted, setCurrentUserSubmitted] = useState(false);
+    const [userSubmission, setUserSubmission] = useState<AssignmentSubmission | null>(null);
+
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -28,7 +37,17 @@ export default function Assignment() {
 
         const diffInMs = dueDate - now;
         setTimeLeft(Math.floor(diffInMs / (1000 * 60 * 60 * 24)));
-    }, [assignmentData])
+
+        if (now > dueDate) setExpired(true);
+
+        if (assignmentData.assignmentSubmissions.some(a => a.sysUser.id == currentUser?.id)) {
+            const submission = assignmentData.assignmentSubmissions.filter(a => a.sysUser.id == currentUser?.id);
+            setCurrentUserSubmitted(true);
+            setUserSubmission(submission[0]);
+        }
+
+
+    }, [assignmentData]);
 
     const deleteAssignmentMutation = useMutation<any, Error>({
         mutationKey: ['delete_assignment_command'],
@@ -131,6 +150,123 @@ export default function Assignment() {
                     }
                 </div>
             }
+            <div className="mt-4">
+                <h3>Información del trabajo</h3>
+                <ul className="list-group">
+                    {
+                        courseData.currentUserIsOwner &&
+                        <li className="list-group-item">
+                            <span className="subtitle small">Estado</span>
+                            <div className="d-flex my-1">
+                                <div className="badge rounded-pill text-bg-primary">
+                                    {assignmentData.visible ?
+                                        <>
+                                            <i className="bi bi-eye" />
+                                            <span className="ms-1">Visible</span>
+                                        </> : <>
+                                            <i className="bi bi-eye-slash" />
+                                            <span className="ms-1">No visible</span>
+                                        </>}
+                                </div>
+                                <div className="badge rounded-pill text-bg-success ms-2">
+                                    {assignmentData.closed ?
+                                        <>
+                                            <i className="bi bi-lock-fill" />
+                                            <span className="ms-1">Cerrado</span>
+                                        </> : <>
+                                            <i className="bi bi-unlock-fill" />
+                                            <span className="ms-1">Abierto</span>
+                                        </>}
+                                </div>
+
+                            </div>
+                        </li>
+                    }
+                    <li className="list-group-item">
+                        <span className="subtitle small">Nota maxima</span>
+                        <div className="fs-4 fw-semibold">
+                            {assignmentData.maxGrade}
+                        </div>
+                    </li>
+                    {
+                        !courseData.currentUserIsOwner &&
+                        <li className="list-group-item">
+                            <span className="subtitle small">Estado de entrega</span>
+                            <div className={`fw-semibold fs-5 ${currentUserSubmitted ?
+                                'text-success'
+                                : expired ? 'text-danger' : 'text-warning'
+                                }`}>
+                                {
+                                    currentUserSubmitted ?
+                                        <div className="my-1">
+                                            <i className="bi-check-circle-fill"></i>
+                                            <span className="ms-2">Entregado</span>
+                                        </div>
+                                        :
+                                        expired ?
+                                            <div className="my-1">
+                                                <i className="bi-exclamation-circle-fill"></i>
+                                                <span className="ms-2">Tarde</span>
+                                            </div>
+                                            :
+                                            <div className="my-1">
+                                                <i className="bi-exclamation-triangle-fill"></i>
+                                                <span className="ms-2">Pendiente</span>
+                                            </div>
+                                }
+                            </div>
+                        </li>
+                    }
+                    {
+                        !courseData.currentUserIsOwner &&
+                        <li className="list-group-item">
+                            <span className="subtitle small">Hora de entrega</span>
+                            {
+                                !currentUserSubmitted ?
+                                    <div className="my-1">
+                                        <i className="text-muted">Todavía no hay entrega.</i>
+                                    </div>
+                                    :
+                                    <div className="text-muted small my-1">
+                                        <i className="bi bi-clock" />
+                                        <span className="ms-2">{formatDate(userSubmission?.creationDate)}</span>
+                                    </div>
+                            }
+                        </li>
+                    }
+                    {
+                        !courseData.currentUserIsOwner &&
+                        <li className="list-group-item">
+                            <span className="subtitle small">Nota</span>
+                            {
+                                currentUserSubmitted ?
+                                    userSubmission?.grade ?
+                                        <div className="my-1 fs-4 fw-semibold text-primary">
+                                            {userSubmission.grade}
+                                        </div>
+                                        :
+                                        <div className="my-1">
+                                            <i className="text-muted">Todavía no hay nota.</i>
+                                        </div>
+                                    :
+                                    <div className="my-1">
+                                        <i className="text-muted">Todavía no hay nota.</i>
+                                    </div>
+                            }
+                        </li>
+                    }
+                    {
+                        courseData.currentUserIsOwner &&
+                        <li className="list-group-item">
+                            <span className="subtitle small">Entregas por corregir</span>
+                            <div className="my-1 fs-4 fw-semibold">
+                                {assignmentData.assignmentSubmissions.filter(a => !a.grade).length}
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+
             {
                 courseData.currentUserIsOwner &&
                 <div className="my-5">

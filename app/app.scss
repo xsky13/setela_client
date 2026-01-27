@@ -83,3 +83,9 @@ html, body {
 a.unstyled {
 	text-decoration: none;
 }
+
+.subtitle {
+	@extend .text-muted; 
+	@extend .text-uppercase;
+	@extend .fw-semibold;
+}
