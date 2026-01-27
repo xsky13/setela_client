@@ -1,4 +1,6 @@
-export const formatDate = (dateString: string) => {
+export const formatDate = (dateString?: string) => {
+    if (!dateString) return "Fecha no disponible";
+
     const date = new Date(dateString);
 
     if (isNaN(date.getTime())) return "Fecha no disponible";
