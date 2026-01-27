@@ -101,7 +101,7 @@ export default function EditResourceModal({
         <div>
             <button
                 type="button"
-                className="text-center small text-decoration-none bg-white border-0 text-primary"
+                className="text-center small text-decoration-none bg-transparent border-0 text-primary"
                 data-bs-toggle="modal"
                 data-bs-target={"#editResourceModal" + resource.id}
             >
