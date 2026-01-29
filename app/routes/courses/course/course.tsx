@@ -8,6 +8,7 @@ import ResourceListing from '~/Components/Courses/Course/ResourceListing';
 import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
+import type { Assignment } from '~/types/assignment';
 import type { Module, ResourceListing as ResourceListingType } from '~/types/course';
 
 type CourseItem = IOrderable & {
@@ -127,9 +128,8 @@ export default function Course() {
                             case 'assignment':
                                 return <AssignmentListing
                                     key={i}
-                                    id={item.id}
-                                    title={item.title!}
-                                    dueDate={item.dueDate!}
+                                    assignment={item as unknown as Assignment}
+                                    currentUserIsOwner={course!.currentUserIsOwner}
                                 />
                             case 'exam':
                                 return <ExamListing
