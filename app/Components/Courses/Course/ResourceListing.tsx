@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import api from "~/api";
 import LoadingButton from "~/Components/LoadingButton";
 import EditResourceModal from "~/Components/Resource/EditResourceModal";
+import type { Assignment } from "~/types/assignment";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { ResourceParentType } from "~/types/resourceTypes";
 
@@ -33,6 +34,11 @@ export default function ResourceListing({
                         return { ...old, resources: old.resources.filter((r: ResourceListing) => r.id != resource.id) }
                     })
                     break;
+                case ResourceParentType.Assignment:
+                    queryClient.setQueryData(['getAssignmentQuery', { assignmentId: resource.parentId }], (old: Assignment) => {
+                        return { ...old, resources: old.resources.filter((r: ResourceListing) => r.id != resource.id) }
+                    })
+                    break;
                 default:
                     break;
             }
@@ -50,9 +56,9 @@ export default function ResourceListing({
     };
 
     return (
-        <div className="d-flex justify-content-between rounded-2 border border  p-4 my-3">
+        <div className="d-flex justify-content-between rounded-2 border border bg-white p-4 my-3">
             <div>
-                <div className="bg-white border-0 mb-2">
+                <div className="bg-transparent border-0 mb-2">
                     <span className="d-inline-flex rounded-1 px-3 py-2 fw-semibold text-primary-emphasis bg-primary-subtle text-uppercase small">
                         {
                             (() => {
@@ -96,14 +102,16 @@ export default function ResourceListing({
                 }
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
-                <button className="btn btn-light">
+                {
+                    resource.parentType == ResourceParentType.Course && <button className="btn btn-light">
                     <i className='bi bi-check-circle me-2'></i>
                     Marcar finalizado
                 </button>
+                }
                 {
                     currentUserIsOwner &&
                     <div className="d-flex mt-2">
-                        <LoadingButton onClick={deleteResource} loading={deleteResourceMutation.isPending} className="p-0 bg-white border-0 text-danger text-center small me-4">
+                        <LoadingButton onClick={deleteResource} loading={deleteResourceMutation.isPending} className="p-0 bg-transparent border-0 text-danger text-center small me-4">
                             <i className="bi bi-trash-fill" />
                             <span className="ms-2">Eliminar</span>
                         </LoadingButton>

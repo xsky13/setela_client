@@ -1,3 +1,4 @@
+import type { Assignment } from "./assignment"
 import type { ResourceParentType } from "./resourceTypes"
 import type { Enrollment, Profesor, UserSimple } from "./user"
 
@@ -76,13 +77,6 @@ export type ResourceListing = {
     displayOrder: number
 }
 
-export type Assignment = {
-    id: number,
-    title: string,
-    visible: boolean,
-    closed: boolean,
-    displayOrder: number
-}
 
 export type Exam = {
     id: number,

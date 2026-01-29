@@ -8,6 +8,7 @@ import ResourceListing from '~/Components/Courses/Course/ResourceListing';
 import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
+import type { Assignment } from '~/types/assignment';
 import type { Module, ResourceListing as ResourceListingType } from '~/types/course';
 
 type CourseItem = IOrderable & {
@@ -96,7 +97,7 @@ export default function Course() {
                             <li>
                                 <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
                             </li>
-                            <li><NavLink className="dropdown-item" to="./tp/crear">Trabajo practico</NavLink></li>
+                            <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
                             <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
                         </ul>
                     </div>
@@ -127,10 +128,8 @@ export default function Course() {
                             case 'assignment':
                                 return <AssignmentListing
                                     key={i}
-                                    id={item.id}
-                                    title={item.title!}
-                                    dueDate={item.dueDate!}
-                                    formatDate={formatDate}
+                                    assignment={item as unknown as Assignment}
+                                    currentUserIsOwner={course!.currentUserIsOwner}
                                 />
                             case 'exam':
                                 return <ExamListing
@@ -139,8 +138,6 @@ export default function Course() {
                                     title={item.title!}
                                     startTime={item.startTime!}
                                     endTime={item.endTime!}
-                                    getMinutesDifference={getMinutesDifference}
-                                    formatDate={formatDate}
                                 />
                             default: ''
                         }

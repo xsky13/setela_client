@@ -83,3 +83,16 @@ html, body {
 a.unstyled {
 	text-decoration: none;
 }
+
+.subtitle {
+	@extend .text-muted; 
+	@extend .text-uppercase;
+	@extend .fw-semibold;
+}
+
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}

@@ -1,19 +1,16 @@
 import { NavLink } from "react-router";
+import { formatDate, getMinutesDifference } from "~/utils/date";
 
 export default function ExamListing({
     id,
     title,
     startTime,
     endTime,
-    getMinutesDifference,
-    formatDate
 }: { 
     id: number, 
     title: string, 
     startTime: string, 
     endTime: string,
-    getMinutesDifference: (a: string, b: string) => number,
-    formatDate: (a: string) => any
 }) {
     return (
         <div className="d-flex justify-content-between rounded-2 border border-2 border-danger  p-4 my-3">
