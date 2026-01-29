@@ -98,7 +98,7 @@ export default function CreateAssignment() {
                     <input
                         id="dueDate"
                         name="dueDate"
-                        type="date"
+                        type="datetime-local"
                         className="form-control"
                         placeholder="Su titulo"
                     />

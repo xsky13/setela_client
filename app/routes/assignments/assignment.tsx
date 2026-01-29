@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
+import AssignmentExtraInfo from "~/Components/Assignments/AssignmentExtraInfo";
 import AssignmentInfo from "~/Components/Assignments/AssignmentInfo";
 import AssignmentSubmissionListing from "~/Components/AssignmentSubmissions/AssignmentSubmissionListing";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
@@ -98,30 +99,35 @@ export default function Assignment() {
                     </li>
                 </ol>
             </nav>
-            <div className="d-flex justify-content-between align-items-center">
+            <div className="d-flex justify-content-between align-items-start">
                 <h1>{assignmentData.title}</h1>
-                {
-                    courseData?.currentUserIsOwner &&
-                    <div className="my-2 d-flex">
-                        <AddResourcesModal
-                            parentId={assignmentData.id}
-                            courseId={assignmentData.courseId}
-                            type="assignment"
-                        />
-                        <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
-                        <LoadingButton
-                            loading={deleteAssignmentMutation.isPending}
-                            onClick={deleteAssignment}
-                            className="btn btn-danger"
-                        >
-                            <i className="bi bi-trash me-1" />
-                            Eliminar
-                        </LoadingButton>
-                    </div>
-                }
+                <div className="my-2">
+                    {
+                        courseData?.currentUserIsOwner &&
+                        <div className="d-flex">
+                            <AddResourcesModal
+                                parentId={assignmentData.id}
+                                courseId={assignmentData.courseId}
+                                type="assignment"
+                            />
+                            <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
+                            <LoadingButton
+                                loading={deleteAssignmentMutation.isPending}
+                                onClick={deleteAssignment}
+                                className="btn btn-danger"
+                            >
+                                <i className="bi bi-trash me-1" />
+                                Eliminar
+                            </LoadingButton>
+                        </div>
+                    }
+                </div>
             </div>
-            <div className="mt-3">
-                <div className={`alert alert-${expired ? "danger" : "warning"}`}>
+
+
+
+            <div className="mt-3 d-flex gap-4">
+                <div className={`alert alert-${expired ? "danger" : "warning"} col`}>
                     <div className="d-flex align-items-center gap-2">
                         <i className={`bi bi-exclamation-${expired ? "circle" : "triangle"}-fill text-${expired ? "danger" : "warning"} fs-4`}></i>
                         <div className="ms-2">
@@ -129,42 +135,49 @@ export default function Assignment() {
                             <p className="mb-0 small mt-1">
                                 {
                                     expired ?
-                                    'Este trabajo esta vencido.'
-                                    :
-                                    <span>Quedan {timeLeft} días para la entrega</span>
+                                        'Este trabajo esta vencido.'
+                                        :
+                                        <span>Quedan {timeLeft} días para la entrega</span>
                                 }
                             </p>
                         </div>
                     </div>
                 </div>
+                <div className="">
+                    <AssignmentExtraInfo currentUserIsOwner={courseData.currentUserIsOwner} assignmentData={assignmentData} />
+                </div>
+
             </div>
-            <div className="mt-5 px-3 py-2 m-0 rounded-1 bg-body-tertiary">
+            <div className="mt-5 px-3 py-2 rounded-1 bg-body-tertiary border">
                 <h3>Consigna</h3>
                 <p>
                     {assignmentData.textContent}
                 </p>
                 {
-                assignmentData.resources.length != 0 &&
-                <div className="mt-4">
-                    <div className="subtitle">Recursos y materiales</div>
-                    {
-                        assignmentData.resources.map(resource => (
-                            <ResourceListing resource={resource} currentUserIsOwner={courseData.currentUserIsOwner} />
-                        ))
-                    }
+                    assignmentData.resources.length != 0 &&
+                    <div className="mt-4">
+                        <div className="subtitle">Recursos y materiales</div>
+                        {
+                            assignmentData.resources.map(resource => (
+                                <ResourceListing resource={resource} currentUserIsOwner={courseData.currentUserIsOwner} />
+                            ))
+                        }
+                    </div>
+                }
+            </div>
+
+            {
+                !courseData.currentUserIsOwner &&
+                <div className="mt-5">
+                    <AssignmentInfo
+                        assignmentData={assignmentData}
+                        currentUserIsOwner={courseData.currentUserIsOwner}
+                        currentUserSubmitted={currentUserSubmitted}
+                        expired={expired}
+                        userSubmission={userSubmission}
+                    />
                 </div>
             }
-            </div>
-            
-            <div className="mt-5">
-                <AssignmentInfo
-                    assignmentData={assignmentData}
-                    currentUserIsOwner={courseData.currentUserIsOwner}
-                    currentUserSubmitted={currentUserSubmitted}
-                    expired={expired}
-                    userSubmission={userSubmission}
-                />
-            </div>
 
             {
                 courseData.currentUserIsOwner &&
