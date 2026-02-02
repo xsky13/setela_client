@@ -2,10 +2,14 @@ import type { Assignment, AssignmentSubmission } from "~/types/assignment";
 import { formatDate } from "~/utils/date";
 import LoadingButton from "../LoadingButton";
 import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "~/api";
+import { toast } from "sonner";
 
 export default function AssignmentSubmissionListing({ assignmentSubmission, assignment }: { assignmentSubmission: AssignmentSubmission, assignment: Assignment }) {
     const [isLate, setIsLate] = useState(false);
     const [updateIsLate, setUpdateIsLate] = useState(false);
+    const queryClient = useQueryClient();
 
     useEffect(() => {
         const submissionTime = new Date(assignmentSubmission.creationDate).getTime();
@@ -14,7 +18,30 @@ export default function AssignmentSubmissionListing({ assignmentSubmission, assi
 
         if (submissionTime > dueTime) setIsLate(true);
         if (submissionUpdateTime > dueTime) setUpdateIsLate(true);
-    }, [assignmentSubmission, assignment])
+    }, [assignmentSubmission, assignment]);
+
+    const deleteAssignmentSubmissionMutation = useMutation({
+        mutationKey: ['delete_assignment_submission_command'],
+        mutationFn: async () => {
+            const response = await api.delete("/AssignmentSubmission/" + assignmentSubmission.id);
+            return response.data;
+        },
+        onError(error) {
+            console.log(error);
+            toast(error.message);
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignment.id }], (old: Assignment) => {
+                return { ...old, assignmentSubmissions: old.assignmentSubmissions.filter(a => a.id != assignmentSubmission.id) }
+            })
+        }
+    });
+
+    const deleteAssignmentSubmission = () => {
+        if (confirm("Esta seguro que quiere borrar esta entrega? Esta acción es irreversible")) {
+            deleteAssignmentSubmissionMutation.mutate();
+        }
+    }
 
     return (
         <tr className="">
@@ -47,7 +74,7 @@ export default function AssignmentSubmissionListing({ assignmentSubmission, assi
                 <span className="badge rounded-pill text-bg-danger">Pendiente</span>
             }</td>
             <td>
-                <LoadingButton loading={false} className="p-0 bg-transparent border-0 text-danger text-center small me-4">
+                <LoadingButton onClick={deleteAssignmentSubmission} loading={deleteAssignmentSubmissionMutation.isPending} className="p-0 bg-transparent border-0 text-danger text-center small me-4">
                     <i className="bi bi-trash-fill" />
                     <span className="ms-2">Eliminar</span>
                 </LoadingButton>

@@ -21,5 +21,7 @@ export type AssignmentSubmission = {
     creationDate: string,
     lastUpdateDate: string,
     sysUser: UserSimple,
+    sysUserId: number,
+    assignmentId: number,
     grade: number
 }

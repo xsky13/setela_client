@@ -20,37 +20,24 @@ import { getErrors } from "~/utils/error";
 export default function Assignment() {
     const assignmentData = useContext(AssignmentContext);
     const currentUser = useContext(AuthContext);
+    const courseData = useContext(CourseContext);
+    if (!assignmentData || !currentUser || !courseData) throw new Error("Hubo un error.");
 
-    const [timeLeft, setTimeLeft] = useState(0);
-    const [expired, setExpired] = useState(false);
+    const dueDate = new Date(assignmentData.dueDate).getTime();
+    const now = new Date().getTime();
+    const expired = now > dueDate;
+    const diffInMs = dueDate - now;
+    const timeLeft = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    const [currentUserSubmitted, setCurrentUserSubmitted] = useState(false);
-    const [userSubmission, setUserSubmission] = useState<AssignmentSubmission | null>(null);
+    const userSubmission = assignmentData.assignmentSubmissions.find(
+        a => a.sysUserId === currentUser.id
+    ) || null;
+
+    const currentUserSubmitted = !!userSubmission;
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const courseData = useContext(CourseContext);
-
-    if (!courseData || !assignmentData) throw new Error("Hubo un error.");
-
-    useEffect(() => {
-        const dueDate = new Date(assignmentData.dueDate).getTime();
-        const now = new Date().getTime();
-
-        const diffInMs = dueDate - now;
-        setTimeLeft(Math.floor(diffInMs / (1000 * 60 * 60 * 24)));
-
-        if (now > dueDate) setExpired(true);
-
-        if (assignmentData.assignmentSubmissions.some(a => a.sysUser.id == currentUser?.id)) {
-            const submission = assignmentData.assignmentSubmissions.filter(a => a.sysUser.id == currentUser?.id);
-            setCurrentUserSubmitted(true);
-            setUserSubmission(submission[0]);
-        }
-
-
-    }, [assignmentData]);
 
     const deleteAssignmentMutation = useMutation<any, Error>({
         mutationKey: ['delete_assignment_command'],

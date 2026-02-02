@@ -1,6 +1,10 @@
 import type { Assignment, AssignmentSubmission } from "~/types/assignment";
 import { formatDate } from "~/utils/date";
 import EditAssignmentSubmission from "../AssignmentSubmissions/EditAssignmentSubmission";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "~/api";
+import { toast } from "sonner";
+import LoadingButton from "../LoadingButton";
 
 export default function AssignmentInfo({
     assignmentData,
@@ -15,14 +19,50 @@ export default function AssignmentInfo({
     expired: boolean,
     userSubmission: AssignmentSubmission | null
 }) {
+    const queryClient = useQueryClient();
+    const deleteAssignmentSubmissionMutation = useMutation({
+        mutationKey: ['delete_assignment_submission_command'],
+        mutationFn: async () => {
+            if (userSubmission == null) {
+                toast('Hubo un error');
+                return;
+            }
+            const response = await api.delete("/AssignmentSubmission/" + userSubmission.id);
+            return response.data;
+        },
+        onError(error) {
+            console.log(error);
+            toast(error.message);
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
+                return { ...old, assignmentSubmissions: old.assignmentSubmissions.filter(a => a.id != userSubmission!.id) }
+            })
+        }
+    });
+
+    const deleteAssignmentSubmission = () => {
+        if (confirm("Esta seguro que quiere borrar esta entrega? Esta acción es irreversible")) {
+            deleteAssignmentSubmissionMutation.mutate();
+        }
+    }
+
     return (
         <ul className="list-group">
             {
                 userSubmission &&
                 <li className="list-group-item">
-                    <span className="subtitle small">Contenido</span>
-                    <div className="my-1">
+                    <h4>Mi entrega</h4>
+                    <div className="mt-2 mb-1 hstack gap-2">
                         <EditAssignmentSubmission assignmentSubmission={userSubmission} />
+                        <LoadingButton
+                            className="btn btn-outline-danger"
+                            loading={deleteAssignmentSubmissionMutation.isPending}
+                            onClick={deleteAssignmentSubmission}
+                        >
+                            <i className="bi bi-trash me-2" />
+                            Eliminar entrega
+                        </LoadingButton>
                     </div>
                 </li>
             }

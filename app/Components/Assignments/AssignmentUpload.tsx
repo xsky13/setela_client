@@ -56,10 +56,11 @@ export default function AssignmentUpload({
         createAssignmentSubmission.mutate({ assignmentId: assignmentData.id, textContent });
     }
 
+    
 
 
     return (
-        (!assignmentData.closed && !assignmentData.assignmentSubmissions.some(a => a.sysUser.id == currentUser?.id)) &&
+        (!assignmentData.closed && !assignmentData.assignmentSubmissions.some(a => a.sysUserId == currentUser?.id)) &&
         <div className="mb-4">
             <div className="rounded-2 px-2 py-3 border border-2 border-primary row" style={{ margin: '0 .01rem 0 .01rem' }}>
                 <h4>Subir entrega</h4>
