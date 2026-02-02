@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import api from "~/api";
 import AssignmentExtraInfo from "~/Components/Assignments/AssignmentExtraInfo";
 import AssignmentInfo from "~/Components/Assignments/AssignmentInfo";
+import AssignmentUpload from "~/Components/Assignments/AssignmentUpload";
 import AssignmentSubmissionListing from "~/Components/AssignmentSubmissions/AssignmentSubmissionListing";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import LoadingButton from "~/Components/LoadingButton";
@@ -143,7 +144,7 @@ export default function Assignment() {
                         </div>
                     </div>
                 </div>
-                <div className="">
+                <div>
                     <AssignmentExtraInfo currentUserIsOwner={courseData.currentUserIsOwner} assignmentData={assignmentData} />
                 </div>
 
@@ -169,6 +170,9 @@ export default function Assignment() {
             {
                 !courseData.currentUserIsOwner &&
                 <div className="mt-5">
+                    <AssignmentUpload
+                        assignmentData={assignmentData}
+                    />
                     <AssignmentInfo
                         assignmentData={assignmentData}
                         currentUserIsOwner={courseData.currentUserIsOwner}
