@@ -159,6 +159,7 @@ export default function Assignment() {
                 <div className="mt-5">
                     <AssignmentUpload
                         assignmentData={assignmentData}
+                        action="create"
                     />
                     <AssignmentInfo
                         assignmentData={assignmentData}

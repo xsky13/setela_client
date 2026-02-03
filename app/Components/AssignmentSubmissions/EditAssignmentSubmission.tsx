@@ -1,54 +1,72 @@
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { createPortal } from "react-dom";
-import type { AssignmentSubmission } from "~/types/assignment";
+import type { Assignment, AssignmentSubmission } from "~/types/assignment";
 import LoadingButton from "../LoadingButton";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import AssignmentUpload from "../Assignments/AssignmentUpload";
+import { AssignmentContext } from "~/context/AssignmentContext";
+import api from "~/api";
+import LoadingSegment from "../Loading/LoadingSegment";
+import { toast } from "sonner";
 
-export default function EditAssignmentSubmission({ assignmentSubmission }: { assignmentSubmission: AssignmentSubmission }) {
+export default function EditAssignmentSubmission({ assignmentSubmissionId }: { assignmentSubmissionId: number }) {
     const modalRef = useRef<HTMLDivElement>(null);
     const openModalRef = useRef<HTMLButtonElement>(null);
+    const assignmentData = useContext(AssignmentContext);
+    if (!assignmentData) throw new Error("Hubo un error.");
 
-    const editAssignmentSubmissionMutation = useMutation<AssignmentSubmission, Error, { assignmentId: number, textContent: string }>({
-
+    const getAssignmentSubmission = useQuery<AssignmentSubmission>({
+        queryKey: ['getAssignmentSubmissionQuery', { assignmentId: assignmentSubmissionId }],
+        queryFn: async () => {
+            const response = await api.get('AssignmentSubmission/' + assignmentSubmissionId);
+            return response.data;
+        },
+        retry: 1,
+        enabled: false
     });
 
-    const handleFormSubmit = () => {
-
+    const openModal = () => {
+        openModalRef.current?.click();
+        getAssignmentSubmission.refetch();
     }
+
     return (
         <div>
+            <button
+                className="btn btn-primary"
+                onClick={openModal}
+            >
+                <i className="bi bi-pencil me-1" /> Editar entrega
+            </button>
             <button
                 type="button"
                 ref={openModalRef}
                 className="btn btn-primary"
                 data-bs-toggle="modal"
                 data-bs-target="#editAssignmentSubmissionModal"
+                style={{ display: 'none' }}
             >
-                <i className="bi bi-pencil me-1" /> Editar entrega
             </button>
             {typeof document !== 'undefined' && createPortal(<div ref={modalRef} className="modal fade" id="editAssignmentSubmissionModal" tabIndex={-1} aria-labelledby="editAssignmentSubmissionModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-xl">
                     <div className="modal-content">
-                        <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="editAssignmentSubmissionModalLabel">Editar entrega</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                        </div>
-                        <div className="modal-body">
-                            <form id="editAssignmentSubmissionForm" onSubmit={handleFormSubmit}>
-
-                            </form>
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
-                            <LoadingButton
-                                type="submit"
-                                form="editAssignmentSubmissionForm"
-                                className="btn btn-primary"
-                                loading={editAssignmentSubmissionMutation.isPending}
-                            >
-                                Subir cambios
-                            </LoadingButton>
-                        </div>
+                        {
+                            getAssignmentSubmission.isLoading ?
+                                <LoadingSegment />
+                                :
+                                <>
+                                    <div className="modal-header">
+                                        <h1 className="modal-title fs-5" id="editAssignmentSubmissionModalLabel">Editar entrega</h1>
+                                        <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <AssignmentUpload
+                                        action="edit"
+                                        assignmentData={assignmentData}
+                                        assignmentSubmission={getAssignmentSubmission.data}
+                                        modalRef={modalRef}
+                                    />
+                                </>
+                        }
                     </div>
                 </div>
             </div>, document.body)}

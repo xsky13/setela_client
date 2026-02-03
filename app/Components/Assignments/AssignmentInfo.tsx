@@ -54,7 +54,7 @@ export default function AssignmentInfo({
                 <li className="list-group-item">
                     <h4>Mi entrega</h4>
                     <div className="mt-2 mb-1 hstack gap-2">
-                        <EditAssignmentSubmission assignmentSubmission={userSubmission} />
+                        <EditAssignmentSubmission assignmentSubmissionId={userSubmission.id} />
                         <LoadingButton
                             className="btn btn-outline-danger"
                             loading={deleteAssignmentSubmissionMutation.isPending}
