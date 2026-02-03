@@ -75,7 +75,7 @@ export default function EditAssignment() {
             return;
         }
 
-        setRedundantFormData(formValues);
+        setRedundantFormData({...formValues, visible, closed});
 
         editAssignmentMutation.mutate({ ...formValues, visible, closed });
     }
