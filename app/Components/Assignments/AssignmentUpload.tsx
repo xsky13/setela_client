@@ -51,9 +51,15 @@ export default function AssignmentUpload({
         },
         onSuccess: data => {
             toast("Su entrega ha sido " + (action == "create" ? "subida." : "modificada."))
-            queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
-                return { ...old, assignmentSubmissions: [...old.assignmentSubmissions, data] }
-            });
+            if (assignmentSubmission) {
+                queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
+                    return { ...old, assignmentSubmissions: [...old.assignmentSubmissions.filter(a => a.id != assignmentSubmission.id), data] }
+                });
+            } else {
+                queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
+                    return { ...old, assignmentSubmissions: [...old.assignmentSubmissions, data] }
+                });
+            }
             if (modalRef) closeModal(modalRef);
 
         },
