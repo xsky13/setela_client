@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
 import { toast } from "sonner";
+import GradeModal from "./GradeModal";
 
 export default function AssignmentSubmissionListing({ assignmentSubmission, assignment }: { assignmentSubmission: AssignmentSubmission, assignment: Assignment }) {
     const [isLate, setIsLate] = useState(false);
@@ -78,10 +79,7 @@ export default function AssignmentSubmissionListing({ assignmentSubmission, assi
                     <i className="bi bi-trash-fill" />
                     <span className="ms-2">Eliminar</span>
                 </LoadingButton>
-                <div className="block small" role="button">
-                    <i className="bi bi-pencil" />
-                    <span className="ms-2">Corregir</span>
-                </div>
+                <GradeModal assignmentSubmissionId={assignmentSubmission.id} />
             </td>
         </tr>
     );

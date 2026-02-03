@@ -26,3 +26,7 @@ export type AssignmentSubmission = {
     grade: number,
     textContent: string
 }
+
+export type AssignmentSubmissionFull = AssignmentSubmission & {
+    resources: ResourceListing[]
+}
