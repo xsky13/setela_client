@@ -173,47 +173,49 @@ export default function Assignment() {
 
             {
                 courseData.currentUserIsOwner &&
-                <div className="my-5">
-                    <h2>Entregas</h2>
-                    {
-                        assignmentData.assignmentSubmissions.length ?
-                            <table className="table table-striped align-middle">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Nro</th>
-                                        <th scope="col">Nombre</th>
-                                        <th scope="col">Hora de entrega</th>
-                                        <th scope="col">Ultima actualizacion</th>
-                                        <th scope="col">Nota</th>
-                                        <th scope="col">Estado</th>
-                                        <th scope="col">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        assignmentData.assignmentSubmissions.map((assignmentSubmission, i) => (
-                                            <AssignmentSubmissionListing
-                                                assignmentSubmission={assignmentSubmission}
-                                                assignment={assignmentData}
-                                                key={i}
-                                            />
-                                        ))
-                                    }
-                                </tbody>
-                            </table>
-                            :
-                            <i className="text-muted">
-                                <i className="bi bi-exclamation-triangle-fill"></i>
-                                <span className="ms-2">Todavía no hay entregas para este trabajo.</span>
-                            </i>
-                    }
-                    {/* {
-                        assignmentData.assignmentSubmissions.map(assignmentSubmission => (
-                            <AssignmentSubmissionListing assignmentSubmission={assignmentSubmission} />
-                        ))
-                    } */}
-                </div>
+                <>
+                    <div className="my-5">
+                        <h2>Entregas</h2>
+                        {
+                            assignmentData.assignmentSubmissions.length ?
+                                <table className="table table-striped align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nro</th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">Hora de entrega</th>
+                                            <th scope="col">Ultima actualizacion</th>
+                                            <th scope="col">Nota</th>
+                                            <th scope="col">Estado</th>
+                                            <th scope="col">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {
+                                            assignmentData.assignmentSubmissions.map((assignmentSubmission, i) => (
+                                                <AssignmentSubmissionListing
+                                                    assignmentSubmission={assignmentSubmission}
+                                                    assignment={assignmentData}
+                                                    key={i}
+                                                />
+                                            ))
+                                        }
+                                    </tbody>
+                                </table>
+                                :
+                                <i className="text-muted">
+                                    <i className="bi bi-exclamation-triangle-fill"></i>
+                                    <span className="ms-2">Todavía no hay entregas para este trabajo.</span>
+                                </i>
+                        }
+                    </div>
+                    <p className="text-muted fst-italic">
+                        <i className="bi bi-info-circle me-2" />
+                        Si ve que una entrega que corrigió de la nada no tiene nota puede ser que el estudiante haya eliminado la entrega y la haya reenviado.
+                    </p>
+                </>
             }
+
         </div>
     );
 }

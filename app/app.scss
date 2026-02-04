@@ -99,3 +99,30 @@ a.unstyled {
   display: -ms-flexbox;
   display:         flex;
 }
+
+.pill-lg {
+	padding: .3rem .65rem;
+	display: inline-flex;
+	column-gap: .5rem;
+	border-radius: 5px;
+}
+
+.pill-lg.pill-success {
+	@extend .bg-success-subtle;
+	@extend .text-success;
+}
+
+.pill-lg.pill-primary {
+	@extend .bg-primary-subtle;
+	@extend .text-primary;
+}
+
+.pill-lg.pill-warning {
+	@extend .bg-warning-subtle;
+	@extend .text-warning;
+}
+
+.pill-lg.pill-danger {
+	@extend .bg-danger-subtle;
+	@extend .text-danger;
+}

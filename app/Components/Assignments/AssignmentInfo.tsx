@@ -19,6 +19,14 @@ export default function AssignmentInfo({
     expired: boolean,
     userSubmission: AssignmentSubmission | null
 }) {
+    const dueDate = new Date(assignmentData.dueDate).getTime();
+    let creationDate;
+    let lastUpdateDate;
+    if (userSubmission) {
+        creationDate = new Date(userSubmission.creationDate).getTime();
+        lastUpdateDate = new Date(userSubmission.lastUpdateDate).getTime();
+    }
+
     const queryClient = useQueryClient();
     const deleteAssignmentSubmissionMutation = useMutation({
         mutationKey: ['delete_assignment_submission_command'],
@@ -68,29 +76,90 @@ export default function AssignmentInfo({
             }
             <li className="list-group-item">
                 <span className="subtitle small">Estado de entrega</span>
-                <div className={`fw-semibold fs-5 ${currentUserSubmitted ?
-                    'text-success'
-                    : expired ? 'text-danger' : 'text-warning'
-                    }`}>
+                <div className="fw-semibold fs-5 hstack gap-3">
                     {
                         currentUserSubmitted ?
-                            <div className="my-1">
+                            <div className="pill-lg pill-primary">
                                 <i className="bi-check-circle-fill"></i>
-                                <span className="ms-2">Entregado</span>
+                                Entregado
                             </div>
                             :
-                            expired ?
-                                <div className="my-1">
+                            <div className="pill-lg pill-warning">
+                                <i className="bi-alarm"></i>
+                                Pendiente
+                            </div>
+                    }
+                    {
+                        userSubmission ?
+                            creationDate! > dueDate ?
+                                <div className="pill-lg pill-danger">
                                     <i className="bi-exclamation-circle-fill"></i>
-                                    <span className="ms-2">Tarde</span>
+                                    Entregado tarde
                                 </div>
                                 :
-                                <div className="my-1">
+                                <div className="pill-lg pill-success">
+                                    <i className="bi-calendar-check-fill"></i>
+                                    Entregado a tiempo
+                                </div>
+                            :
+                            expired ?
+                                <div className="pill-lg pill-danger">
+                                    <i className="bi-exclamation-circle-fill"></i>
+                                    Tarde
+                                </div>
+                                :
+                                <div className="pill-lg pill-warning">
                                     <i className="bi-exclamation-triangle-fill"></i>
-                                    <span className="ms-2">Pendiente</span>
+                                    Pendiente
                                 </div>
                     }
+
+                    {/* check: if last updated date is older than dueDate, but dont show pill if user already submitted late */}
+                    {
+                        (creationDate && lastUpdateDate) && (
+                            creationDate < dueDate && (
+                                lastUpdateDate > dueDate &&
+                                <div className="pill-lg pill-danger">
+                                    <i className="bi-exclamation-circle-fill"></i>
+                                    Actualizado tarde
+                                </div>
+                            )
+                        )
+                    }
+
+                    {
+                        userSubmission && (
+                            userSubmission?.grade ?
+                                <div className="pill-lg pill-success">
+                                    <i className="bi-check-circle-fill"></i>
+                                    Calificado
+                                </div>
+                                :
+                                <div className="pill-lg pill-warning">
+                                    <i className="bi-clock"></i>
+                                    Aguardando calificacion
+                                </div>
+                        )
+                    }
                 </div>
+            </li>
+            <li className="list-group-item">
+                <span className="subtitle small">Nota</span>
+                {
+                    currentUserSubmitted ?
+                        userSubmission?.grade ?
+                            <div className="my-1 fs-4 fw-semibold text-primary">
+                                {userSubmission.grade.value}
+                            </div>
+                            :
+                            <div className="my-1">
+                                <i className="text-muted">Todavía no hay nota.</i>
+                            </div>
+                        :
+                        <div className="my-1">
+                            <i className="text-muted">Todavía no hay nota.</i>
+                        </div>
+                }
             </li>
             <li className="list-group-item">
                 <span className="subtitle small">Hora de entrega</span>
@@ -117,24 +186,6 @@ export default function AssignmentInfo({
                         <div className="text-muted small my-1">
                             <i className="bi bi-clock" />
                             <span className="ms-2">{formatDate(userSubmission?.lastUpdateDate)}</span>
-                        </div>
-                }
-            </li>
-            <li className="list-group-item">
-                <span className="subtitle small">Nota</span>
-                {
-                    currentUserSubmitted ?
-                        userSubmission?.grade ?
-                            <div className="my-1 fs-4 fw-semibold text-primary">
-                                {userSubmission.grade.value}
-                            </div>
-                            :
-                            <div className="my-1">
-                                <i className="text-muted">Todavía no hay nota.</i>
-                            </div>
-                        :
-                        <div className="my-1">
-                            <i className="text-muted">Todavía no hay nota.</i>
                         </div>
                 }
             </li>
