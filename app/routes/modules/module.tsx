@@ -17,10 +17,7 @@ export default function Module() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    if (moduleData == undefined) throw new Error("Modulo no existe");
-
-
-    if (moduleData == undefined || moduleData == null) throw new Error("Modulo no existe");
+    if (!moduleData || !courseData) throw new Error("Modulo no existe");
 
     const deleteModuleMutation = useMutation<any, Error>({
         mutationKey: ['delete_module_command'],
@@ -44,6 +41,18 @@ export default function Module() {
         if (confirm("Esta seguro que quiere eliminar este modulo? Esta acción es irreversible")) {
             deleteModuleMutation.mutate();
         }
+    }
+
+    if (!courseData.currentUserIsOwner && !moduleData.visible) {
+        return (
+            <div className="d-flex gap-4 align-items-center">
+                <NavLink to={"/cursos/" + courseData.id} className="btn d-block btn-secondary">
+                    <i className="bi bi-chevron-left me-2"></i>
+                    Volver al curso
+                </NavLink>
+                <h1 style={{ margin: 0 }}>Este modulo no esta disponible.</h1>
+            </div>
+        )
     }
 
     return (

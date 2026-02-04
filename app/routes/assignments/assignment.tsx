@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
@@ -13,7 +13,6 @@ import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
 import { AssignmentContext } from "~/context/AssignmentContext";
 import { AuthContext } from "~/context/AuthContext";
 import { CourseContext } from "~/context/CourseContext";
-import type { AssignmentSubmission } from "~/types/assignment";
 import { formatDate } from "~/utils/date";
 import { getErrors } from "~/utils/error";
 
@@ -62,6 +61,18 @@ export default function Assignment() {
         if (confirm("Esta seguro que quiere eliminar este trabajo práctico? Esta acción es irreversible")) {
             deleteAssignmentMutation.mutate();
         }
+    }
+
+    if (!courseData.currentUserIsOwner && !assignmentData.visible) {
+        return (
+            <div className="d-flex gap-4 align-items-center">
+                <NavLink to={"/cursos/" + courseData.id} className="btn d-block btn-secondary">
+                    <i className="bi bi-chevron-left me-2"></i>
+                    Volver al curso
+                </NavLink>
+                <h1 style={{ margin: 0 }}>Esta asignatura no esta disponible.</h1>
+            </div>
+        )
     }
 
 
