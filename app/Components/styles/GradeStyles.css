@@ -1,5 +1,50 @@
-
 .list-group-item {
     /* padding: 0.5rem 0.5rem; */
     padding: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-y);
+}
+
+.date-labels {
+    font-size: 0.75rem;
+}
+
+.date {
+    color: #374151;
+    font-size: 0.875rem;
+    margin: .3rem 0;
+}
+
+.submission-text {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #374151;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    min-height: 70px;
+}
+
+
+.grade-input-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.grade-input-wrapper {
+    position: relative;
+    flex: 0 0 120px;
+}
+
+.grading-input {
+    text-align: center;
+    padding: .5rem 0;
+    /* width: 100px; */
+}
+
+.grade-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+    outline: none;
 }
