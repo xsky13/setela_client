@@ -49,6 +49,10 @@ export default function GradeModal({
         }
     }, [isError]);
 
+    useEffect(() => {
+        
+        console.log(assignmentSubmission);
+    }, [assignmentSubmission])
 
 
     const openModal = () => {

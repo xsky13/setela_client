@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingButton from "../LoadingButton";
 import { useParams } from "react-router";
-import type { Grade } from "~/types/grade";
+import type { Grade, GradeSimple } from "~/types/grade";
 import api from "~/api";
 import { toast } from "sonner";
 import type { Assignment } from "~/types/assignment";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "~/context/AuthContext";
 
 type GradeRequest = {
@@ -20,23 +20,31 @@ export default function GradeForm({
     assignmentId,
     maxGrade,
     assignmentSubmissionId,
-    grade
+    grade,
 }: {
     assignmentId: number,
     maxGrade: number,
     assignmentSubmissionId: number,
-    grade: number | undefined
+    grade: GradeSimple | undefined,
 }) {
     const user = useContext(AuthContext);
     if (!user) throw new Error("El usuario no existe");
     const params = useParams();
     const queryClient = useQueryClient();
-    const [value, setValue] = useState<number | undefined>(grade);
+    const [value, setValue] = useState<number | undefined>(grade?.value);
+
+    useEffect(() => {
+        console.log(grade);
+    }, [grade])
+    
 
     const gradeAssignmentMutation = useMutation<Grade, Error, GradeRequest>({
         mutationKey: ['create_grade_command'],
         mutationFn: async data => {
-            const response = await api.post("/grade", data);
+            let response;
+            if (!grade)
+                response = await api.post("/grade", data);
+            else response = await api.put("/grade/" + grade.id, { value });
             return response.data;
         },
         onError(error) {
@@ -47,7 +55,7 @@ export default function GradeForm({
             queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentId }], (old: Assignment) => {
                 return {
                     ...old, assignmentSubmissions: old.assignmentSubmissions.map(a => a.id == assignmentSubmissionId ? {
-                        ...a, grade: data.value
+                        ...a, grade: { ...a.grade, value: data.value }
                     } : a)
                 }
             });
