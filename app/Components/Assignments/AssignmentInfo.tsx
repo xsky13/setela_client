@@ -108,9 +108,9 @@ export default function AssignmentInfo({
                                     Tarde
                                 </div>
                                 :
-                                <div className="pill-lg pill-warning">
+                                <div className="pill-lg pill-primary">
                                     <i className="bi-exclamation-triangle-fill"></i>
-                                    Pendiente
+                                    A tiempo
                                 </div>
                     }
 
