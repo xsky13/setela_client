@@ -1,4 +1,5 @@
 import type { ResourceListing } from "./course"
+import type { GradeSimple } from "./grade"
 import type { User, UserSimple } from "./user"
 
 export type Assignment = {
@@ -23,7 +24,7 @@ export type AssignmentSubmission = {
     sysUser: UserSimple,
     sysUserId: number,
     assignmentId: number,
-    grade: number,
+    grade: GradeSimple,
     textContent: string
 }
 

@@ -126,7 +126,7 @@ export default function AssignmentInfo({
                     currentUserSubmitted ?
                         userSubmission?.grade ?
                             <div className="my-1 fs-4 fw-semibold text-primary">
-                                {userSubmission.grade}
+                                {userSubmission.grade.value}
                             </div>
                             :
                             <div className="my-1">

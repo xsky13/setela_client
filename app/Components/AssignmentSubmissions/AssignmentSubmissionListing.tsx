@@ -68,7 +68,7 @@ export default function AssignmentSubmissionListing({ assignmentSubmission, assi
                     </div>
                 }
             </td>
-            <td>{assignmentSubmission.grade || <i>Sin calificar</i>}</td>
+            <td>{assignmentSubmission.grade?.value || <i>Sin calificar</i>}</td>
             <td>{assignmentSubmission.grade ?
                 <span className="badge rounded-pill text-bg-primary">Corregida</span>
                 :

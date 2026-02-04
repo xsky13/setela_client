@@ -10,3 +10,10 @@ export type Grade = {
     sysUser: UserSimple,
     courseId: number,
 }
+
+export type GradeSimple = {
+    id: number,
+    value: number,
+    sysUserId: number,
+    sysUser?: UserSimple,
+}
