@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
@@ -22,11 +22,44 @@ export default function Assignment() {
     const courseData = useContext(CourseContext);
     if (!assignmentData || !currentUser || !courseData) throw new Error("Hubo un error.");
 
+    const [assignmentBlock, setAssignmentBlock] = useState<'total' | 'corrected' | 'pending'>('total');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const assignmentSubmissions = useMemo(() => {
+        let list;
+        switch (assignmentBlock) {
+            case 'corrected':
+                list = assignmentData.assignmentSubmissions.filter(a => a.grade?.value);
+                break;
+            case 'pending':
+                list = assignmentData.assignmentSubmissions.filter(a => !a.grade?.value);
+                break;
+            case 'total':
+            default:
+                list = assignmentData.assignmentSubmissions;
+                break;
+
+        }
+
+        if (searchTerm.trim() != "") {
+            list = list.filter(a => a.sysUser.name.toLowerCase().includes(searchTerm));
+        }
+        return list;
+    }, [assignmentBlock, assignmentData.assignmentSubmissions, searchTerm]);
+
     const dueDate = new Date(assignmentData.dueDate).getTime();
     const now = new Date().getTime();
     const expired = now > dueDate;
     const diffInMs = dueDate - now;
     const timeLeft = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+    const totalSubmissions = assignmentData.assignmentSubmissions.length;
+    const totalCorrected = assignmentData.assignmentSubmissions.filter(a => a.grade?.value).length;
+    const totalUncorrected = assignmentData.assignmentSubmissions.filter(a => !a.grade?.value).length;
+
+    const sumGrades = assignmentData.assignmentSubmissions
+        .reduce((acc, submission) => acc + (submission.grade ? submission.grade.value : 0), 0);
+    const average = sumGrades / totalCorrected;
 
     const userSubmission = assignmentData.assignmentSubmissions.find(
         a => a.sysUserId === currentUser.id
@@ -185,40 +218,101 @@ export default function Assignment() {
             {
                 courseData.currentUserIsOwner &&
                 <>
-                    <div className="my-5">
+                    <div className="my-5 border border-2 border-primary rounded-3 px-4 py-3">
                         <h2>Entregas</h2>
-                        {
-                            assignmentData.assignmentSubmissions.length ?
-                                <table className="table table-striped align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Nro</th>
-                                            <th scope="col">Nombre</th>
-                                            <th scope="col">Hora de entrega</th>
-                                            <th scope="col">Ultima actualizacion</th>
-                                            <th scope="col">Nota</th>
-                                            <th scope="col">Estado</th>
-                                            <th scope="col">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            assignmentData.assignmentSubmissions.map((assignmentSubmission, i) => (
-                                                <AssignmentSubmissionListing
-                                                    assignmentSubmission={assignmentSubmission}
-                                                    assignment={assignmentData}
-                                                    key={i}
-                                                />
-                                            ))
-                                        }
-                                    </tbody>
-                                </table>
-                                :
-                                <i className="text-muted">
-                                    <i className="bi bi-exclamation-triangle-fill"></i>
-                                    <span className="ms-2">Todavía no hay entregas para este trabajo.</span>
-                                </i>
-                        }
+
+                        {/* <div className="hstack gap-5 mb-3">
+                            <div className="d-flex align-items-center">
+                                <i className="bi bi-people-fill text-primary fs-4"></i>
+                                <div className="ms-3">
+                                    <span className="fs-3 fw-bold text-primary-emphasis">{totalSubmissions}</span>
+                                    <div className="small text-muted">Total entregas</div>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <i className="bi bi-check-circle-fill text-success fs-4"></i>
+                                <div className="ms-3">
+                                    <span className="fs-3 fw-bold text-success-emphasis">{totalCorrected}</span>
+                                    <div className="small text-muted">Entregas corregidas</div>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <i className="bi bi-clock-history text-warning fs-4"></i>
+                                <div className="ms-3">
+                                    <span className="fs-3 fw-bold text-warning-emphasis">{totalUncorrected}</span>
+                                    <div className="small text-muted">Pendientes</div>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <i className="bi bi-graph-up text-info fs-4"></i>
+                                <div className="ms-3">
+                                    <span className="fs-3 fw-bold text-info-emphasis">{average}</span>
+                                    <div className="small text-muted">Promedio</div>
+                                </div>
+                            </div>
+                        </div> */}
+
+                        <div className="row my-3">
+                            <div className="btn-group col-4" role="group">
+                                <button
+                                    type="button"
+                                    className={"btn btn-outline-primary btn-sm " + (assignmentBlock == 'total' ? 'active' : '')}
+                                    onClick={() => setAssignmentBlock('total')}
+                                >
+                                    <i className="bi bi-grid-fill me-1"></i> Todas ({totalSubmissions})
+                                </button>
+                                <button
+                                    type="button"
+                                    className={"btn btn-outline-primary btn-sm " + (assignmentBlock == 'corrected' ? 'active' : '')}
+                                    onClick={() => setAssignmentBlock('corrected')}
+                                >
+                                    <i className="bi bi-check-circle me-1"></i> Corregidas ({totalCorrected})
+                                </button>
+                                <button
+                                    type="button"
+                                    className={"btn btn-outline-primary btn-sm " + (assignmentBlock == 'pending' ? 'active' : '')}
+                                    onClick={() => setAssignmentBlock('pending')}
+                                >
+                                    <i className="bi bi-clock me-1"></i> Pendientes ({totalUncorrected})
+                                </button>
+                            </div>
+                            <div className="col-8">
+                                <input
+                                    type="text"
+                                    className="form-control w-100"
+                                    placeholder="Buscar por alumno"
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                        <table className="table table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nro</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Hora de entrega</th>
+                                    <th scope="col">Ultima actualizacion</th>
+                                    <th scope="col">Nota</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    assignmentSubmissions.length != 0 &&
+                                    assignmentSubmissions.map((assignmentSubmission, i) => (
+                                        <AssignmentSubmissionListing
+                                            assignmentSubmission={assignmentSubmission}
+                                            assignment={assignmentData}
+                                            key={i}
+                                        />
+                                    ))
+                                }
+                            </tbody>
+                        </table>
                     </div>
                     <p className="text-muted fst-italic">
                         <i className="bi bi-info-circle me-2" />
