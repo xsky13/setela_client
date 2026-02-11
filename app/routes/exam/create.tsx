@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import api from "~/api";
 import FormErrors from "~/Components/Error/FormErrors";
 import LoadingButton from "~/Components/LoadingButton";
-import type { Exam } from "~/types/course";
+import type { Exam } from "~/types/exam";
 import { getErrors } from "~/utils/error";
 
 type ExamRequest = {
