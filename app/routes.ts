@@ -22,6 +22,9 @@ export default [
                 route(":id/a/:assignmentId", "routes/assignments/assignment.tsx"),
                 route(":id/a/:assignmentId/editar", "routes/assignments/edit.tsx"),
             ]),
+
+
+            route(":id/e/crear", "routes/exam/create.tsx"),
         ]),
     ]),
 ] satisfies RouteConfig;
