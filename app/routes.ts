@@ -25,6 +25,9 @@ export default [
 
 
             route(":id/e/crear", "routes/exam/create.tsx"),
+            layout("routes/exam/layout.tsx", [
+                route(":id/e/:examId", "routes/exam/exam.tsx"),
+            ]),
         ]),
     ]),
 ] satisfies RouteConfig;
