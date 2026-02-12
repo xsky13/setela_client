@@ -32,7 +32,7 @@ export default function AssignmentListing({
                     } : a)
                 }
             });
-            queryClient.setQueryData(['getMAssignmentQuery', { assignmentId: Number(assignment.id) }], (old: Assignment) => ({ ...old, visible: !assignment.visible }))
+            queryClient.setQueryData(['getAssignmentQuery', { assignmentId: Number(assignment.id) }], (old: Assignment) => ({ ...old, visible: !assignment.visible }))
         },
         onError(error) {
             const errors = getErrors(error);
