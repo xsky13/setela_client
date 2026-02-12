@@ -67,7 +67,7 @@ export default function ExamOwnerView({ exam }: { exam: ExamDataView }) {
                 </div>
             </div>
             <div className="container">
-                <div className="row gap-3">
+                <div className="row gap-3 align-items-start">
                     <ul className="col-3 list-group">
                         <li className="list-group-item">
                             <span className="subtitle small">Estado</span>
