@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
 import { NavLink } from "react-router";
 import { toast } from "sonner";
@@ -7,7 +7,8 @@ import FormErrors from "~/Components/Error/FormErrors";
 import LoadingButton from "~/Components/LoadingButton";
 import { CourseContext } from "~/context/CourseContext";
 import { ExamContext } from "~/context/ExamContext";
-import type { Exam } from "~/types/exam";
+import type { FullCourse } from "~/types/course";
+import type { Exam, ExamSimple } from "~/types/exam";
 import { formatDateForInput } from "~/utils/date";
 import { getErrors } from "~/utils/error";
 
@@ -33,6 +34,8 @@ export default function EditExam() {
     const [visible, setVisible] = useState(examData.visible)
     const [closed, setClosed] = useState(examData.closed)
 
+    const queryClient = useQueryClient();
+
 
     const editExamMutation = useMutation<Exam, Error, ExamRequest>({
         mutationKey: ["edit_exam_command"],
@@ -44,9 +47,16 @@ export default function EditExam() {
             const errors = getErrors(error);
             setErrors(errors);
         },
-        onSuccess() {
+        onSuccess(data) {
             setErrors([]);
-            toast("El examen fue actualizado.");
+            toast("Sus cambios fueron guardados.");
+
+            queryClient.setQueryData(['getExamQuery', { examId: examData.id }], (old: Exam) => {
+                return { ...data, resources: old.resources, examSubmissions: old.examSubmissions, course: old.course }
+            });
+            queryClient.setQueryData(['getCourseQuery', { courseId: courseData.id }], (old: FullCourse) => ({ 
+                ...old, exams: old.exams.map(e => e.id == examData.id ? data : e) 
+            }))
         },
     });
 
@@ -67,6 +77,8 @@ export default function EditExam() {
             ...formValues,
             startTime: new Date(formValues.startTime).toISOString(),
             endTime: new Date(formValues.endTime).toISOString(),
+            visible,
+            closed
         });
     }
     return (
