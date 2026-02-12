@@ -105,12 +105,12 @@ export default function CreateExam() {
                 
                 <div className="form-floating mb-3">
                     <textarea
-                        id="textContent"
-                        name="textContent"
+                        id="description"
+                        name="description"
                         className="form-control"
                         placeholder="Descripción"
                         style={{ height: '100px' }} />
-                    <label htmlFor="textContent">Descripción</label>
+                    <label htmlFor="description">Descripción</label>
                 </div>
 
 
