@@ -82,7 +82,7 @@ export default function AddResourcesModal({
                 default:
                     break;
             }
-            
+
             removeParam('resourceCreation')
 
             setError('');
@@ -124,21 +124,39 @@ export default function AddResourcesModal({
         setError('');
     }
 
+    const openModal = () => {
+        setUrl('');
+        setLinkText('');
+        setError('');
+        openModalRef.current?.click();
+    }
+
     return (
         <div>
+            <button
+                type="button"
+                ref={openModalRef}
+                data-bs-toggle="modal"
+                data-bs-target={"#addResourceModal" + type + parentId}
+                style={{ display: 'none' }}
+            >
+            </button>
             {
                 type == 'course'
                     ?
                     <div
                         className="dropdown-item"
-                        data-bs-toggle="modal"
-                        data-bs-target={"#addResourceModal" + type + parentId}
+                        onClick={openModal}
                         role="button"
                     >
                         Recurso
                     </div>
                     :
-                    <button type="button" ref={openModalRef} className="btn btn-primary" data-bs-toggle="modal" data-bs-target={"#addResourceModal" + type + parentId}>
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={openModal}
+                    >
                         <i className="bi bi-plus-circle me-1" /> Agregar recursos
                     </button>
             }
