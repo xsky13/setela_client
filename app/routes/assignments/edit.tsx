@@ -8,6 +8,7 @@ import LoadingButton from "~/Components/LoadingButton";
 import { AssignmentContext } from "~/context/AssignmentContext";
 import { CourseContext } from "~/context/CourseContext";
 import type { Assignment } from "~/types/assignment";
+import type { FullCourse } from "~/types/course";
 import { formatDateForInput } from "~/utils/date";
 import { getErrors } from "~/utils/error";
 
@@ -44,7 +45,7 @@ export default function EditAssignment() {
             const response = await api.put('/assignment/' + assignmentData?.id, data);
             return response.data;
         },
-        onSuccess() {
+        onSuccess(data) {
             setErrors([]);
 
             queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
@@ -52,7 +53,11 @@ export default function EditAssignment() {
                     ...old,
                     ...redundantFormData
                 }
-            })
+            });
+
+            queryClient.setQueryData(['getCourseQuery', { courseId: courseData.id }], (old: FullCourse) => ({
+                ...old, assignments: old.assignments.map(a => a.id == assignmentData.id ? data : a)
+            }))
 
             toast("Sus cambios fueron guardados");
         },
@@ -75,7 +80,7 @@ export default function EditAssignment() {
             return;
         }
 
-        setRedundantFormData({...formValues, visible, closed});
+        setRedundantFormData({ ...formValues, visible, closed });
 
         editAssignmentMutation.mutate({ ...formValues, visible, closed });
     }
