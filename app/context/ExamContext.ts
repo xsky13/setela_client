@@ -1,4 +1,4 @@
 import { createContext } from "react";
-import { type Exam } from "~/types/exam";
+import { type ExamDataView } from "~/types/exam";
 
-export const ExamContext = createContext<Exam | undefined | null>(null);
+export const ExamContext = createContext<ExamDataView | undefined | null>(null);

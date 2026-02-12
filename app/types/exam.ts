@@ -18,6 +18,10 @@ export type Exam = {
     examSubmissions: ExamSubmissionSimple[]
 }
 
+export type ExamDataView = Exam & {
+    currentUserIsOwner: boolean;
+}
+
 export type ExamSubmissionSimple = {
     id: number,
     sysUserId: number,
