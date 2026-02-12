@@ -10,6 +10,7 @@ export type Exam = {
     maxGrade: number,
     weight: number,
     visible: boolean,
+    closed: boolean,
     creationDate: string,
     displayOrder: number,
     courseId: number,
