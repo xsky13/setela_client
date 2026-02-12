@@ -10,6 +10,7 @@ import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
 import type { Assignment } from '~/types/assignment';
 import type { Module, ResourceListing as ResourceListingType } from '~/types/course';
+import type { Exam, ExamSimple } from '~/types/exam';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -116,10 +117,8 @@ export default function Course() {
                             case 'exam':
                                 return <ExamListing
                                     key={i}
-                                    id={item.id}
-                                    title={item.title!}
-                                    startTime={item.startTime!}
-                                    endTime={item.endTime!}
+                                    exam={item as unknown as ExamSimple}
+                                    currentUserIsOwner={course!.currentUserIsOwner}
                                 />
                             default: ''
                         }
