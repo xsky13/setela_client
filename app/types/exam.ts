@@ -19,6 +19,17 @@ export type Exam = {
     examSubmissions: ExamSubmissionSimple[]
 }
 
+export type ExamSimple = {
+    id: number,
+    title: string,
+    visible: boolean,
+    closed: boolean,
+    courseId: number,
+    displayOrder: number,
+    startTime: string,
+    endTime: string,
+}
+
 export type ExamDataView = Exam & {
     currentUserIsOwner: boolean;
 }
