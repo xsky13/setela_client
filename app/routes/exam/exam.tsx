@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { NavLink } from "react-router";
 import ExamOwnerView from "~/Components/Views/Exam/ExamOwnerView";
+import ExamStudentView from "~/Components/Views/Exam/ExamStudentView";
 import { CourseContext } from "~/context/CourseContext";
 import { ExamContext } from "~/context/ExamContext";
 
@@ -33,7 +34,12 @@ export default function Exam() {
                 </ol>
             </nav>
 
-            <ExamOwnerView exam={examData} />
+            {
+                examData.currentUserIsOwner ?
+                    <ExamOwnerView exam={examData} />
+                    :
+                    <ExamStudentView exam={examData} />
+            }
         </div>
     );
 }
