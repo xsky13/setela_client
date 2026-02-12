@@ -1,15 +1,45 @@
-import { useMutation } from "@tanstack/react-query";
-import { NavLink } from "react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
+import { NavLink, useNavigate } from "react-router";
+import { toast } from "sonner";
+import api from "~/api";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
 import LoadingButton from "~/Components/LoadingButton";
 import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
+import { CourseContext } from "~/context/CourseContext";
+import type { FullCourse } from "~/types/course";
 import type { ExamDataView } from "~/types/exam";
+import { getErrors } from "~/utils/error";
 
-export default function OwnerView({ exam }: { exam: ExamDataView }) {
-    const deleteExamMutation = useMutation({});
+export default function ExamOwnerView({ exam }: { exam: ExamDataView }) {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const courseData = useContext(CourseContext);
+
+    const deleteExamMutation = useMutation({
+        mutationKey: ['delete_exam_command'],
+        mutationFn: async () => {
+            const response = await api.delete("/exam/" + exam.id);
+            return response.data;
+        },
+        async onSuccess() {
+            queryClient.setQueryData(['getCourseQuery', { courseId: courseData?.id }], (old: FullCourse) => {
+                return { ...old, exams: old.exams.filter(e => e.id != exam.id )}
+            })
+            navigate(`/cursos/${courseData?.id}`);
+        },
+        onError: error => {
+            const errors = getErrors(error);
+            console.log(errors);
+            toast(error.message);
+        },
+        retry: 1
+    });
 
     const deleteExam = () => {
-        deleteExamMutation.mutate();
+        if (confirm("Esta seguro que quiere eliminar este examen? Esta acción es irreversible.")) {
+            deleteExamMutation.mutate();
+        }
     }
 
     return (

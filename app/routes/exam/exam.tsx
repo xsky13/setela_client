@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import OwnerView from "~/Components/Views/Exam/OwnerView";
+import ExamOwnerView from "~/Components/Views/Exam/ExamOwnerView";
 import { ExamContext } from "~/context/ExamContext";
 
 export default function Exam() {
@@ -8,6 +8,6 @@ export default function Exam() {
     if (!examData) throw new Error("El examen no existe. Por favor intente de nuevo o contactese con el administrador.");
 
     return (
-        <OwnerView exam={examData} />
+        <ExamOwnerView exam={examData} />
     );
 }
