@@ -10,6 +10,7 @@ import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { createPortal } from 'react-dom';
 import { useSearchParams } from "react-router";
 import type { Assignment } from "~/types/assignment";
+import type { ExamDataView } from "~/types/exam";
 
 export default function AddResourcesModal({
     type,
@@ -70,6 +71,11 @@ export default function AddResourcesModal({
                     break;
                 case "course":
                     queryClient.setQueryData(['getCourseQuery', { courseId: Number(courseId) }], (old: FullCourse) => {
+                        return { ...old, resources: [...old.resources, data] }
+                    })
+                    break;
+                case "exam":
+                    queryClient.setQueryData(['getExamQuery', { examId: Number(parentId) }], (old: ExamDataView) => {
                         return { ...old, resources: [...old.resources, data] }
                     })
                     break;

@@ -6,6 +6,7 @@ import LoadingButton from "~/Components/LoadingButton";
 import EditResourceModal from "~/Components/Resource/EditResourceModal";
 import type { Assignment } from "~/types/assignment";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
+import type { Exam } from "~/types/exam";
 import { ResourceParentType } from "~/types/resourceTypes";
 
 export default function ResourceListing({
@@ -36,6 +37,10 @@ export default function ResourceListing({
                     break;
                 case ResourceParentType.Assignment:
                     queryClient.setQueryData(['getAssignmentQuery', { assignmentId: resource.parentId }], (old: Assignment) => {
+                        return { ...old, resources: old.resources.filter((r: ResourceListing) => r.id != resource.id) }
+                    })
+                case ResourceParentType.Exam:
+                    queryClient.setQueryData(['getExamQuery', { examId: resource.parentId }], (old: Exam) => {
                         return { ...old, resources: old.resources.filter((r: ResourceListing) => r.id != resource.id) }
                     })
                     break;
