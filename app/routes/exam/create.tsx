@@ -109,7 +109,7 @@ export default function CreateExam() {
                         name="description"
                         className="form-control"
                         placeholder="Descripción"
-                        style={{ height: '100px' }} />
+                        style={{ height: '200px' }} />
                     <label htmlFor="description">Descripción</label>
                 </div>
 

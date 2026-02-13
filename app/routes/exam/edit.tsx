@@ -54,8 +54,8 @@ export default function EditExam() {
             queryClient.setQueryData(['getExamQuery', { examId: examData.id }], (old: Exam) => {
                 return { ...data, resources: old.resources, examSubmissions: old.examSubmissions, course: old.course }
             });
-            queryClient.setQueryData(['getCourseQuery', { courseId: courseData.id }], (old: FullCourse) => ({ 
-                ...old, exams: old.exams.map(e => e.id == examData.id ? data : e) 
+            queryClient.setQueryData(['getCourseQuery', { courseId: courseData.id }], (old: FullCourse) => ({
+                ...old, exams: old.exams.map(e => e.id == examData.id ? data : e)
             }))
         },
     });
@@ -155,7 +155,7 @@ export default function EditExam() {
                         name="description"
                         className="form-control"
                         placeholder="Descripción"
-                        style={{ height: '100px' }}
+                        style={{ height: '200px' }}
                         defaultValue={examData.description}
                     />
                     <label htmlFor="description">Descripción</label>
@@ -215,7 +215,19 @@ export default function EditExam() {
                         Trabajo esta cerrado
                     </label>
                 </div>
-                <LoadingButton loading={editExamMutation.isPending} className="btn btn-primary btn-block w-100">Actualizar</LoadingButton>
+                <div className="row">
+
+                    <div className="col">
+                        <NavLink to={"/cursos/" + courseData.id + "/e/" + examData.id} className="btn btn-light btn-block w-100">
+                            <i className="bi bi-chevron-left" />
+                            <span className="ms-2">Volver a examen</span>
+                        </NavLink>
+                    </div>
+                    <div className="col">
+                        <LoadingButton loading={editExamMutation.isPending} className="btn btn-primary btn-block w-100">Actualizar</LoadingButton>
+
+                    </div>
+                </div>
                 {
                     errors.length != 0 ?
                         <FormErrors serverErrors={errors} />

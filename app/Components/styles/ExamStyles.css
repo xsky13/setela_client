@@ -1,0 +1,19 @@
+.tracking-wide {
+    letter-spacing: 0.05rem;
+}
+
+.exam-icon {
+    position: absolute;
+    top: .6rem;
+    left: 1rem;
+    color: black;
+    background-color: #C9A961;
+    width: 3rem;
+    height: 3rem;
+    /* font-size: 1.5rem; */
+    border-radius: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,5 +1,6 @@
 import type { ExamDataView } from "~/types/exam";
 import { formatDate, getMinutesDifference } from "~/utils/date";
+import '../../styles/ExamStyles.css';
 
 export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
 
@@ -19,11 +20,17 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
             <div className="container">
                 <div className="row gap-3">
                     <div
-                        className="col d-flex flex-column justify-content-center align-items-center rounded-2 px-3 py-1 border border-2 border-primary flex-grow-1" style={{ minHeight: '15rem' }}>
-                        <div className="text-muted small mb-2">Solo podras hacer 1 intento.</div>
-                        <button className="btn btn-primary btn-lg" style={{ fontSize: '1rem' }}>
+                        className="position-relative col d-flex flex-column justify-content-center align-items-center rounded-2 px-3 py-1 border border-2 border-primary flex-grow-1" 
+                        style={{ minHeight: '15rem' }}
+                    >
+                        <div className="exam-icon shadow">
+                            <i className="bi bi-pencil-square"></i>
+                        </div>
+                        <button className="btn btn-primary btn-lg text-uppercase tracking-wide" style={{ fontSize: '1rem' }}>
+                            <i className="bi bi-play-circle-fill me-2"></i>
                             Comenzar examen
                         </button>
+                        <div className="text-muted small mt-2">Solo podras hacer 1 intento.</div>
                     </div>
                     <div className="col-7">
                         <div className="d-flex justify-content-between w-100 py-2 px-4 rounded-2 border bg-body-tertiary mb-3">
