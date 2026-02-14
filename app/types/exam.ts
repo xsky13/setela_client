@@ -1,4 +1,5 @@
 import type { CourseSimple, ResourceListing } from "./course";
+import type { Grade } from "./grade";
 import type { UserSimple } from "./user";
 
 export type Exam = {
@@ -32,6 +33,22 @@ export type ExamSimple = {
 
 export type ExamDataView = Exam & {
     currentUserIsOwner: boolean;
+}
+
+
+
+export type ExamSubmission = {
+    id: number,
+    textContent: string,
+    finished: boolean,
+    examId: number,
+    exam: ExamSimple,
+    grade: Grade,
+    resources: ResourceListing[],
+    sysUserId: number,
+    sysUser: UserSimple,
+    turnInTime: string,
+    lastUpdated: string
 }
 
 export type ExamSubmissionSimple = {
