@@ -1,6 +1,9 @@
 import type { ExamDataView } from "~/types/exam";
 import { formatDate, getMinutesDifference } from "~/utils/date";
 import '../../styles/ExamStyles.css';
+import '../../styles/AssignmentUpload.css';
+import ExamSubmissionModal from "./ExamSubmissionModal";
+import ExamStatusBar from "./ExamStatusBar";
 
 export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
 
@@ -20,42 +23,16 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
             <div className="container">
                 <div className="row gap-3">
                     <div
-                        className="position-relative col d-flex flex-column justify-content-center align-items-center rounded-2 px-3 py-1 border border-2 border-primary flex-grow-1" 
+                        className="position-relative col d-flex flex-column justify-content-center align-items-center rounded-2 px-3 py-1 flex-grow-1 upload-section bg-body-tertiary"
                         style={{ minHeight: '15rem' }}
                     >
-                        <div className="exam-icon shadow">
-                            <i className="bi bi-pencil-square"></i>
-                        </div>
-                        <button className="btn btn-primary btn-lg text-uppercase tracking-wide" style={{ fontSize: '1rem' }}>
-                            <i className="bi bi-play-circle-fill me-2"></i>
-                            Comenzar examen
-                        </button>
+                        <ExamSubmissionModal exam={exam} />
                         <div className="text-muted small mt-2">Solo podras hacer 1 intento.</div>
                     </div>
                     <div className="col-7">
-                        <div className="d-flex justify-content-between w-100 py-2 px-4 rounded-2 border bg-body-tertiary mb-3">
-                            <div className="small text-muted d-flex align-items-center">
-                                <i className="bi bi-clock" />
-                                <div className="ms-2">
-                                    <span className="fw-semibold">Duracion: </span>
-                                    <div>{getMinutesDifference(exam.startTime, exam.endTime)} minutos</div>
-                                </div>
-                            </div>
-                            <div className="small text-muted d-flex align-items-center">
-                                <i className="bi bi-hourglass-top" />
-                                <div className="ms-2">
-                                    <span className="fw-semibold">Hora de comienzo: </span>
-                                    <div>{formatDate(exam.startTime)}</div>
-                                </div>
-                            </div>
-                            <div className="small text-muted d-flex align-items-center">
-                                <i className="bi bi-hourglass-bottom" />
-                                <div className="ms-2">
-                                    <span className="fw-semibold">Hora de finalizacion: </span>
-                                    <div>{formatDate(exam.endTime)}</div>
-                                </div>
-                            </div>
-                        </div>
+                        <ExamStatusBar
+                            exam={exam}
+                        />
                         <h4>Mi entrega</h4>
                         <i className="text-muted">
                             <i className="bi bi-info-circle me-2"></i>
