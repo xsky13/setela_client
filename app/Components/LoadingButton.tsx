@@ -1,15 +1,12 @@
-interface LoadingButtonProps {
-    children: React.ReactNode;
+import type { ComponentPropsWithoutRef } from "react";
+
+interface LoadingButtonProps extends ComponentPropsWithoutRef<"button"> {
     loading?: boolean;
-    className?: string;
-    onClick?: void | any;
-    type?: "button" | "submit";
-    form?: string;
 }
 
-export default function LoadingButton({ children, loading, className, onClick, type, form }: LoadingButtonProps) {
+export default function LoadingButton({ children, loading, ...props }: LoadingButtonProps) {
     return (
-        <button onClick={onClick} className={className} disabled={loading} type={type} form={form}>
+        <button {...props} disabled={loading || props.disabled}>
             {
                 loading ?
                     <div className="spinner-border spinner-border-sm" role="status">
