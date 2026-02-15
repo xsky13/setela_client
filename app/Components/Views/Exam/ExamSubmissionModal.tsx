@@ -1,4 +1,4 @@
-import { useContext, useRef, useState, type ChangeEvent } from "react";
+import { useContext, useEffect, useRef, useState, type ChangeEvent, type Ref } from "react";
 import LoadingButton from "~/Components/LoadingButton";
 import type { Exam, ExamDataView, ExamSubmission } from "~/types/exam";
 import ExamStatusBar from "./ExamStatusBar";
@@ -10,24 +10,28 @@ import { getErrors } from "~/utils/error";
 import { toast } from "sonner";
 import { closeModal } from "~/utils/modal";
 
-export default function ExamSubmissionModal({ exam }: { exam: ExamDataView }) {
+export default function ExamSubmissionModal({ exam, examSubmission, openModalBtn }: { exam: ExamDataView, examSubmission: ExamSubmission | null | undefined, openModalBtn: React.RefObject<HTMLButtonElement | null> }) {
+    const user = useContext(AuthContext);
+
     const [error, setError] = useState('');
     const fileInput = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
     const [textContent, setTextContent] = useState('');
     const queryClient = useQueryClient();
 
+    const userSubmitted = exam.examSubmissions.some(e => e.sysUserId == user?.id);
+
     const modalRef = useRef<HTMLDivElement>(null);
 
-    const [examSubmission, setExamSubmission] = useState<ExamSubmission | null>(null);
+    useEffect(() => {
+        if (examSubmission?.textContent) setTextContent(examSubmission.textContent);
+    }, [examSubmission]);
 
     const finishExamSubmissionMutation = useMutation<ExamSubmission, Error, { textContent: string }>({
         mutationKey: ['finish_exam_command'],
         mutationFn: async data => {
-            if (examSubmission) {
-                const response = await api.post("/examSubmission/" + examSubmission.id, data);
-                return response.data;
-            }
+            const response = await api.post("/examSubmission/" + examSubmission!.id + "/finish", data);
+            return response.data;
         },
         onError(error) {
             const errors = getErrors(error);
@@ -35,6 +39,7 @@ export default function ExamSubmissionModal({ exam }: { exam: ExamDataView }) {
             console.log(errors);
         },
         onSuccess(data) {
+            queryClient.setQueryData(['getExamSubmissionForExam', { examId: exam.id }], data);
             queryClient.setQueryData(['getExamQuery', { examId: exam.id }], (old: Exam) => {
                 return {
                     ...old, examSubmissions: old.examSubmissions.map(e => e.id == examSubmission!.id ? data : e)
@@ -42,10 +47,32 @@ export default function ExamSubmissionModal({ exam }: { exam: ExamDataView }) {
             });
 
             closeModal(modalRef);
+            toast("Su entrega fue enviada exitosamente.");
+        }
+    });
+
+    const createExamSubmissionMutation = useMutation<ExamSubmission, Error, { examId: number }>({
+        mutationKey: ['create_exam_submission_command'],
+        mutationFn: async data => {
+            const response = await api.post("/examSubmission", data);
+            console.log(response);
+
+            return response.data;
+        },
+        onError(error) {
+            const errors = getErrors(error);
+            toast(error.message);
+            console.log(errors);
+        },
+        onSuccess(data) {
+            queryClient.setQueryData(['getExamSubmissionForExam', { examId: exam.id }], data);
+
+            queryClient.setQueryData(['getExamQuery', { examId: exam.id }], (old: Exam) => {
+                if (!old) return old;
+                return {  ...old, examSubmissions: [...old.examSubmissions, data] }
+            });
         }
     })
-
-
 
     const handleClick = () => {
         fileInput.current?.click();
@@ -60,24 +87,57 @@ export default function ExamSubmissionModal({ exam }: { exam: ExamDataView }) {
     const finishExam = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (prompt("Guardar cambios y mandar entrega?")) {
+        if (confirm("Guardar cambios y mandar entrega?")) {
             finishExamSubmissionMutation.mutate({ textContent });
+        }
+    }
+
+    const openModal = async () => {
+        if (examSubmission) {
+            openModalBtn?.current?.click();
+        } else {
+            await createExamSubmissionMutation.mutateAsync({ examId: exam.id });
+
+            setTimeout(() => {
+                openModalBtn.current?.click();
+            }, 0);
         }
     }
 
 
     return (
         <div>
+
+            {
+                examSubmission?.finished ?
+                    <button
+                        className="btn btn-primary btn-lg text-uppercase tracking-wide"
+                        style={{ fontSize: '1rem' }}
+                        disabled
+                    >
+                        <i className="bi bi-play-circle-fill me-2"></i>
+                        {userSubmitted ? 'Abrir' : 'Comenzar'} examen
+                    </button>
+                    :
+                    <LoadingButton
+                        type="button"
+                        className="btn btn-primary btn-lg text-uppercase tracking-wide"
+                        loading={createExamSubmissionMutation.isPending}
+                        onClick={openModal}
+                        style={{ fontSize: '1rem' }}
+                    >
+                        <i className="bi bi-play-circle-fill me-2"></i>
+                        {userSubmitted ? 'Abrir' : 'Comenzar'} examen
+                    </LoadingButton>
+            }
+
             <button
-                type="button"
-                className="btn btn-primary btn-lg text-uppercase tracking-wide"
+                ref={openModalBtn}
                 data-bs-toggle="modal"
                 data-bs-target="#submitExamModal"
-                style={{ fontSize: '1rem' }}
-            >
-                <i className="bi bi-play-circle-fill me-2"></i>
-                Comenzar examen
-            </button>
+                type="button"
+                style={{ display: 'none' }}
+            ></button>
 
             <div ref={modalRef} className="modal fade" id="submitExamModal" tabIndex={-1} aria-labelledby="submitExamModalLabel" aria-hidden="true">
                 <div className="modal-dialog modal-fullscreen">
