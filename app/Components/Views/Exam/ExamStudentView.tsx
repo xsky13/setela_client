@@ -105,7 +105,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                         />
                         <div className="text-muted small mt-2">Solo podras hacer 1 intento.</div>
                     </div>
-                    <div className="col-7">
+                    <div className="col-8">
                         <ExamStatusBar
                             exam={exam}
                             examSubmission={examSubmission}

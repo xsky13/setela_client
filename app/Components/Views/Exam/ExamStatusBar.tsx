@@ -81,7 +81,7 @@ export default function ExamStatusBar({
                     <i className="bi bi-hourglass" />
                     <div className="ms-2">
                         <span className="fw-semibold">Tiempo restante: </span>
-                        {formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}
+                        <div>{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}</div>
                     </div>
                 </div>
             }
