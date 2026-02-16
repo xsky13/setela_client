@@ -1,8 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { toast } from "sonner";
 import type { Exam, ExamSubmission } from "~/types/exam";
 import { formatDate, getMinutesDifference } from "~/utils/date";
 
-export default function ExamStatusBar({ exam, examSubmission }: { exam: Exam, examSubmission?: ExamSubmission | null | undefined }) {
+export default function ExamStatusBar({
+    exam,
+    examSubmission,
+    finishExam
+}: {
+    exam: Exam,
+    examSubmission?: ExamSubmission | null | undefined,
+    finishExam: () => void
+}) {
     const duration = getMinutesDifference(exam.startTime, exam.endTime);
 
     const calculateTimeLeft = () => {
@@ -25,6 +34,7 @@ export default function ExamStatusBar({ exam, examSubmission }: { exam: Exam, ex
     };
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+    const [hasWarned, setHasWarned] = useState(false);
 
     useEffect(() => {
         if (!examSubmission) return;
@@ -34,7 +44,19 @@ export default function ExamStatusBar({ exam, examSubmission }: { exam: Exam, ex
             const newTime = calculateTimeLeft();
             setTimeLeft(newTime);
 
+            if (newTime.minutes === 5 && newTime.seconds === 0 && !hasWarned) {
+                toast.warning("Faltan 5 minutos...", {
+                    description: "Asegúrese de guardar sus cambios y subir su entrega a tiempo.",
+                    duration: 10000,
+                });
+                setHasWarned(true);
+            }
+
             if (newTime.minutes === 0 && newTime.seconds === 0) {
+                finishExam();
+                toast("Se acabo el tiempo!", {
+                    description: "Su entrega fue enviada automáticamente. Si todavía faltaron cambios, contáctese con su profesor."
+                });
                 clearInterval(timer);
             }
         }, 1000);

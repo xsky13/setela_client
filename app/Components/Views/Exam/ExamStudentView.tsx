@@ -1,16 +1,26 @@
-import type { ExamDataView, ExamSubmission } from "~/types/exam";
+import type { Exam, ExamDataView, ExamSubmission } from "~/types/exam";
 import { formatDate, getMinutesDifference } from "~/utils/date";
 import '../../styles/ExamStyles.css';
 import '../../styles/AssignmentUpload.css';
 import ExamSubmissionModal from "./ExamSubmissionModal";
 import ExamStatusBar from "./ExamStatusBar";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "~/context/AuthContext";
+import { getErrors } from "~/utils/error";
+import { toast } from "sonner";
+import { closeModal } from "~/utils/modal";
 
 export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const user = useContext(AuthContext);
+
+    const queryClient = useQueryClient();
+
+    // variables for child state
+    const [files, setFiles] = useState<File[]>([]);
+    const [textContent, setTextContent] = useState('');
+    const modalRef = useRef<HTMLDivElement>(null);
 
     const openModalBtn = useRef<HTMLButtonElement>(null);
 
@@ -25,6 +35,33 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         enabled: !!userSubmission?.id,
         retry: 1
     });
+
+    const finishExamSubmissionMutation = useMutation<ExamSubmission, Error, { textContent: string }>({
+        mutationKey: ['finish_exam_command'],
+        mutationFn: async data => {
+            const response = await api.post("/examSubmission/" + examSubmission!.id + "/finish", data);
+            return response.data;
+        },
+        onError(error) {
+            const errors = getErrors(error);
+            toast(error.message);
+            console.log(errors);
+        },
+        onSuccess(data) {
+            queryClient.setQueryData(['getExamSubmissionForExam', { examId: exam.id }], data);
+            queryClient.setQueryData(['getExamQuery', { examId: exam.id }], (old: Exam) => {
+                return {
+                    ...old, examSubmissions: old.examSubmissions.map(e => e.id == examSubmission!.id ? data : e)
+                }
+            });
+
+            closeModal(modalRef);
+        }
+    });
+
+    const finishExam = () => {
+        finishExamSubmissionMutation.mutate({ textContent });
+    }
 
     const openModal = () => {
         openModalBtn.current?.click();
@@ -54,12 +91,20 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                             exam={exam}
                             examSubmission={examSubmission || null}
                             openModalBtn={openModalBtn}
+                            textContent={textContent}
+                            setTextContent={setTextContent}
+                            files={files}
+                            setFiles={setFiles}
+                            modalRef={modalRef}
+                            finishExam={finishExam}
+                            examLoading={finishExamSubmissionMutation.isPending}
                         />
                         <div className="text-muted small mt-2">Solo podras hacer 1 intento.</div>
                     </div>
                     <div className="col-7">
                         <ExamStatusBar
                             exam={exam}
+                            finishExam={finishExam}
                         />
                         <h4>Mi entrega</h4>
                         {
@@ -108,16 +153,10 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                             <div className="subtitle">Revision</div>
                                             {
                                                 examSubmission.finished ?
-                                                    examSubmission.grade ?
-                                                        <button className="btn btn-outline-primary" onClick={openModal}>
-                                                            <i className="bi bi-arrow-return-right me-2"></i>
-                                                            Ver
-                                                        </button>
-                                                        :
-                                                        <button className="btn btn-outline-primary" disabled>
-                                                            <i className="bi bi-arrow-return-right me-2"></i>
-                                                            Ver
-                                                        </button>
+                                                    <button className="btn btn-outline-primary" onClick={openModal}>
+                                                        <i className="bi bi-arrow-return-right me-2"></i>
+                                                        Ver
+                                                    </button>
                                                     :
                                                     <button className="btn btn-outline-primary" onClick={openModal}>
                                                         <i className="bi bi-arrow-return-right me-2"></i>
