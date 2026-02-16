@@ -146,7 +146,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                     <div className="mt-3">
                                         <div className="d-flex align-items-center justify-content-between my-2">
                                             <div className="subtitle">Documentos adjuntos</div>
-                                            <span className="badge text-bg-secondary fs-6">{examSubmission?.resources?.length}</span>
+                                            <span className="badge text-bg-secondary fs-6">{examSubmission.finished ? examSubmission?.resources?.length : files.length}</span>
                                         </div>
                                         <hr />
                                         <div className="d-flex align-items-center justify-content-between my-2">

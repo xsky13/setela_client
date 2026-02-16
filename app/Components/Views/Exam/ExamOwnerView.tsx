@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import ResourceListing from "~/Components/Courses/Course/ResourceListing";
+import ExamSubmissionListing from "~/Components/ExamSubmissions/ExamSubmissionListing";
 import LoadingButton from "~/Components/LoadingButton";
 import AddResourcesModal from "~/Components/Resource/AddResourcesModal";
 import { CourseContext } from "~/context/CourseContext";
@@ -16,6 +17,35 @@ export default function ExamOwnerView({ exam }: { exam: ExamDataView }) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const courseData = useContext(CourseContext);
+
+    const [assignmentBlock, setAssignmentBlock] = useState<'total' | 'corrected' | 'pending'>('total');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const examSubmissions = useMemo(() => {
+        let list;
+        switch (assignmentBlock) {
+            case 'corrected':
+                list = exam.examSubmissions.filter(e => e.grade?.value);
+                break;
+            case 'pending':
+                list = exam.examSubmissions.filter(e => !e.grade?.value);
+                break;
+            case 'total':
+            default:
+                list = exam.examSubmissions;
+                break;
+
+        }
+
+        if (searchTerm.trim() != "") {
+            list = list.filter(a => a.sysUser.name.toLowerCase().includes(searchTerm));
+        }
+        return list;
+    }, [assignmentBlock, exam.examSubmissions, searchTerm]);
+
+    const totalSubmissions = exam.examSubmissions.length;
+    const totalCorrected = exam.examSubmissions.filter(e => e.grade?.value).length;
+    const totalUncorrected = exam.examSubmissions.filter(e => !e.grade?.value).length;
 
     const deleteExamMutation = useMutation({
         mutationKey: ['delete_exam_command'],
@@ -147,6 +177,69 @@ export default function ExamOwnerView({ exam }: { exam: ExamDataView }) {
                         }
                     </div>
                 </div>
+            </div>
+
+            <div className="my-5 border border-2 border-primary rounded-3 px-4 py-3">
+                <h2>Entregas</h2>
+
+                <div className="row my-3">
+                    <div className="btn-group col-4" role="group">
+                        <button
+                            type="button"
+                            className={"btn btn-outline-primary btn-sm " + (assignmentBlock == 'total' ? 'active' : '')}
+                            onClick={() => setAssignmentBlock('total')}
+                        >
+                            <i className="bi bi-grid-fill me-1"></i> Todas ({totalSubmissions})
+                        </button>
+                        <button
+                            type="button"
+                            className={"btn btn-outline-primary btn-sm " + (assignmentBlock == 'corrected' ? 'active' : '')}
+                            onClick={() => setAssignmentBlock('corrected')}
+                        >
+                            <i className="bi bi-check-circle me-1"></i> Corregidas ({totalCorrected})
+                        </button>
+                        <button
+                            type="button"
+                            className={"btn btn-outline-primary btn-sm " + (assignmentBlock == 'pending' ? 'active' : '')}
+                            onClick={() => setAssignmentBlock('pending')}
+                        >
+                            <i className="bi bi-clock me-1"></i> Pendientes ({totalUncorrected})
+                        </button>
+                    </div>
+                    <div className="col-8">
+                        <input
+                            type="text"
+                            className="form-control w-100"
+                            placeholder="Buscar por alumno"
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                </div>
+                <table className="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nro</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Hora de comienzo</th>
+                            <th scope="col">Hora de entrega</th>
+                            <th scope="col">Nota</th>
+                            <th scope="col">Estado de entrega</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            exam.examSubmissions.length != 0 &&
+                            examSubmissions.map((ex, i) => {
+                                return <ExamSubmissionListing
+                                    examSubmission={ex}
+                                    exam={exam}
+                                    key={i}
+                                />
+                            })
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     );

@@ -1,5 +1,5 @@
 import type { CourseSimple, ResourceListing } from "./course";
-import type { Grade } from "./grade";
+import type { Grade, GradeSimple } from "./grade";
 import type { UserSimple } from "./user";
 
 export type Exam = {
@@ -47,15 +47,18 @@ export type ExamSubmission = {
     resources: ResourceListing[],
     sysUserId: number,
     sysUser: UserSimple,
-    startTime: string,  
+    startTime: string,
     turnInTime: string,
-    lastUpdated: string
+    lastUpdated: string,
 }
 
 export type ExamSubmissionSimple = {
     id: number,
     sysUserId: number,
     sysUser: UserSimple,
+    startTime: string,
     turnInTime: string,
-    lastUpdated: string
+    lastUpdated: string,
+    grade?: GradeSimple,
+    finished: boolean,
 }
