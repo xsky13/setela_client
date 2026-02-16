@@ -6,7 +6,7 @@ import ExamSubmissionModal from "./ExamSubmissionModal";
 import ExamStatusBar from "./ExamStatusBar";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "~/context/AuthContext";
 import { getErrors } from "~/utils/error";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
 
     const userSubmission = exam.examSubmissions.find(e => e.sysUserId === user?.id);
 
-    const { data: examSubmission } = useQuery<any, Error, ExamSubmission>({
+    const { data: examSubmission } = useQuery<ExamSubmission>({
         queryKey: ['getExamSubmissionForExam', { examId: exam.id }],
         queryFn: async () => {
             const response = await api.get("/examSubmission/" + userSubmission?.id);
@@ -39,7 +39,9 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const finishExamSubmissionMutation = useMutation<ExamSubmission, Error, { textContent: string }>({
         mutationKey: ['finish_exam_command'],
         mutationFn: async data => {
-            const response = await api.post("/examSubmission/" + examSubmission!.id + "/finish", data);
+            const id = userSubmission?.id || examSubmission?.id;
+            if (!id) throw new Error("No submission ID found");
+            const response = await api.post("/examSubmission/" + id + "/finish", data);
             return response.data;
         },
         onError(error) {
@@ -51,7 +53,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
             queryClient.setQueryData(['getExamSubmissionForExam', { examId: exam.id }], data);
             queryClient.setQueryData(['getExamQuery', { examId: exam.id }], (old: Exam) => {
                 return {
-                    ...old, examSubmissions: old.examSubmissions.map(e => e.id == examSubmission!.id ? data : e)
+                    ...old, examSubmissions: old.examSubmissions.map(e => e.id == data.id ? data : e)
                 }
             });
 
@@ -59,9 +61,11 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         }
     });
 
-    const finishExam = () => {
+    const finishExam = useCallback(() => {
+        if (finishExamSubmissionMutation.isPending) return;
+
         finishExamSubmissionMutation.mutate({ textContent });
-    }
+    }, [textContent, finishExamSubmissionMutation])
 
     const openModal = () => {
         openModalBtn.current?.click();
@@ -104,6 +108,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                     <div className="col-7">
                         <ExamStatusBar
                             exam={exam}
+                            examSubmission={examSubmission}
                             finishExam={finishExam}
                         />
                         <h4>Mi entrega</h4>

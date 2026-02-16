@@ -27,7 +27,7 @@ export default function ExamSubmissionModal({
     examSubmission: ExamSubmission | null | undefined,
     openModalBtn: React.RefObject<HTMLButtonElement | null>,
     textContent: string,
-    setTextContent: Dispatch<SetStateAction<string>>
+    setTextContent: Dispatch<SetStateAction<string>>,
     files: File[],
     setFiles: Dispatch<SetStateAction<File[]>>,
     modalRef: React.RefObject<HTMLDivElement | null>,
@@ -40,6 +40,12 @@ export default function ExamSubmissionModal({
     const queryClient = useQueryClient();
 
     const userSubmitted = exam.examSubmissions.some(e => e.sysUserId == user?.id);
+
+    const now = new Date().getTime();
+    const start = new Date(exam.startTime).getTime();
+    const end = new Date(exam.endTime).getTime();
+
+    const isInOpenRange = now > start && now < end;
 
 
     useEffect(() => {
@@ -75,7 +81,7 @@ export default function ExamSubmissionModal({
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setFiles(Array.from(e.target.files));
+            setFiles(prev => [...prev, ...Array.from(e.target.files ?? [])]);
         }
     };
 
@@ -115,16 +121,26 @@ export default function ExamSubmissionModal({
                         {userSubmitted ? 'Abrir' : 'Comenzar'} examen
                     </button>
                     :
-                    <LoadingButton
-                        type="button"
-                        className="btn btn-primary btn-lg text-uppercase tracking-wide"
-                        loading={createExamSubmissionMutation.isPending}
-                        onClick={openModal}
-                        style={{ fontSize: '1rem' }}
-                    >
-                        <i className="bi bi-play-circle-fill me-2"></i>
-                        {userSubmitted ? 'Abrir' : 'Comenzar'} examen
-                    </LoadingButton>
+                    (exam.closed && !isInOpenRange) ?
+                        <button
+                            className="btn btn-primary btn-lg text-uppercase tracking-wide"
+                            style={{ fontSize: '1rem' }}
+                            disabled
+                        >
+                            <i className="bi bi-play-circle-fill me-2"></i>
+                            Comenzar examen
+                        </button>
+                        :
+                        <LoadingButton
+                            type="button"
+                            className="btn btn-primary btn-lg text-uppercase tracking-wide"
+                            loading={createExamSubmissionMutation.isPending}
+                            onClick={openModal}
+                            style={{ fontSize: '1rem' }}
+                        >
+                            <i className="bi bi-play-circle-fill me-2"></i>
+                            {userSubmitted ? 'Abrir' : 'Comenzar'} examen
+                        </LoadingButton>
             }
 
             <button
