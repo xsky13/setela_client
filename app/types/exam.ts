@@ -47,6 +47,7 @@ export type ExamSubmission = {
     resources: ResourceListing[],
     sysUserId: number,
     sysUser: UserSimple,
+    startTime: string,  
     turnInTime: string,
     lastUpdated: string
 }

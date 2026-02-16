@@ -69,7 +69,7 @@ export default function ExamSubmissionModal({ exam, examSubmission, openModalBtn
 
             queryClient.setQueryData(['getExamQuery', { examId: exam.id }], (old: Exam) => {
                 if (!old) return old;
-                return {  ...old, examSubmissions: [...old.examSubmissions, data] }
+                return { ...old, examSubmissions: [...old.examSubmissions, data] }
             });
         }
     })
@@ -149,6 +149,7 @@ export default function ExamSubmissionModal({ exam, examSubmission, openModalBtn
                         <div className="modal-body">
                             <div className="">
                                 <ExamStatusBar
+                                    examSubmission={examSubmission}
                                     exam={exam}
                                 />
                                 <div className="col px-3 py-2 rounded-1 bg-body-tertiary border">
