@@ -169,7 +169,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                             <div className="subtitle">Calificacion:</div>
                                             {
                                                 examSubmission.grade ?
-                                                    <span className="fs-6 text-primary-emphasis"></span>
+                                                    <span className="fs-5 fw-semibold text-primary-emphasis">{examSubmission.grade.value}</span>
                                                     :
                                                     <span className="small">Todavía no hay calificación</span>
                                             }

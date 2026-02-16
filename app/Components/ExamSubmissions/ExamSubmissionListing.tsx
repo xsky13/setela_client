@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
 import { toast } from "sonner";
+import GradeExamModal from "../Grades/GradeExamModal";
 // import GradeModal from "./GradeModal";
 
 export default function ExamSubmissionListing({ examSubmission, exam }: { examSubmission: ExamSubmissionSimple, exam: Exam }) {
-    const [isLate, setIsLate] = useState(false);
     // const [updateIsLate, setUpdateIsLate] = useState(false);
     const queryClient = useQueryClient();
 
@@ -50,13 +50,6 @@ export default function ExamSubmissionListing({ examSubmission, exam }: { examSu
             <td className="fw-semibold">{examSubmission.sysUser.name}</td>
             <td className="text-muted small">
                 {formatDate(examSubmission.startTime)}
-                {
-                    isLate &&
-                    <div className="text-danger mt-1">
-                        <i className="bi-exclamation-triangle-fill"></i>
-                        <span className="ms-2">Entregado tarde</span>
-                    </div>
-                }
             </td>
             <td className="text-muted small">
                 {formatDate(examSubmission.turnInTime)}
@@ -87,7 +80,7 @@ export default function ExamSubmissionListing({ examSubmission, exam }: { examSu
                     <i className="bi bi-trash-fill" />
                     <span className="ms-2">Eliminar</span>
                 </LoadingButton>
-                {/* <GradeModal examSubmissionId={examSubmission.id} /> */}
+                {examSubmission.finished && <GradeExamModal examSubmissionId={examSubmission.id} />}
             </td>
         </tr>
     );

@@ -157,6 +157,8 @@ export default function ExamSubmissionModal({
                                                     <div className="mt-4">
                                                         <div className="subtitle">Recursos y materiales</div>
                                                         {
+                                                            exam.resources &&
+                                                            exam.resources.length != 0 &&
                                                             exam.resources.map((resource, i) => (
                                                                 <ResourceListing key={i} resource={resource} currentUserIsOwner={exam.currentUserIsOwner} />
                                                             ))
@@ -170,7 +172,8 @@ export default function ExamSubmissionModal({
                                             <div>
                                                 {
                                                     examSubmission &&
-                                                    examSubmission.resources?.length != 0 &&
+                                                    examSubmission.resources &&
+                                                    examSubmission.resources.length != 0 &&
                                                     <div className="my-2">
                                                         {
                                                             examSubmission.resources.map(r => (
