@@ -50,7 +50,7 @@ export default function GradeModal({
     }, [isError]);
 
     useEffect(() => {
-        
+
         console.log(assignmentSubmission);
     }, [assignmentSubmission])
 
@@ -134,21 +134,24 @@ export default function GradeModal({
                                                     </div>
                                                     {
                                                         assignmentSubmission?.resources.length != 0 ?
-                                                            <div className="vstack gap-2">
+                                                            <div className="list-group">
                                                                 {
                                                                     assignmentSubmission?.resources.map((resource, i) => (
-                                                                        <div key={i} className="bg-white p-2 rounded-2 border list-group-item d-flex justify-content-between align-items-center">
-                                                                            <div>
-                                                                                <div className="text-primary-emphasis bg-primary-subtle p-2 rounded-2 d-inline me-2">
-                                                                                    <i className="bi bi-file-earmark" />
+                                                                        <li key={i} className="list-group-item bg-body-tertiary w-auto d-flex justify-content-between gap-2">
+                                                                            <div className="hstack gap-2 align-items-start">
+                                                                                <i className="bi bi-file-earmark-fill text-primary bg-primary-subtle px-2 py-1 rounded-2" />
+                                                                                <div className="fw-semibold">
+                                                                                    {resource.linkText || resource.url}
+                                                                                    <div className="mt-1 text-muted small fw-normal">
+                                                                                        {formatDate(resource.creationDate)}
+                                                                                    </div>
                                                                                 </div>
-                                                                                <span className="fw-semibold">{resource.url}</span>
                                                                             </div>
-                                                                            <button className="btn btn-secondary">
+                                                                            <a href={resource.url + "?download=true"} target="_blank" className="btn btn-secondary">
                                                                                 <i className="bi bi-download me-1"></i>
-                                                                                Descargar
-                                                                            </button>
-                                                                        </div>
+                                                                                <div>Descargar</div>
+                                                                            </a>
+                                                                        </li>
                                                                     ))
                                                                 }
                                                             </div>
