@@ -1,6 +1,6 @@
 "use client"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import api from "~/api";
 import { ResourceType } from "~/types/resourceTypes";
 import LoadingButton from "../LoadingButton";
@@ -9,25 +9,35 @@ import { closeModal } from "~/utils/modal";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { createPortal } from 'react-dom';
 import { useSearchParams } from "react-router";
-import type { Assignment } from "~/types/assignment";
+import type { Assignment, AssignmentSubmissionFull } from "~/types/assignment";
 import type { ExamDataView } from "~/types/exam";
+import { CourseContext } from "~/context/CourseContext";
 
 export default function AddResourcesModal({
     type,
     parentId,
     courseId,
+    /**
+     * * two resources, exam submissions and assignment submissions use their parent's id to use as a key in the query.
+     * * Therefore, they can't use parentId, because they would reference themselves
+     */
+    grandparentId 
 }: {
     type: string;
     parentId: number,
     courseId: number,
+    grandparentId?: number
 }) {
-    const [resourceType, setResourceType] = useState(ResourceType.Link);
+    const [resourceType, setResourceType] = useState(ResourceType.Document);
     const queryClient = useQueryClient();
     const [linkText, setLinkText] = useState('');
     const [url, setUrl] = useState('');
     const [error, setError] = useState('');
     const modalRef = useRef<HTMLDivElement>(null);
     const openModalRef = useRef<HTMLButtonElement>(null);
+
+    const courseContext = useContext(CourseContext);
+    if (!courseContext) throw new Error("El curso no existe.");
 
     const [file, setFile] = useState<File | null>(null);
 
@@ -68,6 +78,12 @@ export default function AddResourcesModal({
                     break;
                 case "assignment":
                     queryClient.setQueryData(['getAssignmentQuery', { assignmentId: Number(parentId) }], (old: Assignment) => {
+                        return { ...old, resources: [...old.resources, data] }
+                    })
+                    break;
+                case "assignmentSubmission":
+                    // for assignment submission only update the GetById query, since there is no father query for a full assignment submission
+                    queryClient.setQueryData(['getAssignmentSubmissionForAssignment', { assignmentId: Number(grandparentId) }], (old: AssignmentSubmissionFull) => {
                         return { ...old, resources: [...old.resources, data] }
                     })
                     break;
@@ -121,7 +137,7 @@ export default function AddResourcesModal({
                 }
                 formData.append("file", file);
                 formData.append("download", download.toString());
-                
+
                 break;
         }
 
@@ -139,6 +155,11 @@ export default function AddResourcesModal({
         setLinkText('');
         setError('');
         openModalRef.current?.click();
+    }
+
+    if ((type != "assignmentSubmission" && type != "examSubmission") && !courseContext.currentUserIsOwner) {
+        toast("No tiene acceso a esta función.");
+        return;
     }
 
     return (
@@ -179,37 +200,40 @@ export default function AddResourcesModal({
                         </div>
                         <div className="modal-body">
                             <form id={"addResourceForm" + type + parentId} onSubmit={handleFormSubmit}>
-                                <div className="mb-3">
-                                    <ul className="nav nav-pills nav-fill">
-                                        <li className="nav-item">
-                                            <button
-                                                className={"nav-link " + (resourceType == ResourceType.Link && "active")}
-                                                type="button"
-                                                onClick={() => changeTabs(ResourceType.Link)}
-                                            >
-                                                Enlace
-                                            </button>
-                                        </li>
-                                        <li className="nav-item">
-                                            <button
-                                                className={"nav-link " + (resourceType == ResourceType.Image && "active")}
-                                                type="button"
-                                                onClick={() => changeTabs(ResourceType.Image)}
-                                            >
-                                                Imagen
-                                            </button>
-                                        </li>
-                                        <li className="nav-item">
-                                            <button
-                                                className={"nav-link " + (resourceType == ResourceType.Document && "active")}
-                                                type="button"
-                                                onClick={() => changeTabs(ResourceType.Document)}
-                                            >
-                                                Documento
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
+                                {
+                                    courseContext.currentUserIsOwner &&
+                                    <div className="mb-3">
+                                        <ul className="nav nav-pills nav-fill">
+                                            <li className="nav-item">
+                                                <button
+                                                    className={"nav-link " + (resourceType == ResourceType.Link && "active")}
+                                                    type="button"
+                                                    onClick={() => changeTabs(ResourceType.Link)}
+                                                >
+                                                    Enlace
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button
+                                                    className={"nav-link " + (resourceType == ResourceType.Image && "active")}
+                                                    type="button"
+                                                    onClick={() => changeTabs(ResourceType.Image)}
+                                                >
+                                                    Imagen
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button
+                                                    className={"nav-link " + (resourceType == ResourceType.Document && "active")}
+                                                    type="button"
+                                                    onClick={() => changeTabs(ResourceType.Document)}
+                                                >
+                                                    Documento
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                }
                                 {
                                     (() => {
                                         switch (resourceType) {
@@ -263,16 +287,21 @@ export default function AddResourcesModal({
                                                             />
                                                             <label htmlFor="linkText">Nombre del recurso (opcional)</label>
                                                         </div>
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            id="download"
-                                                            checked={download}
-                                                            onChange={() => setDownload(!download)}
-                                                        />
-                                                        <label className="form-check-label" htmlFor="download">
-                                                            Descargable
-                                                        </label>
+                                                        {
+                                                            courseContext.currentUserIsOwner &&
+                                                            <>
+                                                                <input
+                                                                    className="form-check-input"
+                                                                    type="checkbox"
+                                                                    id="download"
+                                                                    checked={download}
+                                                                    onChange={() => setDownload(!download)}
+                                                                />
+                                                                <label className="form-check-label ms-2" htmlFor="download">
+                                                                    Descargable
+                                                                </label>
+                                                            </>
+                                                        }
                                                     </>
                                                 )
                                         }

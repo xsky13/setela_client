@@ -25,6 +25,11 @@ export default function EditAssignmentSubmission({ assignmentSubmissionId }: { a
         enabled: false
     });
 
+    if (getAssignmentSubmission.isError) {
+        toast("Hubo un error. Por favor intente de nuevo o contáctese con el administrador.");
+        return;
+    }
+
     const openModal = () => {
         openModalRef.current?.click();
         getAssignmentSubmission.refetch();
@@ -59,6 +64,7 @@ export default function EditAssignmentSubmission({ assignmentSubmissionId }: { a
                                         <h1 className="modal-title fs-5" id="editAssignmentSubmissionModalLabel">Editar entrega</h1>
                                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                     </div>
+                                    <div className="subtitle">Mis archivos</div>
                                     <AssignmentUpload
                                         action="edit"
                                         assignmentData={assignmentData}

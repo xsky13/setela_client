@@ -25,7 +25,7 @@ export type AssignmentSubmission = {
     sysUserId: number,
     assignmentId: number,
     grade?: GradeSimple,
-    textContent: string
+    textContent: string,
 }
 
 export type AssignmentSubmissionFull = AssignmentSubmission & {

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import LoadingButton from "../LoadingButton";
 import { AuthContext } from "~/context/AuthContext";
 import { closeModal } from "~/utils/modal";
+import { CourseContext } from "~/context/CourseContext";
 
 export default function AssignmentUpload({
     assignmentData,
@@ -25,6 +26,8 @@ export default function AssignmentUpload({
     const currentUser = useContext(AuthContext);
     const queryClient = useQueryClient();
 
+    const courseContext = useContext(CourseContext)
+
     let canEnter = true;
 
     if (action == "create") canEnter = !assignmentData.assignmentSubmissions.some(a => a.sysUserId == currentUser?.id);
@@ -39,7 +42,7 @@ export default function AssignmentUpload({
         }
     };
 
-    const createAssignmentSubmission = useMutation<AssignmentSubmission, Error, { assignmentId: number, textContent: string }>({
+    const createAssignmentSubmission = useMutation<AssignmentSubmission, Error, FormData>({
         mutationKey: ['create_assignment_submission_command'],
         mutationFn: async data => {
             let response;
@@ -76,7 +79,16 @@ export default function AssignmentUpload({
             return;
         }
 
-        createAssignmentSubmission.mutate({ assignmentId: assignmentData.id, textContent });
+        const formData = new FormData();
+
+        formData.append('assignmentId', assignmentData.id.toString());
+        formData.append('courseId', courseContext!.id.toString());
+        formData.append('textContent', textContent);
+        Array.from(files).forEach((file) => {
+            formData.append('files', file);
+        });
+
+        createAssignmentSubmission.mutate(formData);
     }
 
 

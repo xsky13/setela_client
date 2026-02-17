@@ -1,10 +1,12 @@
-import type { Assignment, AssignmentSubmission } from "~/types/assignment";
+import type { Assignment, AssignmentSubmission, AssignmentSubmissionFull } from "~/types/assignment";
 import { formatDate } from "~/utils/date";
 import EditAssignmentSubmission from "../AssignmentSubmissions/EditAssignmentSubmission";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
 import { toast } from "sonner";
 import LoadingButton from "../LoadingButton";
+import AddResourcesModal from "../Resource/AddResourcesModal";
+import AssignmentSubmissionResourceListing from "../AssignmentSubmissions/AssignmentSubmissionResourceListing";
 
 export default function AssignmentInfo({
     assignmentData,
@@ -26,6 +28,17 @@ export default function AssignmentInfo({
         creationDate = new Date(userSubmission.creationDate).getTime();
         lastUpdateDate = new Date(userSubmission.lastUpdateDate).getTime();
     }
+
+    const { data: assignmentSubmission } = useQuery<AssignmentSubmissionFull>({
+        queryKey: ['getAssignmentSubmissionForAssignment', { assignmentId: assignmentData.id }],
+        queryFn: async () => {
+            const response = await api.get("/assignmentSubmission/" + userSubmission?.id);
+            return response.data;
+        },
+        enabled: !!userSubmission?.id,
+        retry: 1
+    });
+
 
     const queryClient = useQueryClient();
     const deleteAssignmentSubmissionMutation = useMutation({
@@ -49,20 +62,21 @@ export default function AssignmentInfo({
         }
     });
 
+
     const deleteAssignmentSubmission = () => {
         if (confirm("Esta seguro que quiere borrar esta entrega? Esta acción es irreversible")) {
             deleteAssignmentSubmissionMutation.mutate();
         }
     }
 
+
     return (
         <ul className="list-group">
             {
                 userSubmission &&
                 <li className="list-group-item">
-                    <h4>Mi entrega</h4>
-                    <div className="mt-2 mb-1 hstack gap-2">
-                        <EditAssignmentSubmission assignmentSubmissionId={userSubmission.id} />
+                    <div className="mb-1 hstack justify-content-between">
+                        <h4>Mi entrega</h4>
                         <LoadingButton
                             className="btn btn-outline-danger"
                             loading={deleteAssignmentSubmissionMutation.isPending}
@@ -72,77 +86,106 @@ export default function AssignmentInfo({
                             Eliminar entrega
                         </LoadingButton>
                     </div>
-                </li>
-            }
-            <li className="list-group-item">
-                <span className="subtitle small">Estado de entrega</span>
-                <div className="fw-semibold fs-5 hstack gap-3">
-                    {
-                        currentUserSubmitted ?
-                            <div className="pill-lg pill-primary">
-                                <i className="bi-check-circle-fill"></i>
-                                Entregado
-                            </div>
-                            :
-                            <div className="pill-lg pill-warning">
-                                <i className="bi-alarm"></i>
-                                Pendiente
-                            </div>
-                    }
-                    {
-                        userSubmission ?
-                            creationDate! > dueDate ?
-                                <div className="pill-lg pill-danger">
-                                    <i className="bi-exclamation-circle-fill"></i>
-                                    Entregado tarde
-                                </div>
-                                :
-                                <div className="pill-lg pill-success">
-                                    <i className="bi-calendar-check-fill"></i>
-                                    Entregado a tiempo
-                                </div>
-                            :
-                            expired ?
-                                <div className="pill-lg pill-danger">
-                                    <i className="bi-exclamation-circle-fill"></i>
-                                    Tarde
-                                </div>
-                                :
+                    <div className="fw-semibold fs-5 hstack gap-3">
+                        {
+                            currentUserSubmitted ?
                                 <div className="pill-lg pill-primary">
-                                    <i className="bi-exclamation-triangle-fill"></i>
-                                    A tiempo
-                                </div>
-                    }
-
-                    {/* check: if last updated date is older than dueDate, but dont show pill if user already submitted late */}
-                    {
-                        (creationDate && lastUpdateDate) && (
-                            creationDate < dueDate && (
-                                lastUpdateDate > dueDate &&
-                                <div className="pill-lg pill-danger">
-                                    <i className="bi-exclamation-circle-fill"></i>
-                                    Actualizado tarde
-                                </div>
-                            )
-                        )
-                    }
-
-                    {
-                        userSubmission && (
-                            userSubmission?.grade ?
-                                <div className="pill-lg pill-success">
                                     <i className="bi-check-circle-fill"></i>
-                                    Calificado
+                                    Entregado
                                 </div>
                                 :
                                 <div className="pill-lg pill-warning">
-                                    <i className="bi-clock"></i>
-                                    Aguardando calificacion
+                                    <i className="bi-alarm"></i>
+                                    Pendiente
                                 </div>
-                        )
-                    }
-                </div>
-            </li>
+                        }
+                        {
+                            userSubmission ?
+                                creationDate! > dueDate ?
+                                    <div className="pill-lg pill-danger">
+                                        <i className="bi-exclamation-circle-fill"></i>
+                                        Entregado tarde
+                                    </div>
+                                    :
+                                    <div className="pill-lg pill-success">
+                                        <i className="bi-calendar-check-fill"></i>
+                                        Entregado a tiempo
+                                    </div>
+                                :
+                                expired ?
+                                    <div className="pill-lg pill-danger">
+                                        <i className="bi-exclamation-circle-fill"></i>
+                                        Tarde
+                                    </div>
+                                    :
+                                    <div className="pill-lg pill-primary">
+                                        <i className="bi-exclamation-triangle-fill"></i>
+                                        A tiempo
+                                    </div>
+                        }
+
+                        {/* check: if last updated date is older than dueDate, but dont show pill if user already submitted late */}
+                        {
+                            (creationDate && lastUpdateDate) && (
+                                creationDate < dueDate && (
+                                    lastUpdateDate > dueDate &&
+                                    <div className="pill-lg pill-danger">
+                                        <i className="bi-exclamation-circle-fill"></i>
+                                        Actualizado tarde
+                                    </div>
+                                )
+                            )
+                        }
+
+                        {
+                            userSubmission && (
+                                userSubmission?.grade ?
+                                    <div className="pill-lg pill-success">
+                                        <i className="bi-check-circle-fill"></i>
+                                        Calificado
+                                    </div>
+                                    :
+                                    <div className="pill-lg pill-warning">
+                                        <i className="bi-clock"></i>
+                                        Aguardando calificacion
+                                    </div>
+                            )
+                        }
+                    </div>
+                </li>
+            }
+            {
+                assignmentSubmission &&
+                <li className="list-group-item">
+                    <span className="subtitle small">Archivos adjuntos</span>
+                    <div className="mt-1 list-group d-inline">
+                        {
+                            assignmentSubmission.resources &&
+                                assignmentSubmission.resources.length != 0 ?
+                                assignmentSubmission.resources.map(r =>
+                                    <AssignmentSubmissionResourceListing
+                                        resource={r}
+                                        assignmentId={assignmentData.id}
+                                        assignmentSubmissionId={assignmentSubmission.id}
+                                    />
+                                )
+                                :
+                                <div className="text-muted">
+                                    <i className="bi bi-info-circle" />
+                                    <i className="ms-2">No hay documentos</i>
+                                </div>
+                        }
+                        <div className="mt-2">
+                            <AddResourcesModal
+                                type="assignmentSubmission"
+                                parentId={assignmentSubmission.id}
+                                courseId={assignmentData.courseId}
+                                grandparentId={assignmentData.id}
+                            />
+                        </div>
+                    </div>
+                </li>
+            }
             <li className="list-group-item">
                 <span className="subtitle small">Nota</span>
                 {
