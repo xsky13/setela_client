@@ -29,6 +29,8 @@ export default function AddResourcesModal({
     const modalRef = useRef<HTMLDivElement>(null);
     const openModalRef = useRef<HTMLButtonElement>(null);
 
+    const [file, setFile] = useState<File | null>(null);
+
     const [searchParams, setSearchParams] = useSearchParams();
 
 
@@ -48,9 +50,7 @@ export default function AddResourcesModal({
     }, [])
 
 
-    const addResourceMutation = useMutation<ResourceListing, Error, {
-        url: string, linkText: string, type: string, parentType: string, parentId: number, courseId: number
-    }>({
+    const addResourceMutation = useMutation<ResourceListing, Error, FormData>({
         mutationKey: ['add_resource_command'],
         mutationFn: async data => {
             const response = await api.post('/resource', data);
@@ -96,26 +96,32 @@ export default function AddResourcesModal({
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (resourceType != ResourceType.Link) {
-            toast("WIP");
-            return;
+        const formData = new FormData();
+
+        formData.append("type", resourceType.toString());
+        formData.append("parentType", type);
+        formData.append("parentId", parentId.toString());
+        formData.append("courseId", courseId.toString());
+        formData.append("linkText", linkText || "");
+
+        switch (resourceType) {
+            case ResourceType.Link:
+                if (!url) {
+                    setError("URL no puede estar vacío.");
+                    return;
+                }
+                formData.append("url", url);
+                break;
+            default:
+                if (!file) {
+                    setError("Debes seleccionar un archivo.");
+                    return;
+                }
+                formData.append("file", file);
+                break;
         }
 
-        if (url == '') {
-            setError("URL no puede estar vacío.");
-            return;
-        }
-
-        const data = {
-            url,
-            linkText,
-            type: resourceType.toString(),
-            parentType: type,
-            parentId,
-            courseId
-        };
-
-        addResourceMutation.mutate(data);
+        addResourceMutation.mutate(formData);
     }
 
     const changeTabs = (type: ResourceType) => {
@@ -235,7 +241,12 @@ export default function AddResourcesModal({
                                                     <>
                                                         <div className="mb-3">
                                                             <label htmlFor="file" className="form-label">Elegir archivo</label>
-                                                            <input className="form-control" type="file" id="file" />
+                                                            <input
+                                                                className="form-control"
+                                                                type="file"
+                                                                id="file"
+                                                                onChange={e => setFile(e.target.files?.[0] ?? null)}
+                                                            />
                                                         </div>
                                                         <div className="form-floating mb-3">
                                                             <input

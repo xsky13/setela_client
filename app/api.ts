@@ -42,7 +42,12 @@ api.interceptors.request.use((config) => {
             config.headers.Authorization = `Bearer ${token}`;
         }
     }
-    config.headers["Content-Type"] = "application/json";
+    if (!(config.data instanceof FormData)) {
+        config.headers["Content-Type"] = "application/json";
+    } else {
+        // Delete it to be safe, letting the browser set multipart/form-data + boundary
+        delete config.headers["Content-Type"];
+    }
     return config;
 });
 
