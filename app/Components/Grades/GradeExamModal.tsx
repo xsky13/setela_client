@@ -133,12 +133,12 @@ export default function GradeExamModal({
                                                                                 <div className="text-primary-emphasis bg-primary-subtle p-2 rounded-2 d-inline me-2">
                                                                                     <i className="bi bi-file-earmark" />
                                                                                 </div>
-                                                                                <span className="fw-semibold">{resource.url}</span>
+                                                                                <span className="fw-semibold">{resource.linkText || resource.url}</span>
                                                                             </div>
-                                                                            <button className="btn btn-secondary">
+                                                                            <a href={resource.url + "?download=true"} className="btn btn-secondary">
                                                                                 <i className="bi bi-download me-1"></i>
                                                                                 Descargar
-                                                                            </button>
+                                                                            </a>
                                                                         </div>
                                                                     ))
                                                                 }

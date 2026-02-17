@@ -231,8 +231,6 @@ export default function ExamOwnerView({ exam }: { exam: ExamDataView }) {
                         {
                             exam.examSubmissions.length != 0 &&
                             examSubmissions.map((ex, i) => {
-                                console.log(ex);
-                                
                                 return <ExamSubmissionListing
                                     examSubmission={ex}
                                     exam={exam}

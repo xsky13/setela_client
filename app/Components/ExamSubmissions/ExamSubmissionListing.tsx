@@ -1,25 +1,13 @@
-import type { Exam, ExamSubmission, ExamSubmissionSimple } from "~/types/exam";
+import type { Exam, ExamSubmissionSimple } from "~/types/exam";
 import { formatDate } from "~/utils/date";
 import LoadingButton from "../LoadingButton";
-import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
 import { toast } from "sonner";
 import GradeExamModal from "../Grades/GradeExamModal";
-// import GradeModal from "./GradeModal";
 
 export default function ExamSubmissionListing({ examSubmission, exam }: { examSubmission: ExamSubmissionSimple, exam: Exam }) {
-    // const [updateIsLate, setUpdateIsLate] = useState(false);
     const queryClient = useQueryClient();
-
-    // useEffect(() => {
-    //     const submissionTime = new Date(examSubmission.creationDate).getTime();
-    //     const submissionUpdateTime = new Date(examSubmission.lastUpdateDate).getTime();
-    //     const dueTime = new Date(exam.dueDate).getTime();
-
-    //     if (submissionTime > dueTime) setIsLate(true);
-    //     if (submissionUpdateTime > dueTime) setUpdateIsLate(true);
-    // }, [examSubmission, exam]);
 
     const deleteExamSubmissionMutation = useMutation({
         mutationKey: ['delete_exam_submission_command'],
@@ -31,7 +19,9 @@ export default function ExamSubmissionListing({ examSubmission, exam }: { examSu
             console.log(error);
             toast(error.message);
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
+            console.log(data);
+            
             queryClient.setQueryData(['getExamQuery', { examId: exam.id }], (old: Exam) => {
                 return { ...old, examSubmissions: old.examSubmissions.filter(e => e.id != examSubmission.id) }
             })

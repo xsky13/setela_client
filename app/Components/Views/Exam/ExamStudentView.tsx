@@ -11,10 +11,11 @@ import { AuthContext } from "~/context/AuthContext";
 import { getErrors } from "~/utils/error";
 import { toast } from "sonner";
 import { closeModal } from "~/utils/modal";
+import { CourseContext } from "~/context/CourseContext";
 
 export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const user = useContext(AuthContext);
-
+    const course = useContext(CourseContext);
     const queryClient = useQueryClient();
 
     // variables for child state
@@ -36,7 +37,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         retry: 1
     });
 
-    const finishExamSubmissionMutation = useMutation<ExamSubmission, Error, { textContent: string }>({
+    const finishExamSubmissionMutation = useMutation<ExamSubmission, Error, FormData>({
         mutationKey: ['finish_exam_command'],
         mutationFn: async data => {
             const id = userSubmission?.id || examSubmission?.id;
@@ -64,7 +65,17 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const finishExam = useCallback(() => {
         if (finishExamSubmissionMutation.isPending) return;
 
-        finishExamSubmissionMutation.mutate({ textContent });
+        const formData = new FormData();
+
+        formData.append("examId", exam.id.toString());
+        formData.append("textContent", textContent);
+        formData.append("courseId", course!.id.toString());
+
+        Array.from(files).forEach((file) => {
+            formData.append('files', file);
+        });
+
+        finishExamSubmissionMutation.mutate(formData);
     }, [textContent, finishExamSubmissionMutation])
 
     const openModal = () => {
