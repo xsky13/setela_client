@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
 import type { AssignmentSubmissionFull } from "~/types/assignment";
+import { formatDate } from "~/utils/date";
 
 export default function AssignmentSubmissionResourceListing({ resource, assignmentId, assignmentSubmissionId }: {
     resource: ResourceListing,
@@ -39,10 +40,13 @@ export default function AssignmentSubmissionResourceListing({ resource, assignme
     
     return (
         <li className="list-group-item bg-body-tertiary w-auto d-flex justify-content-between gap-2">
-            <div className="hstack gap-2">
+            <div className="hstack gap-2 align-items-start">
                 <i className="bi bi-file-earmark-fill text-primary bg-primary-subtle px-2 py-1 rounded-2" />
                 <div className="fw-semibold">
                     {resource.linkText || resource.url}
+                    <div className="mt-1 text-muted small fw-normal">
+                        {formatDate(resource.creationDate)}
+                    </div>
                 </div>
             </div>
             <div className="hstack gap-2">

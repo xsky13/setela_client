@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import LoadingButton from "../LoadingButton";
 import AddResourcesModal from "../Resource/AddResourcesModal";
 import AssignmentSubmissionResourceListing from "../AssignmentSubmissions/AssignmentSubmissionResourceListing";
+import { useEffect, useState } from "react";
 
 export default function AssignmentInfo({
     assignmentData,
@@ -29,6 +30,8 @@ export default function AssignmentInfo({
         lastUpdateDate = new Date(userSubmission.lastUpdateDate).getTime();
     }
 
+    const [updating, setUpdating] = useState(false);
+
     const { data: assignmentSubmission } = useQuery<AssignmentSubmissionFull>({
         queryKey: ['getAssignmentSubmissionForAssignment', { assignmentId: assignmentData.id }],
         queryFn: async () => {
@@ -38,6 +41,13 @@ export default function AssignmentInfo({
         enabled: !!userSubmission?.id,
         retry: 1
     });
+
+
+    const [textContent, setTextContent] = useState(assignmentSubmission?.textContent || "");
+
+    useEffect(() => {
+        setTextContent(assignmentSubmission?.textContent || "");
+    }, [assignmentSubmission])
 
 
     const queryClient = useQueryClient();
@@ -61,6 +71,30 @@ export default function AssignmentInfo({
             })
         }
     });
+
+    const updateAssignmentSubmissionText = useMutation<AssignmentSubmission, Error, { textContent: string }>({
+        mutationKey: ['update_assignment_submission_content'],
+        mutationFn: async data => {
+            const response = await api.put('/AssignmentSubmission/' + assignmentSubmission?.id, data);
+            return response.data;
+        },
+        onSuccess: data => {
+            toast("Su entrega ha sido actualizada");
+            queryClient.setQueryData(['getAssignmentSubmissionForAssignment', { assignmentId: assignmentData.id }], (old: AssignmentSubmissionFull) => {
+                return { ...old, textContent: data.textContent }
+            });
+            setUpdating(false);
+        },
+        onError: (error) => {
+            console.log(error);
+            toast(error.message);
+        }
+    });
+
+    const handleUpdate = (e: React.FormEvent) => {
+        e.preventDefault()
+        updateAssignmentSubmissionText.mutate({ textContent });
+    }
 
 
     const deleteAssignmentSubmission = () => {
@@ -157,8 +191,8 @@ export default function AssignmentInfo({
             {
                 assignmentSubmission &&
                 <li className="list-group-item">
-                    <span className="subtitle small">Archivos adjuntos</span>
-                    <div className="mt-1 list-group d-inline">
+                    <div className="subtitle small">Archivos adjuntos</div>
+                    <div className="list-group mb-3 mt-2">
                         {
                             assignmentSubmission.resources &&
                                 assignmentSubmission.resources.length != 0 ?
@@ -175,17 +209,61 @@ export default function AssignmentInfo({
                                     <i className="ms-2">No hay documentos</i>
                                 </div>
                         }
-                        <div className="mt-2">
-                            <AddResourcesModal
-                                type="assignmentSubmission"
-                                parentId={assignmentSubmission.id}
-                                courseId={assignmentData.courseId}
-                                grandparentId={assignmentData.id}
-                            />
-                        </div>
                     </div>
+                    <AddResourcesModal
+                        type="assignmentSubmission"
+                        parentId={assignmentSubmission.id}
+                        courseId={assignmentData.courseId}
+                        grandparentId={assignmentData.id}
+                    />
                 </li>
             }
+            <li className="list-group-item">
+                <span className="subtitle small">Comentarios</span>
+                <p className="mt-2">
+                    <div className="d-flex gap-2">
+                        {
+                            updating ?
+                                <>
+                                    <div>
+                                        <i className="bi bi-x-circle-fill" onClick={() => setUpdating(false)} role="button" />
+                                        <i
+                                            className="bi bi-arrow-counterclockwise"
+                                            onClick={() => setTextContent(assignmentSubmission?.textContent || textContent)}
+                                            title="Deshacer cambios"
+                                            role="button" />
+                                    </div>
+                                    <form onSubmit={handleUpdate} className="w-100">
+                                        <div className="form-floating mb-3">
+                                            <textarea
+                                                id="description"
+                                                name="description"
+                                                className="form-control"
+                                                placeholder="Descripción"
+                                                style={{ height: '100px' }}
+                                                value={textContent}
+                                                onChange={e => setTextContent(e.target.value)}
+                                            />
+                                            <label htmlFor="description">Comentarios</label>
+                                        </div>
+                                        <LoadingButton
+                                            loading={updateAssignmentSubmissionText.isPending}
+                                            className="btn btn-primary w-100"
+                                        >
+                                            Guardar cambios
+                                        </LoadingButton>
+                                    </form>
+                                </>
+                                :
+                                <>
+                                    <i className="bi bi-pencil text-primary" onClick={() => setUpdating(true)} role="button" />
+                                    {assignmentSubmission?.textContent}
+                                </>
+                        }
+
+                    </div>
+                </p>
+            </li>
             <li className="list-group-item">
                 <span className="subtitle small">Nota</span>
                 {
