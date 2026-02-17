@@ -9,6 +9,7 @@ import api from "~/api";
 import { getErrors } from "~/utils/error";
 import { toast } from "sonner";
 import '../../styles/GradeStyles.css'
+import { CourseContext } from "~/context/CourseContext";
 
 
 export default function ExamSubmissionModal({
@@ -35,6 +36,7 @@ export default function ExamSubmissionModal({
     examLoading: boolean
 }) {
     const user = useContext(AuthContext);
+    const course = useContext(CourseContext);
 
     const fileInput = useRef<HTMLInputElement>(null);
     const queryClient = useQueryClient();
@@ -52,7 +54,7 @@ export default function ExamSubmissionModal({
         if (examSubmission?.textContent) setTextContent(examSubmission.textContent);
     }, [examSubmission]);
 
-    const createExamSubmissionMutation = useMutation<ExamSubmission, Error, { examId: number }>({
+    const createExamSubmissionMutation = useMutation<ExamSubmission, Error, { examId: number, courseId: number }>({
         mutationKey: ['create_exam_submission_command'],
         mutationFn: async data => {
             const response = await api.post("/examSubmission", data);
@@ -98,7 +100,7 @@ export default function ExamSubmissionModal({
         if (examSubmission) {
             openModalBtn?.current?.click();
         } else {
-            await createExamSubmissionMutation.mutateAsync({ examId: exam.id });
+            await createExamSubmissionMutation.mutateAsync({ examId: exam.id, courseId: course!.id });
 
             setTimeout(() => {
                 openModalBtn.current?.click();
