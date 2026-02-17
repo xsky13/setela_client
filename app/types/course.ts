@@ -74,6 +74,7 @@ export type ResourceListing = {
     parentId: number,
     creationDate: string,
     sysUser: UserSimple,
-    displayOrder: number
+    displayOrder: number,
+    download: boolean
 }
 

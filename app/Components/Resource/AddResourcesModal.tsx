@@ -33,6 +33,8 @@ export default function AddResourcesModal({
 
     const [searchParams, setSearchParams] = useSearchParams();
 
+    const [download, setDownload] = useState(true)
+
 
     const removeParam = (paramName: string) => {
         const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -118,6 +120,8 @@ export default function AddResourcesModal({
                     return;
                 }
                 formData.append("file", file);
+                formData.append("download", download.toString());
+                
                 break;
         }
 
@@ -259,6 +263,16 @@ export default function AddResourcesModal({
                                                             />
                                                             <label htmlFor="linkText">Nombre del recurso (opcional)</label>
                                                         </div>
+                                                        <input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            id="download"
+                                                            checked={download}
+                                                            onChange={() => setDownload(!download)}
+                                                        />
+                                                        <label className="form-check-label" htmlFor="download">
+                                                            Descargable
+                                                        </label>
                                                     </>
                                                 )
                                         }

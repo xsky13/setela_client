@@ -99,7 +99,12 @@ export default function ResourceListing({
                                 // should open up a popup with image
                                 return <NavLink to={resource.url} className="h5 card-title text-decoration-none">{resource.linkText || resource.url}</NavLink>
                             case 3:
-                                return <NavLink to={resource.url} target="_blank" className="h5 card-title text-decoration-none">{resource.linkText || resource.url}</NavLink>
+                                return <a
+                                    href={resource.url + (resource.download ? "?download=true" : "")}
+                                    target="blank"
+                                    className="h5 card-title text-decoration-none"
+                                    rel="noreferrer"
+                                >{resource.linkText || resource.url}</a>
                             default:
                                 break;
                         }
@@ -109,9 +114,9 @@ export default function ResourceListing({
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
                 {
                     resource.parentType == ResourceParentType.Course && <button className="btn btn-light">
-                    <i className='bi bi-check-circle me-2'></i>
-                    Marcar finalizado
-                </button>
+                        <i className='bi bi-check-circle me-2'></i>
+                        Marcar finalizado
+                    </button>
                 }
                 {
                     currentUserIsOwner &&
