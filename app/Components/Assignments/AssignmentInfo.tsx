@@ -23,12 +23,6 @@ export default function AssignmentInfo({
     userSubmission: AssignmentSubmission | null
 }) {
     const dueDate = new Date(assignmentData.dueDate).getTime();
-    let creationDate;
-    let lastUpdateDate;
-    if (userSubmission) {
-        creationDate = new Date(userSubmission.creationDate).getTime();
-        lastUpdateDate = new Date(userSubmission.lastUpdateDate).getTime();
-    }
 
     const [updating, setUpdating] = useState(false);
 
@@ -46,8 +40,10 @@ export default function AssignmentInfo({
     const [textContent, setTextContent] = useState(assignmentSubmission?.textContent || "");
 
     useEffect(() => {
-        setTextContent(assignmentSubmission?.textContent || "");
-    }, [assignmentSubmission])
+        if (assignmentSubmission?.textContent) {
+            setTextContent(assignmentSubmission.textContent);
+        }
+    }, [assignmentSubmission?.textContent]);
 
 
     const queryClient = useQueryClient();
@@ -69,6 +65,8 @@ export default function AssignmentInfo({
             queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
                 return { ...old, assignmentSubmissions: old.assignmentSubmissions.filter(a => a.id != userSubmission!.id) }
             })
+            
+            queryClient.removeQueries({ queryKey: ['getAssignmentSubmissionForAssignment', { assignmentId: assignmentData.id }] });
         }
     });
 
@@ -81,7 +79,7 @@ export default function AssignmentInfo({
         onSuccess: data => {
             toast("Su entrega ha sido actualizada");
             queryClient.setQueryData(['getAssignmentSubmissionForAssignment', { assignmentId: assignmentData.id }], (old: AssignmentSubmissionFull) => {
-                return { ...old, textContent: data.textContent }
+                return { ...old, textContent: data.textContent, lastUpdateDate: data.lastUpdateDate }
             });
             setUpdating(false);
         },
@@ -90,6 +88,10 @@ export default function AssignmentInfo({
             toast(error.message);
         }
     });
+
+    const currentSub = assignmentSubmission || userSubmission;
+    const creationDate = currentSub ? new Date(currentSub.creationDate).getTime() : null;
+    const lastUpdateDate = currentSub ? new Date(currentSub.lastUpdateDate).getTime() : null;
 
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault()
@@ -196,8 +198,9 @@ export default function AssignmentInfo({
                         {
                             assignmentSubmission.resources &&
                                 assignmentSubmission.resources.length != 0 ?
-                                assignmentSubmission.resources.map(r =>
+                                assignmentSubmission.resources.map((r, i) =>
                                     <AssignmentSubmissionResourceListing
+                                    key={i}
                                         resource={r}
                                         assignmentId={assignmentData.id}
                                         assignmentSubmissionId={assignmentSubmission.id}
@@ -249,6 +252,7 @@ export default function AssignmentInfo({
                                         <LoadingButton
                                             loading={updateAssignmentSubmissionText.isPending}
                                             className="btn btn-primary w-100"
+                                            disabled={textContent == currentSub?.textContent}
                                         >
                                             Guardar cambios
                                         </LoadingButton>
@@ -306,7 +310,7 @@ export default function AssignmentInfo({
                         :
                         <div className="text-muted small my-1">
                             <i className="bi bi-clock" />
-                            <span className="ms-2">{formatDate(userSubmission?.lastUpdateDate)}</span>
+                            <span className="ms-2">{formatDate(currentSub?.lastUpdateDate)}</span>
                         </div>
                 }
             </li>

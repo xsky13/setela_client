@@ -21,7 +21,7 @@ export default function AddResourcesModal({
      * * two resources, exam submissions and assignment submissions use their parent's id to use as a key in the query.
      * * Therefore, they can't use parentId, because they would reference themselves
      */
-    grandparentId 
+    grandparentId
 }: {
     type: string;
     parentId: number,
@@ -84,8 +84,8 @@ export default function AddResourcesModal({
                 case "assignmentSubmission":
                     // for assignment submission only update the GetById query, since there is no father query for a full assignment submission
                     queryClient.setQueryData(['getAssignmentSubmissionForAssignment', { assignmentId: Number(grandparentId) }], (old: AssignmentSubmissionFull) => {
-                        return { ...old, resources: [...old.resources, data] }
-                    })
+                        return { ...old, lastUpdateDate: data.creationDate,  resources: [...old.resources, data] }
+                    });
                     break;
                 case "course":
                     queryClient.setQueryData(['getCourseQuery', { courseId: Number(courseId) }], (old: FullCourse) => {

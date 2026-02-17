@@ -20,8 +20,9 @@ export default function AssignmentSubmissionResourceListing({ resource, assignme
             return response.data;
         },
         async onSuccess() {
+            // TODO unsafe but can't find a way to extract date for now
             queryClient.setQueryData(['getAssignmentSubmissionForAssignment', { assignmentId: Number(assignmentId) }], (old: AssignmentSubmissionFull) => {
-                return { ...old, resources: [...old.resources.filter(r => r.id != resource.id)] }
+                return { ...old, lastUpdateDate: new Date(), resources: [...old.resources.filter(r => r.id != resource.id)] }
             })
 
             toast("Su recurso fue eliminado exitosamente.");
@@ -37,7 +38,7 @@ export default function AssignmentSubmissionResourceListing({ resource, assignme
             deleteResourceMutation.mutate()
         }
     };
-    
+
     return (
         <li className="list-group-item bg-body-tertiary w-auto d-flex justify-content-between gap-2">
             <div className="hstack gap-2 align-items-start">
