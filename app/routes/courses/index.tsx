@@ -37,31 +37,40 @@ export default function Index() {
             <h1>Cursos</h1>
             {
                 courseData.map((course: any, i: number) => (
-                    <div key={i} className="position-relative my-3 rounded-2 border border-2 border-primary px-3 py-2 d-flex justify-content-between">
-                        <div>
-                            <span className="fw-semibold">{course.title}</span>
-                            <div className="mt-2 small">
-                                <span className="fw-bold text-muted h6">Profesores</span>
-                                <ul className=" list-unstyled">
-                                    {course.professors.map((professor: Profesor, i: number) => (
-                                        <li key={i}>{professor.name}</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                        <div>
-                            <Link to={`/cursos/` + course.id} className="btn btn-secondary">
-                                Ir al curso
-                                <i className="bi bi-chevron-right ms-1"></i>
-                            </Link>
-                        </div>
+                    <div key={i} className="overflow-hidden position-relative my-3 rounded-2 border border-2 border-primary pe-3 d-flex">
                         {
-                            (user.roles.includes(1) || user.professorCourses.find(c => c.id == course.id)) &&
-                            <Link to={`/cursos/${course.id}/editar`} className="position-absolute small text-muted fw-semibold unstyled" style={{ bottom: 10, right: 20 }}>
-                                <i className="bi bi-pencil me-1"></i>
-                                Editar
-                            </Link>
+                            !course.isActive &&
+                            <div className="bg-danger-subtle text-danger px-3 d-flex flex-column align-items-center justify-content-center">
+                                <i className="bi bi-exclamation-triangle-fill fs-5" />
+                                <div className="small">Inactivo</div>
+                            </div>
                         }
+                        <div className="ps-3 py-2 d-flex justify-content-between w-100">
+                            <div>
+                                <span className="fw-semibold">{course.title}</span>
+                                <div className="mt-2 small">
+                                    <span className="fw-bold text-muted h6">Profesores</span>
+                                    <ul className=" list-unstyled">
+                                        {course.professors.map((professor: Profesor, i: number) => (
+                                            <li key={i}>{professor.name}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <Link to={`/cursos/` + course.id} className="btn btn-secondary">
+                                    Ir al curso
+                                    <i className="bi bi-chevron-right ms-1"></i>
+                                </Link>
+                            </div>
+                            {
+                                (user.roles.includes(1) || user.professorCourses.find(c => c.id == course.id)) &&
+                                <Link to={`/cursos/${course.id}/editar`} className="position-absolute small text-muted fw-semibold unstyled" style={{ bottom: 10, right: 20 }}>
+                                    <i className="bi bi-pencil me-1"></i>
+                                    Editar
+                                </Link>
+                            }
+                        </div>
                     </div>
                 ))
             }

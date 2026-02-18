@@ -61,7 +61,7 @@ export default function CourseLayout() {
     if (isError) return <ErrorSegment status={isAxiosError(error) && error.response?.status} />
 
     return (
-        courseData!.isActive ?
+        courseData!.isActive || user?.roles.includes(UserRole.admin) ?
             <div className="d-flex">
                 <Sidebar
                     postEnrollmentFunc={changeAccess}
