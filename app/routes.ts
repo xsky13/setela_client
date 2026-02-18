@@ -7,6 +7,7 @@ export default [
         route("crear", "routes/courses/create.tsx"),
         index("routes/courses/index.tsx"),
         layout("routes/courses/course/layout.tsx", [
+            route(":id/editar", "routes/courses/course/edit.tsx"),
             route(":id", "routes/courses/course/course.tsx"),
             route(":id/participantes", "routes/courses/course/participantes.tsx"),
 
