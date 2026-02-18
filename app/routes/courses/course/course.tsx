@@ -17,6 +17,8 @@ import type { Module, ResourceListing as ResourceListingType, TopicSeparator } f
 import type { Exam, ExamSimple } from '~/types/exam';
 import api from '~/api';
 import { toast } from 'sonner';
+import { AuthContext } from '~/context/AuthContext';
+import { UserRole } from '~/types/roles';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -40,6 +42,7 @@ type CourseItem = IOrderable & {
 
 export default function Course() {
     const course = useContext(CourseContext);
+    const user = useContext(AuthContext);
     const [courseData, setCourseData] = useState<CourseItem[]>([]);
     const navigate = useNavigate();
 
@@ -65,7 +68,11 @@ export default function Course() {
     }, [course]);
 
     const deleteCourseMutation = useMutation({
-        mutationFn: async () => (await api.delete("/course/" + course?.id)).data,
+        mutationFn: async () => {
+            let path = user?.roles.includes(UserRole.admin) ? `/course/${course?.id}/hardDelete` : `/course/${course?.id}`;
+            const response = await api.delete(path)
+            return response.data;
+        },
         onError: error => toast(error.message),
         onSuccess: () => {
             navigate("/");   
@@ -73,7 +80,10 @@ export default function Course() {
     });
 
     const deleteCourse = () => {
-        if (confirm("Esta seguro que quiere eliminar este curso?")) {
+        let message = "Esta seguro que quiere eliminar este curso?";
+        if (user?.roles.includes(UserRole.admin)) message = "Esta seguro que quiere eliminar este curso? Todos los examenes, recursos, modulos, etc. van a ser eliminados"
+        
+        if (confirm(message)) {
             deleteCourseMutation.mutate();
         }
     }
