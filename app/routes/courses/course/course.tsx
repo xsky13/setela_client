@@ -49,7 +49,7 @@ export default function Course() {
         const allItems: CourseItem[] = [
             ...(course.topicSeparators?.map(ts => ({ ...ts, key: `ts-${ts.id}`, type: 'topicSeparator' as const })) || []),
             ...(course.modules?.map(m => ({ ...m, key: `m-${m.id}`, type: 'module' as const })) || []),
-            ...(course.resources?.map(r => ({ ...r, key: `r-${r.id}`, type: 'resource' as const })) || []),
+            ...(course.resources?.map(r => ({ ...r, visible: true, key: `r-${r.id}`, type: 'resource' as const })) || []),
             ...(course.exams?.map(e => ({ ...e, key: `e-${e.id}`, type: 'exam' as const })) || []),
             ...(course.assignments?.map(a => ({ ...a, key: `a-${a.id}`, type: 'assignment' as const })) || [])
         ];
