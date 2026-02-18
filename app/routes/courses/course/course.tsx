@@ -6,10 +6,11 @@ import ExamListing from '~/Components/Courses/Course/ExamListing';
 import ModuleListing from '~/Components/Courses/Course/ModuleListing';
 import ResourceListing from '~/Components/Courses/Course/ResourceListing';
 import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
+import TopicSeparatorListing from '~/Components/TopicSeparator/TopicSeparatorListing';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
 import type { Assignment } from '~/types/assignment';
-import type { Module, ResourceListing as ResourceListingType } from '~/types/course';
+import type { Module, ResourceListing as ResourceListingType, TopicSeparator } from '~/types/course';
 import type { Exam, ExamSimple } from '~/types/exam';
 
 type CourseItem = IOrderable & {
@@ -92,9 +93,11 @@ export default function Course() {
                         switch (item.type) {
                             case 'topicSeparator':
                                 return (
-                                    <div key={i} className='my-3'>
-                                        <h3>{item.title}</h3>
-                                    </div>
+                                    <TopicSeparatorListing
+                                        key={i}
+                                        topicSeparator={item as unknown as TopicSeparator}
+                                        currentUserIsOwner={course!.currentUserIsOwner}
+                                    />
                                 )
                             case 'module':
                                 return <ModuleListing

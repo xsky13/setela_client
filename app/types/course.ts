@@ -51,7 +51,8 @@ export type CourseDataView = FullCourse & {
 export type TopicSeparator = {
     id: number,
     title: string,
-    displayOrder: number
+    displayOrder: number,
+    course: CourseSimple
 }
 
 export type Module = {
