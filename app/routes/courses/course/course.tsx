@@ -6,6 +6,7 @@ import ExamListing from '~/Components/Courses/Course/ExamListing';
 import ModuleListing from '~/Components/Courses/Course/ModuleListing';
 import ResourceListing from '~/Components/Courses/Course/ResourceListing';
 import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
+import CreateTopicSeparatorModal from '~/Components/TopicSeparator/CreateTopicSeparatorModal';
 import TopicSeparatorListing from '~/Components/TopicSeparator/TopicSeparatorListing';
 import { CourseContext } from "~/context/CourseContext";
 import type { IOrderable } from '~/interfaces/IOrderable';
@@ -83,6 +84,9 @@ export default function Course() {
                             </li>
                             <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
                             <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
+                            <li>
+                                <CreateTopicSeparatorModal courseId={course.id} />
+                            </li>
                         </ul>
                     </div>
                 }
