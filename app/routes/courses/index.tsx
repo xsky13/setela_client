@@ -30,7 +30,7 @@ export default function Index() {
     });
 
     if (isLoading) return <LoadingSegment />
-    if (isAxiosError(error) && error.response?.status !== 401) return <ErrorSegment />;
+    if (isAxiosError(error) && error.response?.status !== 401) return <ErrorSegment status={error.status} />;
 
     return (
         <div className="container pt-5">

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Outlet, useParams } from "react-router";
+import { Navigate, Outlet, useParams } from "react-router";
 import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
@@ -28,7 +28,7 @@ export default function CourseLayout() {
     const [isOwner, setIsOwner] = useState(false);
 
     const { data: courseData, isError, isLoading, error } = useQuery<FullCourse>({
-        queryKey: ['getCourseQuery', { courseId: Number(params.id)}],
+        queryKey: ['getCourseQuery', { courseId: Number(params.id) }],
         queryFn: async () => {
             const response = await api.get('course/' + params.id);
             return response.data;
@@ -61,21 +61,24 @@ export default function CourseLayout() {
     if (isError) return <ErrorSegment status={isAxiosError(error) && error.response?.status} />
 
     return (
-        <div className="d-flex">
-            <Sidebar
-                postEnrollmentFunc={changeAccess}
-                courseData={courseData!}
-            />
-            <div className="main p-4 px-5">
-                {
-                    userCanAccessCourse ?
-                        <CourseContext value={{ ...courseData!, currentUserIsOwner: isOwner }}>
-                            <Outlet />
-                        </CourseContext>
-                        :
-                        <h1 className=" text-center">Debe inscribirse al curso antes de poder acceder a el.</h1>
-                }
+        courseData!.isActive ?
+            <div className="d-flex">
+                <Sidebar
+                    postEnrollmentFunc={changeAccess}
+                    courseData={courseData!}
+                />
+                <div className="main p-4 px-5">
+                    {
+                        userCanAccessCourse ?
+                            <CourseContext value={{ ...courseData!, currentUserIsOwner: isOwner }}>
+                                <Outlet />
+                            </CourseContext>
+                            :
+                            <h1 className=" text-center">Debe inscribirse al curso antes de poder acceder a el.</h1>
+                    }
+                </div>
             </div>
-        </div>
+            :
+            <Navigate to="/" replace={true} />
     );
 }

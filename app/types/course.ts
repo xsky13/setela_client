@@ -35,7 +35,8 @@ export type FullCourse = {
     topicSeparators: TopicSeparator[],
     modules: Module[],
     assignments: Assignment[],
-    exams: Exam[]
+    exams: Exam[],
+    isActive: boolean
 }
 
 export type CourseDataView = FullCourse & {

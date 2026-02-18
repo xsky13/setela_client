@@ -1,10 +1,12 @@
+import { useMutation } from '@tanstack/react-query';
 import '../styles/courseStyles.css';
 import { useContext, useEffect, useState } from "react";
-import { NavLink } from 'react-router';
+import { NavLink, useNavigate } from 'react-router';
 import AssignmentListing from '~/Components/Courses/Course/AssignmentListing';
 import ExamListing from '~/Components/Courses/Course/ExamListing';
 import ModuleListing from '~/Components/Courses/Course/ModuleListing';
 import ResourceListing from '~/Components/Courses/Course/ResourceListing';
+import LoadingButton from '~/Components/LoadingButton';
 import AddResourcesModal from '~/Components/Resource/AddResourcesModal';
 import CreateTopicSeparatorModal from '~/Components/TopicSeparator/CreateTopicSeparatorModal';
 import TopicSeparatorListing from '~/Components/TopicSeparator/TopicSeparatorListing';
@@ -13,6 +15,8 @@ import type { IOrderable } from '~/interfaces/IOrderable';
 import type { Assignment } from '~/types/assignment';
 import type { Module, ResourceListing as ResourceListingType, TopicSeparator } from '~/types/course';
 import type { Exam, ExamSimple } from '~/types/exam';
+import api from '~/api';
+import { toast } from 'sonner';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -37,6 +41,7 @@ type CourseItem = IOrderable & {
 export default function Course() {
     const course = useContext(CourseContext);
     const [courseData, setCourseData] = useState<CourseItem[]>([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!course) return;
@@ -59,6 +64,20 @@ export default function Course() {
 
     }, [course]);
 
+    const deleteCourseMutation = useMutation({
+        mutationFn: async () => (await api.delete("/course/" + course?.id)).data,
+        onError: error => toast(error.message),
+        onSuccess: () => {
+            navigate("/");   
+        } 
+    });
+
+    const deleteCourse = () => {
+        if (confirm("Esta seguro que quiere eliminar este curso?")) {
+            deleteCourseMutation.mutate();
+        }
+    }
+
     return (
         <div>
             <div className="d-flex justify-content-between">
@@ -68,26 +87,38 @@ export default function Course() {
                 </div>
                 {
                     course?.currentUserIsOwner &&
-                    <div className="dropdown">
-                        <button
-                            className="btn btn-primary dropdown-toggle d-flex align-items-center"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
+                    <div className="hstack gap-2">
+                        <div className="dropdown">
+                            <button
+                                className="btn btn-primary dropdown-toggle d-flex align-items-center"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                <span className="me-2">Crear</span>
+                            </button>
+                            <ul className="dropdown-menu">
+                                <li><NavLink className="dropdown-item" to="./m/crear">Modulo</NavLink></li>
+                                <li>
+                                    <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
+                                </li>
+                                <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
+                                <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
+                                <li>
+                                    <CreateTopicSeparatorModal courseId={course.id} />
+                                </li>
+                            </ul>
+                        </div>
+                        <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
+
+                        <LoadingButton
+                            loading={deleteCourseMutation.isPending}
+                            onClick={deleteCourse}
+                            className="btn btn-danger"
                         >
-                            <span className="me-2">Crear</span>
-                        </button>
-                        <ul className="dropdown-menu">
-                            <li><NavLink className="dropdown-item" to="./m/crear">Modulo</NavLink></li>
-                            <li>
-                                <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
-                            </li>
-                            <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
-                            <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
-                            <li>
-                                <CreateTopicSeparatorModal courseId={course.id} />
-                            </li>
-                        </ul>
+                            <i className="bi bi-trash me-1" />
+                            Eliminar
+                        </LoadingButton>
                     </div>
                 }
             </div>
