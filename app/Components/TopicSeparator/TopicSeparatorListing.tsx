@@ -16,18 +16,36 @@ export default function TopicSeparatorListing({ topicSeparator, currentUserIsOwn
         mutationFn: async data => (await api.put("/topicSeparator/" + topicSeparator.id, data)).data,
         onError: error => toast(error.message),
         onSuccess: data => {
-            queryClient.setQueryData(['getCourseQuery', { courseId: Number(params.id)}], (old: FullCourse) => {
-                return { ...old, topicSeparators: old.topicSeparators.map(ts => ts.id == topicSeparator.id ? 
-                    data
-                    : ts)}
+            queryClient.setQueryData(['getCourseQuery', { courseId: Number(params.id) }], (old: FullCourse) => {
+                return {
+                    ...old, topicSeparators: old.topicSeparators.map(ts => ts.id == topicSeparator.id ?
+                        data
+                        : ts)
+                }
             });
 
             setIsUpdating(false);
         }
     });
 
+    const deleteTopicSeparatorMutation = useMutation({
+        mutationFn: async () => (await api.delete("/topicSeparator/" + topicSeparator.id)).data,
+        onError: error => toast(error.message),
+        onSuccess: data => {
+            queryClient.setQueryData(['getCourseQuery', { courseId: Number(params.id) }], (old: FullCourse) => {
+                return { ...old, topicSeparators: old.topicSeparators.filter(ts => ts.id != topicSeparator.id) }
+            });
+        }
+    });
+
     const handleChange = () => {
         updateTopicSeparatorMutation.mutate({ newTitle: title });
+    }
+
+    const handleDelete = () => {
+        if (confirm("Esta seguro que quiere eliminar este separador?")) {
+            deleteTopicSeparatorMutation.mutate();
+        }
     }
 
     return (
@@ -55,12 +73,19 @@ export default function TopicSeparatorListing({ topicSeparator, currentUserIsOwn
             }
             {
                 currentUserIsOwner &&
-                <div>
+                <div className="hstack gap-2">
                     <i
                         className={`bi bi-${isUpdating ? "x-circle-fill" : "pencil"}`}
                         role="button"
                         onClick={() => setIsUpdating(!isUpdating)}
                     />
+                    <LoadingButton
+                        className="bg-transparent border-0 p-0 text-danger"
+                        onClick={handleDelete}
+                        loading={deleteTopicSeparatorMutation.isPending}
+                    >
+                        <i className="bi bi-trash" />
+                    </LoadingButton>
                 </div>
             }
         </div>
