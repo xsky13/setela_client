@@ -4,6 +4,7 @@ export default [
     index("routes/home.tsx"),
     route("/cuenta", "routes/cuenta.tsx"),
     ...prefix("cursos", [
+        route("crear", "routes/courses/create.tsx"),
         index("routes/courses/index.tsx"),
         layout("routes/courses/course/layout.tsx", [
             route(":id", "routes/courses/course/course.tsx"),

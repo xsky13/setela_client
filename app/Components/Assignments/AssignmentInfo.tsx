@@ -65,7 +65,7 @@ export default function AssignmentInfo({
             queryClient.setQueryData(['getAssignmentQuery', { assignmentId: assignmentData.id }], (old: Assignment) => {
                 return { ...old, assignmentSubmissions: old.assignmentSubmissions.filter(a => a.id != userSubmission!.id) }
             })
-            
+
             queryClient.removeQueries({ queryKey: ['getAssignmentSubmissionForAssignment', { assignmentId: assignmentData.id }] });
         }
     });
@@ -200,7 +200,7 @@ export default function AssignmentInfo({
                                 assignmentSubmission.resources.length != 0 ?
                                 assignmentSubmission.resources.map((r, i) =>
                                     <AssignmentSubmissionResourceListing
-                                    key={i}
+                                        key={i}
                                         resource={r}
                                         assignmentId={assignmentData.id}
                                         assignmentSubmissionId={assignmentSubmission.id}
@@ -221,53 +221,56 @@ export default function AssignmentInfo({
                     />
                 </li>
             }
-            <li className="list-group-item">
-                <span className="subtitle small">Comentarios</span>
-                <p className="mt-2">
-                    <div className="d-flex gap-2">
-                        {
-                            updating ?
-                                <>
-                                    <div>
-                                        <i className="bi bi-x-circle-fill" onClick={() => setUpdating(false)} role="button" />
-                                        <i
-                                            className="bi bi-arrow-counterclockwise"
-                                            onClick={() => setTextContent(assignmentSubmission?.textContent || textContent)}
-                                            title="Deshacer cambios"
-                                            role="button" />
-                                    </div>
-                                    <form onSubmit={handleUpdate} className="w-100">
-                                        <div className="form-floating mb-3">
-                                            <textarea
-                                                id="description"
-                                                name="description"
-                                                className="form-control"
-                                                placeholder="Descripción"
-                                                style={{ height: '100px' }}
-                                                value={textContent}
-                                                onChange={e => setTextContent(e.target.value)}
-                                            />
-                                            <label htmlFor="description">Comentarios</label>
+            {
+                currentUserSubmitted &&
+                <li className="list-group-item">
+                    <span className="subtitle small">Comentarios</span>
+                    <p className="mt-2">
+                        <div className="d-flex gap-2">
+                            {
+                                updating ?
+                                    <>
+                                        <div>
+                                            <i className="bi bi-x-circle-fill" onClick={() => setUpdating(false)} role="button" />
+                                            <i
+                                                className="bi bi-arrow-counterclockwise"
+                                                onClick={() => setTextContent(assignmentSubmission?.textContent || textContent)}
+                                                title="Deshacer cambios"
+                                                role="button" />
                                         </div>
-                                        <LoadingButton
-                                            loading={updateAssignmentSubmissionText.isPending}
-                                            className="btn btn-primary w-100"
-                                            disabled={textContent == currentSub?.textContent}
-                                        >
-                                            Guardar cambios
-                                        </LoadingButton>
-                                    </form>
-                                </>
-                                :
-                                <>
-                                    <i className="bi bi-pencil text-primary" onClick={() => setUpdating(true)} role="button" />
-                                    {assignmentSubmission?.textContent}
-                                </>
-                        }
+                                        <form onSubmit={handleUpdate} className="w-100">
+                                            <div className="form-floating mb-3">
+                                                <textarea
+                                                    id="description"
+                                                    name="description"
+                                                    className="form-control"
+                                                    placeholder="Descripción"
+                                                    style={{ height: '100px' }}
+                                                    value={textContent}
+                                                    onChange={e => setTextContent(e.target.value)}
+                                                />
+                                                <label htmlFor="description">Comentarios</label>
+                                            </div>
+                                            <LoadingButton
+                                                loading={updateAssignmentSubmissionText.isPending}
+                                                className="btn btn-primary w-100"
+                                                disabled={textContent == currentSub?.textContent}
+                                            >
+                                                Guardar cambios
+                                            </LoadingButton>
+                                        </form>
+                                    </>
+                                    :
+                                    <>
+                                        <i className="bi bi-pencil text-primary" onClick={() => setUpdating(true)} role="button" />
+                                        {assignmentSubmission?.textContent}
+                                    </>
+                            }
 
-                    </div>
-                </p>
-            </li>
+                        </div>
+                    </p>
+                </li>
+            }
             <li className="list-group-item">
                 <span className="subtitle small">Nota</span>
                 {
