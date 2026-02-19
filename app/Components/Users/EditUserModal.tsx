@@ -11,6 +11,7 @@ import FormErrors from "../Error/FormErrors";
 import { UserRole } from "~/types/roles";
 import EditUserCourses from "./EditUserCourses";
 import EditUserEnrollments from "./EditUserEnrollments";
+import EditUserPassword from "./EditUserPassword";
 
 type tabType = 'basic' | 'role' | 'password' | 'courses' | 'enrollments';
 export default function EditUserModal({
@@ -313,6 +314,8 @@ export default function EditUserModal({
                                                     </div>
                                                 </div>
                                             )
+                                        case 'password':
+                                            return <EditUserPassword user={user} />
                                         case 'courses':
                                             return <EditUserCourses user={user} />
                                         case 'enrollments':
