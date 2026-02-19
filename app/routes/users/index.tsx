@@ -8,6 +8,7 @@ import type { Route } from "./+types";
 import { useContext } from "react";
 import { AuthContext } from "~/context/AuthContext";
 import { Navigate } from "react-router";
+import EditUserModal from "~/Components/Users/EditUserModal";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -80,9 +81,7 @@ export default function UserList() {
                                 <td className="text-muted fw-bold">{u.enrollments.length}</td>
                                 <td className="text-muted fw-bold">{u.professorCourses.length}</td>
                                 <td className="">
-                                    <button className="btn btn-secondary">
-                                        <i className="bi bi-pencil me-2" />
-                                        Editar</button>
+                                    <EditUserModal user={u} />
                                 </td>
                             </tr>
                         ))
