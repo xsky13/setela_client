@@ -1,20 +1,14 @@
 "use client"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import api from "~/api";
-import { ResourceType } from "~/types/resourceTypes";
 import LoadingButton from "../LoadingButton";
 import { toast } from "sonner";
-import { closeModal } from "~/utils/modal";
-import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { createPortal } from 'react-dom';
-import { useSearchParams } from "react-router";
-import type { Assignment, AssignmentSubmissionFull } from "~/types/assignment";
-import type { ExamDataView } from "~/types/exam";
-import { CourseContext } from "~/context/CourseContext";
-import type { FullUser } from "~/types/user";
+import type { FullUser, User } from "~/types/user";
 import { getErrors } from "~/utils/error";
 import FormErrors from "../Error/FormErrors";
+import { UserRole } from "~/types/roles";
 
 export default function EditUserModal({
     user
@@ -24,25 +18,91 @@ export default function EditUserModal({
     const [errors, setErrors] = useState<string[]>([]);
     const modalRef = useRef<HTMLDivElement>(null);
     const openModalRef = useRef<HTMLButtonElement>(null);
+    const queryClient = useQueryClient();
 
     const [email, setEmail] = useState(user.email);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [name, setName] = useState(user.name);
 
-    const updateUserMutation = useMutation<any, Error, { name?: string, email?: string }>({
+    const [roleToAdd, setRoleToAdd] = useState<string>();
+    const [roleToRemove, setRoleToRemove] = useState<string>();
+
+    const updateUserMutation = useMutation<User, Error, { name?: string, email?: string }>({
         mutationFn: async data => {
             const response = await api.put("user/" + user.id, data);
             return response.data;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast("Sus cambios fueron guardados.");
             setErrors([]);
+            queryClient.setQueryData(['get_users_query'], (old: FullUser[]) => {
+                return [ ...old.map(u => u.id == data.id ? { ...u, name: data.name, email: data.email }: u) ]
+            })
         },
         onError: error => {
             const errors = getErrors(error);
             setErrors(errors);
         }
     });
+
+    const addRoleMutation = useMutation<User, Error, { role: UserRole }>({
+        mutationFn: async data => {
+            const response = await api.post(`/user/${user.id}/add_role`, data);
+            return response.data;
+        },
+        onSuccess: (data) => {
+            toast("Sus cambios fueron guardados.");
+            setErrors([]);
+            queryClient.setQueryData(['get_users_query'], (old: FullUser[]) => {
+                return [ ...old.map(u => u.id == data.id ? { ...u, roles: data.roles }: u) ]
+            });
+        },
+        onError: error => {
+            const errors = getErrors(error);
+            console.log(errors);
+
+            toast(error.message);
+        }
+    });
+
+    const removeRoleMutation = useMutation<User, Error, { role: UserRole }>({
+        mutationFn: async data => {
+            const response = await api.post(`/user/${user.id}/remove_role`, data);
+            return response.data;
+        },
+        onSuccess: (data) => {
+            toast("Sus cambios fueron guardados.");
+            setErrors([]);
+            queryClient.setQueryData(['get_users_query'], (old: FullUser[]) => {
+                return [ ...old.map(u => u.id == data.id ? { ...u, roles: data.roles }: u) ]
+            });
+        },
+        onError: error => {
+            const errors = getErrors(error);
+            console.log(errors);
+            toast.error(error.message);
+        }
+    });
+
+    const handleRoleAdd = () => {
+        if (!roleToAdd) {
+            toast.error("Por favor seleccione un rol");
+            return;
+        }
+
+        addRoleMutation.mutate({ role: Number(roleToAdd) })
+    }
+
+    const handleRoleRemove = () => {
+        if (!roleToRemove) {
+            toast.error("Por favor seleccione un rol");
+            return;
+        }
+
+        // console.log(roleToRemove);
+        
+        removeRoleMutation.mutate({ role: Number(roleToRemove) })
+    }
 
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -55,6 +115,19 @@ export default function EditUserModal({
             setErrors([]);
             updateUserMutation.mutate({ email, name })
 
+        }
+    }
+
+    const roleWord = (role: UserRole): string => {
+        switch (role) {
+            case UserRole.admin:
+                return "Administrador"
+            case UserRole.professor:
+                return "Profesor"
+            case UserRole.student:
+                return "Estudiante"
+            default:
+                return "Estudiante"
         }
     }
 
@@ -114,7 +187,7 @@ export default function EditUserModal({
                                 <LoadingButton
                                     type="submit"
                                     className="btn btn-primary"
-                                loading={updateUserMutation.isPending}
+                                    loading={updateUserMutation.isPending}
                                 >
                                     Guardar cambios
                                 </LoadingButton>
@@ -122,6 +195,66 @@ export default function EditUserModal({
                                     errors.length != 0 && <FormErrors serverErrors={errors} />
                                 }
                             </form>
+                            <div className="mt-3">
+                                <h5>Roles</h5>
+                                <div className="hstack gap-2 mb-2">
+                                    {
+                                        user.roles.map((role, j) => {
+                                            switch (role) {
+                                                case UserRole.admin:
+                                                    return <div className="badge rounded-pill text-bg-danger">
+                                                        Administrador
+                                                    </div>
+                                                case UserRole.professor:
+                                                    return <div className="badge rounded-pill text-bg-success">
+                                                        Profesor
+                                                    </div>
+                                                case UserRole.student:
+                                                    return <div className="badge rounded-pill text-bg-primary">
+                                                        Estudiante
+                                                    </div>
+                                                default:
+                                                    break;
+                                            }
+                                        })
+                                    }
+                                </div>
+                                <div className="d-flex align-items-center gap-2">
+                                    <select onChange={e => setRoleToAdd(e.target.value)} className="form-select" aria-label="Default select example">
+                                        <option value="" selected>Seleccionar rol</option>
+                                        <option value={UserRole.admin}>Administrador</option>
+                                        <option value={UserRole.professor}>Profesor</option>
+                                        <option value={UserRole.student}>Estudiante</option>
+                                    </select>
+                                    <LoadingButton
+                                        onClick={handleRoleAdd}
+                                        loading={addRoleMutation.isPending}
+                                        className="btn btn-primary flex-shrink-0"
+                                    >
+                                        Agregar rol
+                                    </LoadingButton>
+                                </div>
+                                <div className="mt-3">
+                                    <div className="subtitle">Eliminar rol</div>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <select onChange={e => setRoleToRemove(e.target.value)} className="form-select" aria-label="Default select example">
+                                            <option value="" selected>Seleccionar rol a elminar</option>
+                                            {
+                                                user.roles.map((role, j) => (
+                                                    <option value={role}>{roleWord(role)}</option>
+                                                ))
+                                            }
+                                        </select>
+                                        <LoadingButton
+                                            onClick={handleRoleRemove}
+                                            loading={removeRoleMutation.isPending}
+                                            className="btn btn-outline-danger flex-shrink-0"
+                                        >
+                                            Eliminar rol
+                                        </LoadingButton>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button type="button" className="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
