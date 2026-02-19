@@ -28,6 +28,7 @@ export type Enrollment = {
     enrollmentDate: string,
     valid: boolean;
     grade: number | null;
+    courseId: number,
 }
 
 export type Profesor = {

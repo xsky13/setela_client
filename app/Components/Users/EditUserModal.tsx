@@ -10,6 +10,7 @@ import { getErrors } from "~/utils/error";
 import FormErrors from "../Error/FormErrors";
 import { UserRole } from "~/types/roles";
 import EditUserCourses from "./EditUserCourses";
+import EditUserEnrollments from "./EditUserEnrollments";
 
 type tabType = 'basic' | 'role' | 'password' | 'courses' | 'enrollments';
 export default function EditUserModal({
@@ -314,6 +315,8 @@ export default function EditUserModal({
                                             )
                                         case 'courses':
                                             return <EditUserCourses user={user} />
+                                        case 'enrollments':
+                                            return <EditUserEnrollments user={user} />
                                         default:
                                             break;
                                     }
