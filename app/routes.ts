@@ -34,4 +34,5 @@ export default [
             ]),
         ]),
     ]),
+    route("administracion/usuarios", "routes/users/index.tsx")
 ] satisfies RouteConfig;
