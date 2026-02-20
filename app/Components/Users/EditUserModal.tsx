@@ -184,14 +184,17 @@ export default function EditUserModal({
                                         Contrasena
                                     </button>
                                 </li>
-                                <li className="nav-item">
-                                    <button
-                                        className={`nav-link ${tab === 'courses' && 'active'}`}
-                                        onClick={() => setTab('courses')}
-                                    >
-                                        Cursos dictados
-                                    </button>
-                                </li>
+                                {
+                                    (user.roles.includes(UserRole.admin) || user.roles.includes(UserRole.professor)) &&
+                                    <li className="nav-item">
+                                        <button
+                                            className={`nav-link ${tab === 'courses' && 'active'}`}
+                                            onClick={() => setTab('courses')}
+                                        >
+                                            Cursos dictados
+                                        </button>
+                                    </li>
+                                }
                                 <li className="nav-item">
                                     <button className={`nav-link ${tab === 'enrollments' && 'active'}`}
                                         onClick={() => setTab('enrollments')}

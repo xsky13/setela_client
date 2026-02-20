@@ -9,6 +9,8 @@ import { toast } from "sonner";
 export default function EditUserEnrollments({ user }: { user: FullUser }) {
     const queryClient = useQueryClient();
 
+    console.log(user);
+    
     const removeCourseMutation = useMutation<Enrollment, Error, { courseId: number, userId: number }>({
         mutationFn: async data => (await api.post(`/course/${data.courseId}/disenroll`, data)).data,
         onError(error) {
@@ -35,7 +37,7 @@ export default function EditUserEnrollments({ user }: { user: FullUser }) {
     return (
         <div>
             {
-                user.professorCourses.length == 0 ?
+                user.enrollments.length == 0 ?
                     <p className="text-muted fst-italic">
                         <i className="bi bi-info-circle me-2" />
                         Este usuario no esta inscripto en ningun curso

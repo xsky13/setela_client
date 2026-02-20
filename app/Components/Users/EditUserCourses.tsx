@@ -34,9 +34,7 @@ export default function EditUserCourses({ user }: { user: FullUser }) {
     }
     return (
         <div>
-            <p>
-                <i className="bi bi-info-circle me-2" />
-                Para agregar curso, ir a pagina principal del curso y poner al usuario como profesor desde alli.</p>
+            <p>Para agregar curso, ir a pagina principal del curso y poner al usuario como profesor desde alli.</p>
             {
                 user.professorCourses.length == 0 ?
                     <p className="text-muted fst-italic">
