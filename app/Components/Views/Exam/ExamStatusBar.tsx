@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "sonner";
 import type { Exam, ExamSubmission } from "~/types/exam";
 import { formatDate, getMinutesDifference } from "~/utils/date";
@@ -34,11 +34,28 @@ export default function ExamStatusBar({
     };
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+    // using these to supposedly stop race conditions
     const [hasWarned, setHasWarned] = useState(false);
+    const hasFiredEndToast = useRef(false);
 
     useEffect(() => {
-        if (!examSubmission) return;
-        if (examSubmission?.finished || !examSubmission) return;
+        if (!examSubmission || examSubmission.finished) return;
+
+        const initialTime = calculateTimeLeft();
+        if (initialTime.minutes === 0 && initialTime.seconds === 0) {
+
+            if (!examSubmission.finished) {
+                if (!hasFiredEndToast.current) {
+                    hasFiredEndToast.current = true;
+                    toast.info("Se acabo el tiempo!", {
+                        description: "Su entrega fue enviada automáticamente. Si todavía faltaron cambios, contáctese con su profesor."
+                    });
+                    finishExam()
+                }
+            }
+            return;
+        }
 
         const timer = setInterval(() => {
             const newTime = calculateTimeLeft();
@@ -53,10 +70,15 @@ export default function ExamStatusBar({
             }
 
             if (newTime.minutes === 0 && newTime.seconds === 0) {
-                finishExam();
-                toast("Se acabo el tiempo!", {
-                    description: "Su entrega fue enviada automáticamente. Si todavía faltaron cambios, contáctese con su profesor."
-                });
+                if (!hasFiredEndToast.current) {
+                    hasFiredEndToast.current = true;
+                    if (!examSubmission.adminExtendedTime) {
+                        finishExam();
+                        toast.info("Se acabo el tiempo!", {
+                            description: "Su entrega fue enviada automáticamente. Si todavía faltaron cambios, contáctese con su profesor."
+                        });
+                    }
+                }
                 clearInterval(timer);
             }
         }, 1000);

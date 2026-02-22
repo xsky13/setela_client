@@ -70,7 +70,6 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         formData.append("examId", exam.id.toString());
         formData.append("textContent", textContent);
         formData.append("courseId", course!.id.toString());
-
         Array.from(files).forEach((file) => {
             formData.append('files', file);
         });

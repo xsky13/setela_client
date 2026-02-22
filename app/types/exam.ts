@@ -50,6 +50,7 @@ export type ExamSubmission = {
     startTime: string,
     turnInTime: string,
     lastUpdated: string,
+    adminExtendedTime: boolean
 }
 
 export type ExamSubmissionSimple = {
@@ -61,4 +62,5 @@ export type ExamSubmissionSimple = {
     lastUpdated: string,
     grade?: GradeSimple,
     finished: boolean,
+    adminExtendedTime: boolean,
 }
