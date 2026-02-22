@@ -81,7 +81,7 @@ export default function EditUserModal({
             toast("Sus cambios fueron guardados.");
             setErrors([]);
             queryClient.setQueryData(['get_users_query'], (old: FullUser[]) => {
-                return [...old.map(u => u.id == data.id ? { ...u, roles: data.roles } : u)]
+                return [...old.map(u => u.id == data.id ? { ...u, roles: data.roles, professorCourses: [] } : u)]
             });
         },
         onError: error => {
