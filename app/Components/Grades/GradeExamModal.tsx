@@ -129,11 +129,14 @@ export default function GradeExamModal({
                                                                 {
                                                                     examSubmission?.resources.map((resource, i) => (
                                                                         <div key={i} className="bg-white p-2 rounded-2 border list-group-item d-flex justify-content-between align-items-center">
-                                                                            <div>
+                                                                            <div className="hstack gap-2">
                                                                                 <div className="text-primary-emphasis bg-primary-subtle p-2 rounded-2 d-inline me-2">
                                                                                     <i className="bi bi-file-earmark" />
                                                                                 </div>
-                                                                                <span className="fw-semibold">{resource.linkText || resource.url}</span>
+                                                                                <div>
+                                                                                    <div className="fw-semibold">{resource.linkText || resource.url}</div>
+                                                                                    <span className="text-muted small">{formatDate(resource.creationDate)}</span>
+                                                                                </div>
                                                                             </div>
                                                                             <a href={resource.url + "?download=true"} className="btn btn-secondary">
                                                                                 <i className="bi bi-download me-1"></i>

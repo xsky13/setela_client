@@ -79,9 +79,6 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         formData.append("examId", exam.id.toString());
         formData.append("textContent", latestText);
         formData.append("courseId", course!.id.toString());
-        // Array.from(latestFiles).forEach((file) => {
-        //     formData.append('files', file);
-        // });
 
         finishExamSubmissionMutation.mutate(formData);
         return true;
@@ -206,7 +203,10 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                             <div className="subtitle">Calificacion:</div>
                                             {
                                                 examSubmission.grade ?
-                                                    <span className="fs-5 fw-semibold text-primary-emphasis">{examSubmission.grade.value}</span>
+                                                    <span className="fs-5 fw-semibold text-primary-emphasis">
+                                                        {examSubmission.grade.value}
+                                                        <span style={{ opacity: '50%' }}>/ {exam.maxGrade}</span>
+                                                    </span>
                                                     :
                                                     <span className="small">Todavía no hay calificación</span>
                                             }
