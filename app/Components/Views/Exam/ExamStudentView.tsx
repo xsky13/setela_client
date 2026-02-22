@@ -205,7 +205,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                                 examSubmission.grade ?
                                                     <span className="fs-5 fw-semibold text-primary-emphasis">
                                                         {examSubmission.grade.value}
-                                                        <span style={{ opacity: '50%' }}>/ {exam.maxGrade}</span>
+                                                        <span style={{ opacity: '50%' }}> / {exam.maxGrade}</span>
                                                     </span>
                                                     :
                                                     <span className="small">Todavía no hay calificación</span>
