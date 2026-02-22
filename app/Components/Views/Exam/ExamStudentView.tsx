@@ -153,7 +153,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                                 {
                                                     getMinutesDifference(exam.startTime, examSubmission.turnInTime) > getMinutesDifference(exam.startTime, exam.endTime) ?
                                                         <div className="badge rounded-pill text-bg-danger">
-                                                            <i className="bi bi-exclamation-triangle-fill me-2"></i><span>Tarde</span>
+                                                            <i className="bi bi-exclamation-triangle-fill me-2"></i><span>Tarde {examSubmission.adminExtendedTime && '(tiempo extendido)'}</span>
                                                         </div>
                                                         :
                                                         <div className="badge rounded-pill text-bg-success">
