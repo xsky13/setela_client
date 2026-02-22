@@ -72,9 +72,19 @@ export default function ExamSubmissionListing({ examSubmission, exam }: { examSu
                 {formatDate(examSubmission.turnInTime)}
                 {
                     new Date(examSubmission.turnInTime).getTime() > new Date(exam.endTime).getTime() &&
-                    <div className="text-danger mt-1">
-                        <i className="bi-exclamation-triangle-fill"></i>
-                        <span className="ms-2">Entregado tarde</span>
+                    <div className="mt-1">
+                        {
+                            examSubmission.adminExtendedTime ?
+                                <div className="fst-italic">
+                                    <i className="bi-info-circle"></i>
+                                    <span className="ms-1">Tiempo extendido</span>
+                                </div>
+                                :
+                                <div className="text-danger">
+                                    <i className="bi-exclamation-triangle-fill"></i>
+                                    <span className="ms-2">Entregado tarde</span>
+                                </div>
+                        }
                     </div>
                 }
             </td>
