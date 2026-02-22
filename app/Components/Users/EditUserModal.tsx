@@ -72,7 +72,7 @@ export default function EditUserModal({
         }
     });
 
-    const removeRoleMutation = useMutation<User, Error, { role: UserRole }>({
+    const removeRoleMutation = useMutation<FullUser, Error, { role: UserRole }>({
         mutationFn: async data => {
             const response = await api.post(`/user/${user.id}/remove_role`, data);
             return response.data;
@@ -81,7 +81,7 @@ export default function EditUserModal({
             toast("Sus cambios fueron guardados.");
             setErrors([]);
             queryClient.setQueryData(['get_users_query'], (old: FullUser[]) => {
-                return [...old.map(u => u.id == data.id ? { ...u, roles: data.roles, professorCourses: [] } : u)]
+                return [...old.map(u => u.id == data.id ? { ...u, roles: data.roles, professorCourses: data.professorCourses } : u)]
             });
         },
         onError: error => {
