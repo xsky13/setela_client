@@ -37,54 +37,37 @@ export default function ExamStatusBar({
 
     // using these to supposedly stop race conditions
     const [hasWarned, setHasWarned] = useState(false);
-    const hasFiredEndToast = useRef(false);
 
     useEffect(() => {
-        if (!examSubmission || examSubmission.finished) return;
+        if (!examSubmission || examSubmission.finished || examSubmission.adminExtendedTime) return;
 
-        const initialTime = calculateTimeLeft();
-        if (initialTime.minutes === 0 && initialTime.seconds === 0) {
-
-            if (!examSubmission.finished) {
-                if (!hasFiredEndToast.current) {
-                    hasFiredEndToast.current = true;
-                    toast.info("Se acabo el tiempo!", {
-                        description: "Su entrega fue enviada automáticamente. Si todavía faltaron cambios, contáctese con su profesor."
-                    });
-                    finishExam()
-                }
+        const checkAndFinish = () => {
+            const current = calculateTimeLeft();
+            if (current.minutes <= 0 && current.seconds <= 0) {
+                finishExam();
+                return true;
             }
-            return;
-        }
+            return false;
+        };
+        if (checkAndFinish()) return;
 
         const timer = setInterval(() => {
             const newTime = calculateTimeLeft();
             setTimeLeft(newTime);
 
             if (newTime.minutes === 5 && newTime.seconds === 0 && !hasWarned) {
-                toast.warning("Faltan 5 minutos...", {
-                    description: "Asegúrese de guardar sus cambios y subir su entrega a tiempo.",
-                    duration: 10000,
-                });
+                toast.warning("Faltan 5 minutos...");
                 setHasWarned(true);
             }
 
-            if (newTime.minutes === 0 && newTime.seconds === 0) {
-                if (!hasFiredEndToast.current) {
-                    hasFiredEndToast.current = true;
-                    if (!examSubmission.adminExtendedTime) {
-                        finishExam();
-                        toast.info("Se acabo el tiempo!", {
-                            description: "Su entrega fue enviada automáticamente. Si todavía faltaron cambios, contáctese con su profesor."
-                        });
-                    }
-                }
+            if (newTime.minutes <= 0 && newTime.seconds <= 0) {
+                checkAndFinish();
                 clearInterval(timer);
             }
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [exam.endTime, examSubmission]);
+    }, [examSubmission?.id, examSubmission?.finished, examSubmission?.adminExtendedTime]);
 
     const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
@@ -98,12 +81,17 @@ export default function ExamStatusBar({
                 </div>
             </div>
             {
-                examSubmission &&
+                (examSubmission && !examSubmission.finished) &&
                 <div className="small text-muted d-flex align-items-center">
                     <i className="bi bi-hourglass" />
                     <div className="ms-2">
                         <span className="fw-semibold">Tiempo restante: </span>
-                        <div>{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}</div>
+                        {
+                            examSubmission.adminExtendedTime ?
+                                <i className="text-muted d-block">tiempo extendido</i>
+                                :
+                                <div>{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}</div>
+                        }
                     </div>
                 </div>
             }

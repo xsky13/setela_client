@@ -59,7 +59,7 @@ export default function GradeExamModal({
 
     return (
         <>
-            <div className="block small" role="button" onClick={openModal}>
+            <div className=" small text-primary-emphasis fw-semibold border-bottom border-primary-subtle " role="button" onClick={openModal}>
                 <i className="bi bi-pencil" />
                 <span className="ms-2">Corregir</span>
             </div>

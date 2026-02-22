@@ -61,26 +61,44 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
             closeModal(modalRef);
         }
     });
+    const stateRef = useRef({ textContent, files });
+    const hasFiredEndToast = useRef(false);
 
-    const finishExam = useCallback(() => {
-        if (finishExamSubmissionMutation.isPending) return;
-
+    const finishExam = () => {
+        if (hasFiredEndToast.current) {
+            console.log('second time');
+            return false;
+        };
+        hasFiredEndToast.current = true;
         const formData = new FormData();
+        const { textContent: latestText, files: latestFiles } = stateRef.current;
 
         formData.append("examId", exam.id.toString());
-        formData.append("textContent", textContent);
+        formData.append("textContent", latestText);
         formData.append("courseId", course!.id.toString());
-        Array.from(files).forEach((file) => {
+        Array.from(latestFiles).forEach((file) => {
             formData.append('files', file);
         });
 
         finishExamSubmissionMutation.mutate(formData);
-    }, [textContent, finishExamSubmissionMutation])
+        return true;
+    }
+
+    const autoFinishExam = () => {
+        if (finishExam()) {
+            toast.info("Se acabó el tiempo!", {
+                description: "Su entrega fue enviada automáticamente."
+            });
+        }
+    }
+
+    useEffect(() => {
+        stateRef.current = { textContent, files };
+    }, [textContent, files]);
 
     const openModal = () => {
         openModalBtn.current?.click();
     }
-
 
     return (
         <div>
@@ -111,6 +129,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                             setFiles={setFiles}
                             modalRef={modalRef}
                             finishExam={finishExam}
+                            autoFinishExam={autoFinishExam}
                             examLoading={finishExamSubmissionMutation.isPending}
                         />
                         <div className="text-muted small mt-2">Solo podras hacer 1 intento.</div>
@@ -119,7 +138,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                         <ExamStatusBar
                             exam={exam}
                             examSubmission={examSubmission}
-                            finishExam={finishExam}
+                            finishExam={autoFinishExam}
                         />
                         <h4>Mi entrega</h4>
                         {

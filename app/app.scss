@@ -130,3 +130,11 @@ a.unstyled {
 	@extend .bg-danger-subtle;
 	@extend .text-danger;
 }
+
+.button-unstyled {
+	@extend .p-0; 
+	@extend .small;
+	@extend .bg-transparent;
+	@extend .border-0;
+	@extend .text-center;
+}

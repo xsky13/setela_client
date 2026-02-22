@@ -21,6 +21,7 @@ export default function ExamSubmissionModal({
     setFiles,
     modalRef,
     finishExam,
+    autoFinishExam,
     examLoading
 }: {
     exam: ExamDataView,
@@ -32,6 +33,7 @@ export default function ExamSubmissionModal({
     setFiles: Dispatch<SetStateAction<File[]>>,
     modalRef: React.RefObject<HTMLDivElement | null>,
     finishExam: () => void,
+    autoFinishExam: () => void,
     examLoading: boolean
 }) {
     const user = useContext(AuthContext);
@@ -56,8 +58,6 @@ export default function ExamSubmissionModal({
         mutationKey: ['create_exam_submission_command'],
         mutationFn: async data => {
             const response = await api.post("/examSubmission", data);
-            console.log(response);
-
             return response.data;
         },
         onError(error) {
@@ -211,7 +211,7 @@ export default function ExamSubmissionModal({
                                         <ExamStatusBar
                                             examSubmission={examSubmission}
                                             exam={exam}
-                                            finishExam={finishExam}
+                                            finishExam={autoFinishExam}
                                         />
                                         <div className="col px-3 py-2 rounded-1 bg-body-tertiary border">
                                             <p>
