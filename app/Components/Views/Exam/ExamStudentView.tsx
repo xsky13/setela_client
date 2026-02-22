@@ -12,6 +12,7 @@ import { getErrors } from "~/utils/error";
 import { toast } from "sonner";
 import { closeModal } from "~/utils/modal";
 import { CourseContext } from "~/context/CourseContext";
+import type { ResourceListing } from "~/types/course";
 
 export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const user = useContext(AuthContext);
@@ -19,7 +20,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const queryClient = useQueryClient();
 
     // variables for child state
-    const [files, setFiles] = useState<File[]>([]);
+    const [examSubmissionResources, setExamSubmissionResources] = useState<ResourceListing[]>([]);
     const [textContent, setTextContent] = useState('');
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +37,8 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         enabled: !!userSubmission?.id,
         retry: 1
     });
+
+    useEffect(() => setExamSubmissionResources(examSubmission?.resources || []), [examSubmission])
 
     const finishExamSubmissionMutation = useMutation<ExamSubmission, Error, FormData>({
         mutationKey: ['finish_exam_command'],
@@ -61,7 +64,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
             closeModal(modalRef);
         }
     });
-    const stateRef = useRef({ textContent, files });
+    const stateRef = useRef({ textContent });
     const hasFiredEndToast = useRef(false);
 
     const finishExam = () => {
@@ -71,14 +74,14 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
         };
         hasFiredEndToast.current = true;
         const formData = new FormData();
-        const { textContent: latestText, files: latestFiles } = stateRef.current;
+        const { textContent: latestText } = stateRef.current;
 
         formData.append("examId", exam.id.toString());
         formData.append("textContent", latestText);
         formData.append("courseId", course!.id.toString());
-        Array.from(latestFiles).forEach((file) => {
-            formData.append('files', file);
-        });
+        // Array.from(latestFiles).forEach((file) => {
+        //     formData.append('files', file);
+        // });
 
         finishExamSubmissionMutation.mutate(formData);
         return true;
@@ -93,8 +96,8 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     }
 
     useEffect(() => {
-        stateRef.current = { textContent, files };
-    }, [textContent, files]);
+        stateRef.current = { textContent };
+    }, [textContent]);
 
     const openModal = () => {
         openModalBtn.current?.click();
@@ -125,8 +128,8 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                             openModalBtn={openModalBtn}
                             textContent={textContent}
                             setTextContent={setTextContent}
-                            files={files}
-                            setFiles={setFiles}
+                            files={examSubmissionResources}
+                            setFiles={setExamSubmissionResources}
                             modalRef={modalRef}
                             finishExam={finishExam}
                             autoFinishExam={autoFinishExam}
@@ -180,7 +183,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                                     <div className="mt-3">
                                         <div className="d-flex align-items-center justify-content-between my-2">
                                             <div className="subtitle">Documentos adjuntos</div>
-                                            <span className="badge text-bg-secondary fs-6">{examSubmission.finished ? examSubmission?.resources?.length : files.length}</span>
+                                            <span className="badge text-bg-secondary fs-6">{examSubmission.finished ? examSubmission?.resources?.length : examSubmissionResources.length}</span>
                                         </div>
                                         <hr />
                                         <div className="d-flex align-items-center justify-content-between my-2">

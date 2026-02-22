@@ -9,6 +9,7 @@ import api from "~/api";
 import { getErrors } from "~/utils/error";
 import { toast } from "sonner";
 import '../../styles/GradeStyles.css'
+import type { ResourceListing as ResourceType } from "~/types/course";
 
 
 export default function ExamSubmissionModal({
@@ -22,15 +23,15 @@ export default function ExamSubmissionModal({
     modalRef,
     finishExam,
     autoFinishExam,
-    examLoading
+    examLoading,
 }: {
     exam: ExamDataView,
     examSubmission: ExamSubmission | null | undefined,
     openModalBtn: React.RefObject<HTMLButtonElement | null>,
     textContent: string,
     setTextContent: Dispatch<SetStateAction<string>>,
-    files: File[],
-    setFiles: Dispatch<SetStateAction<File[]>>,
+    files: ResourceType[],
+    setFiles: Dispatch<SetStateAction<ResourceType[]>>,
     modalRef: React.RefObject<HTMLDivElement | null>,
     finishExam: () => void,
     autoFinishExam: () => void,
@@ -75,15 +76,56 @@ export default function ExamSubmissionModal({
         }
     })
 
+    const uploadMultipleFilesMutation = useMutation<ResourceType[], Error, FormData>({
+        mutationFn: async data => (await api.post("/resource/multiple", data)).data,
+        onError(error) {
+            console.log(getErrors(error));
+            // TODO: IMPROVE THIS. UNACCEPTABLE
+            toast.error(getErrors(error)[0]);
+        },
+        onSuccess(data) {
+            setFiles(prevFiles => [...prevFiles, ...data]);
+        }
+    })
+
     const handleClick = () => {
         fileInput.current?.click();
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setFiles(prev => [...prev, ...Array.from(e.target.files ?? [])]);
+            const formData = new FormData();
+            formData.append("parentType", "examSubmission");
+            formData.append("parentId", examSubmission!.id.toString());
+            formData.append("courseId", exam.courseId.toString());
+            Array.from(e.target.files).forEach((file) => {
+                formData.append('files', file);
+            });
+
+            uploadMultipleFilesMutation.mutate(formData);
         }
     };
+
+    const deleteResourceMutation = useMutation<{ success: boolean }, Error, { resourceId: number }>({
+        mutationKey: ['delete_resource_command'],
+        mutationFn: async data => {
+            const response = await api.delete("/resource/" + data.resourceId);
+            return response.data;
+        },
+        async onSuccess(_, variables) {
+            queryClient.setQueryData(['getExamSubmissionForExam', { examId: exam.id }], (old: ExamSubmission) => {
+                return { ...old, resources: [...old.resources.filter(r => r.id != variables.resourceId)] }
+            })
+        },
+        onError(error) {
+            toast(error.message);
+            console.log(error);
+        }
+    });
+
+    const handleResourceDelete = (resourceId: number) => {
+        deleteResourceMutation.mutate({ resourceId });
+    }
 
     const endExam = (e: React.FormEvent) => {
         e.preventDefault();
@@ -237,10 +279,14 @@ export default function ExamSubmissionModal({
                                                 <div className="d-flex flex-column justify-content-center align-items-center rounded-2 px-3 py-1 border flex-grow-1 bg-white upload-section bg-body-tertiary" style={{ minHeight: '5rem' }}>
                                                     <div className="h5">Arrastra tus archivos aqui</div>
                                                     <div className="text-muted small mb-2">O haz clic al boton para seleccionar</div>
-                                                    <button onClick={handleClick} className="btn btn-primary">
+                                                    <LoadingButton
+                                                        className="btn btn-primary"
+                                                        onClick={handleClick}
+                                                        loading={uploadMultipleFilesMutation.isPending}
+                                                    >
                                                         <i className="bi bi-file-earmark me-2" />
                                                         Elegir archivo(s)
-                                                    </button>
+                                                    </LoadingButton>
                                                     <input
                                                         type="file"
                                                         ref={fileInput}
@@ -253,12 +299,21 @@ export default function ExamSubmissionModal({
                                                     (files && files.length != 0) &&
                                                     <div className="mt-2 w-full">
                                                         <span className="subtitle">Archivos seleccionados</span>
-                                                        {Array.from(files).map((file, i) => (
-                                                            <div className="small" key={i}>
-                                                                <i onClick={() => setFiles(prev => prev.filter((_, index) => index !== i))} className="bi bi-trash-fill text-danger me-2" role="button" />
-                                                                <span>{file.name}</span>
-                                                            </div>
-                                                        ))}
+                                                        {
+                                                            files.map((r, i) => (
+                                                                <div className="small" key={i}>
+                                                                    <LoadingButton
+                                                                        className="button-unstyled me-2"
+                                                                        onClick={() => handleResourceDelete(r.id)}
+                                                                        disabled={deleteResourceMutation.isPending}
+                                                                        loading={deleteResourceMutation.isPending && deleteResourceMutation.variables.resourceId === r.id}
+                                                                    >
+                                                                        <i className="bi bi-trash-fill text-danger" />
+                                                                    </LoadingButton>
+                                                                    <span>{r.linkText}</span>
+                                                                </div>
+                                                            ))
+                                                        }
                                                     </div>
                                                 }
                                             </div>
