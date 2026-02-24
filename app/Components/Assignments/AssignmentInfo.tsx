@@ -203,7 +203,7 @@ export default function AssignmentInfo({
                                         key={i}
                                         resource={r}
                                         assignmentId={assignmentData.id}
-                                        assignmentSubmissionId={assignmentSubmission.id}
+                                        assignmentSubmissionGrade={assignmentSubmission.grade?.value.toString()}
                                     />
                                 )
                                 :

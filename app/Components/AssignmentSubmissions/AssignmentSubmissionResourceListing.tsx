@@ -9,10 +9,10 @@ import { formatDate } from "~/utils/date";
 import { useState } from "react";
 import { getErrors } from "~/utils/error";
 
-export default function AssignmentSubmissionResourceListing({ resource, assignmentId, assignmentSubmissionId }: {
+export default function AssignmentSubmissionResourceListing({ resource, assignmentId, assignmentSubmissionGrade }: {
     resource: ResourceListing,
     assignmentId: number,
-    assignmentSubmissionId: number
+    assignmentSubmissionGrade?: string
 }) {
     const [updating, setUpdating] = useState(false);
     const [resourceTitle, setResourceTitle] = useState(resource.linkText || resource.url);
@@ -95,39 +95,41 @@ export default function AssignmentSubmissionResourceListing({ resource, assignme
                     </div>
                 </div>
             </div>
-            <div className="hstack gap-2">
-                <div
-                    role="button"
-                >
-                    {
-                        updating ?
-                            <div className="d-flex gap-2">
+            {
+                !assignmentSubmissionGrade && <div className="hstack gap-2">
+                    <div
+                        role="button"
+                    >
+                        {
+                            updating ?
+                                <div className="d-flex gap-2">
+                                    <i
+                                        className="bi bi-arrow-counterclockwise"
+                                        onClick={() => setResourceTitle(resource.linkText || resource.url)}
+                                        title="Deshacer cambios"
+                                        role="button"
+                                    />
+                                    <i
+                                        onClick={() => setUpdating(false)}
+                                        className="bi bi-x-circle-fill"
+                                    />
+                                </div>
+                                :
                                 <i
-                                    className="bi bi-arrow-counterclockwise"
-                                    onClick={() => setResourceTitle(resource.linkText || resource.url)}
-                                    title="Deshacer cambios"
-                                    role="button"
+                                    onClick={() => setUpdating(true)}
+                                    className="bi bi-pencil"
                                 />
-                                <i
-                                    onClick={() => setUpdating(false)}
-                                    className="bi bi-x-circle-fill"
-                                />
-                            </div>
-                            :
-                            <i
-                                onClick={() => setUpdating(true)}
-                                className="bi bi-pencil"
-                            />
-                    }
+                        }
+                    </div>
+                    <LoadingButton
+                        onClick={deleteResource}
+                        loading={deleteResourceMutation.isPending}
+                        className="text-danger bg-transparent p-0 border-0"
+                    >
+                        <i className="bi bi-trash" role="button" />
+                    </LoadingButton>
                 </div>
-                <LoadingButton
-                    onClick={deleteResource}
-                    loading={deleteResourceMutation.isPending}
-                    className="text-danger bg-transparent p-0 border-0"
-                >
-                    <i className="bi bi-trash" role="button" />
-                </LoadingButton>
-            </div>
+            }
         </li>
     );
 }
