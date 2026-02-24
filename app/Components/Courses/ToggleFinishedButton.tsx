@@ -23,7 +23,7 @@ export default function ToggleFinishedButton({
         onSuccess: async data => {
             queryClient.setQueryData(['get_progress_items', { courseId: courseId }], (old: UserProgress[]) => {
                 if (!data) {
-                    return old.filter(p => (p.parentType != ProgressParentType.module && p.parentId != parentId));
+                    return old.filter(p => !(p.parentType == parentType && p.parentId == parentId));
                 }
                 return [...old, data];
             });
@@ -32,7 +32,7 @@ export default function ToggleFinishedButton({
     });
 
     const toggleFinished = () => {
-        toggleItemMutation.mutate({ parentType: ProgressParentType.module, parentId, courseId });
+        toggleItemMutation.mutate({ parentType: parentType, parentId, courseId });
     }
 
     if (progressItems.isLoading) {
@@ -44,7 +44,7 @@ export default function ToggleFinishedButton({
         return;
     }
     else {
-        const isFinished = progressItems.data?.some(item => item.parentType == ProgressParentType.module && item.parentId == parentId);
+        const isFinished = progressItems.data?.some(item => item.parentType == parentType && item.parentId == parentId);
 
         return (
             <LoadingButton
