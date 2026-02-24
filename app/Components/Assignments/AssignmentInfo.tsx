@@ -214,8 +214,8 @@ export default function AssignmentInfo({
                         }
                     </div>
                     {
-                        // user cant update if theres a grade or if its expired
-                        (!expired && !userSubmission?.grade) && <AddResourcesModal
+                        // user cant update if theres a grade
+                        !userSubmission?.grade && <AddResourcesModal
                             type="assignmentSubmission"
                             parentId={assignmentSubmission.id}
                             courseId={assignmentData.courseId}
@@ -232,7 +232,7 @@ export default function AssignmentInfo({
                         <div className="d-flex gap-2">
                             {
                                 // user cant update if theres a grade or if its expired
-                                updating && (!expired && !userSubmission?.grade) ?
+                                updating && !userSubmission?.grade ?
                                     <>
                                         <div>
                                             <i className="bi bi-x-circle-fill" onClick={() => setUpdating(false)} role="button" />
@@ -265,7 +265,7 @@ export default function AssignmentInfo({
                                         </form>
                                     </>
                                     :
-                                    (!expired && !userSubmission?.grade) && <>
+                                    !userSubmission?.grade && <>
                                         <i className="bi bi-pencil text-primary" onClick={() => setUpdating(true)} role="button" />
                                         {assignmentSubmission?.textContent}
                                     </>
