@@ -51,7 +51,9 @@ export default function Assignment() {
     const now = new Date().getTime();
     const expired = now > dueDate;
     const diffInMs = dueDate - now;
-    const timeLeft = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    const hoursLeft = Math.floor(diffInMs / (1000 * 60 * 60));
+    const minutesLeft = Math.floor(diffInMs / (1000 * 60));
 
     const totalSubmissions = assignmentData.assignmentSubmissions.length;
     const totalCorrected = assignmentData.assignmentSubmissions.filter(a => a.grade?.value).length;
@@ -106,6 +108,18 @@ export default function Assignment() {
                 <h1 style={{ margin: 0 }}>Esta asignatura no esta disponible.</h1>
             </div>
         )
+    }
+
+    const timeLeft = () => {
+        if (daysLeft > 0) {
+            return daysLeft + ' días';
+        } else if (hoursLeft > 0) {
+            return hoursLeft + ' horas';
+        } else if (minutesLeft > 0) {
+            return minutesLeft + ' minutos';
+        } else {
+            return '> 1 minuto'
+        }
     }
 
 
@@ -169,7 +183,7 @@ export default function Assignment() {
                                     expired ?
                                         'Este trabajo esta vencido.'
                                         :
-                                        <span>Quedan {timeLeft} días para la entrega</span>
+                                        <span>Quedan {timeLeft()} para la entrega</span>
                                 }
                             </p>
                         </div>

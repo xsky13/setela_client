@@ -4,15 +4,16 @@ export const formatDate = (dateString?: string) => {
     const date = new Date(dateString);
 
     if (isNaN(date.getTime())) return "Fecha no disponible";
-    return date.toLocaleString('es-AR', {
+    const returnDate = date.toLocaleString('es-AR', {
         timeZone: 'UTC',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false,
         day: 'numeric',
         month: 'short',
         year: '2-digit'
     });
+    return returnDate
+        .replace(/\s?[ap]\.?\s?m\.?/i, (match) => match.toLowerCase().includes('a') ? ' AM' : ' PM');
 };
 
 export const getMinutesDifference = (date1: string, date2: string): number => {
