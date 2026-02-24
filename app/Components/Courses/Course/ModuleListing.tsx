@@ -1,16 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import LoadingButton from "~/Components/LoadingButton";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
+import { ProgressParentType, type UserProgress, type ProgressQuery } from "~/types/userProgress";
 import { getErrors } from "~/utils/error";
+import ToggleFinishedButton from "../ToggleFinishedButton";
 
-export default function ModuleListing({ 
-    module, 
-    currentUserIsOwner, 
-}: { module: Module, currentUserIsOwner: boolean }) {
+export default function ModuleListing({
+    module,
+    currentUserIsOwner,
+    progressItems
+}: {
+    module: Module,
+    currentUserIsOwner: boolean,
+    progressItems: ProgressQuery
+}) {
     const queryClient = useQueryClient();
 
     const deleteModuleMutation = useMutation<any, Error>({
@@ -40,7 +47,8 @@ export default function ModuleListing({
         },
         async onSuccess() {
             queryClient.setQueryData(['getCourseQuery', { courseId: Number(module.courseId) }], (old: FullCourse) => {
-                return { ...old,
+                return {
+                    ...old,
                     modules: old.modules.map((m: Module) => m.id == module.id ? {
                         ...m, visible: !module.visible
                     } : m)
@@ -57,6 +65,12 @@ export default function ModuleListing({
         retry: 1
     });
 
+    useEffect(() => {
+        if (progressItems.isError) {
+            toast.error("Hubo un error cargando progreso...");
+        }
+    }, [progressItems.isError]);
+
     const deleteModule = () => {
         if (confirm("Esta seguro que quiere eliminar este modulo? Esta acción es irreversible")) {
             deleteModuleMutation.mutate();
@@ -66,7 +80,6 @@ export default function ModuleListing({
     const changeVisibility = () => {
         changeVisibilityMutation.mutate({ visible: !module.visible })
     }
-
 
     return (
         <div className="d-flex justify-content-between rounded-2 border border  p-4 my-3">
@@ -80,10 +93,12 @@ export default function ModuleListing({
                 <NavLink to={`./m/${module.id}`} className="h5 card-title text-decoration-none">{module.title}</NavLink>
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
-                <button className="btn btn-light mb-2">
-                    <i className='bi bi-check-circle me-2'></i>
-                    Marcar finalizado
-                </button>
+                <ToggleFinishedButton 
+                    parentType={ProgressParentType.module}
+                    parentId={module.id}
+                    courseId={module.courseId}
+                    progressItems={progressItems}
+                />
                 {
                     currentUserIsOwner &&
                     <div className="d-flex">

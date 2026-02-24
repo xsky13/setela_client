@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import '../styles/courseStyles.css';
 import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from 'react-router';
@@ -19,6 +19,7 @@ import api from '~/api';
 import { toast } from 'sonner';
 import { AuthContext } from '~/context/AuthContext';
 import { UserRole } from '~/types/roles';
+import type { UserProgress } from '~/types/userProgress';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -75,18 +76,25 @@ export default function Course() {
         },
         onError: error => toast(error.message),
         onSuccess: () => {
-            navigate("/");   
-        } 
+            navigate("/");
+        }
     });
 
     const deleteCourse = () => {
         let message = "Esta seguro que quiere eliminar este curso?";
         if (user?.roles.includes(UserRole.admin)) message = "Esta seguro que quiere eliminar este curso? Todos los examenes, recursos, modulos, etc. van a ser eliminados"
-        
+
         if (confirm(message)) {
             deleteCourseMutation.mutate();
         }
     }
+
+    const getProgressItemsQuery = useQuery<UserProgress[]>({
+        queryKey: ['get_progress_items', { courseId: course?.id}],
+        queryFn: async () => (await api.get(`/userProgress/${course?.id}/get_items`)).data,
+        retry: 2
+    });
+
 
     return (
         <div>
@@ -137,18 +145,21 @@ export default function Course() {
                     courseData.map((item, i) => {
                         switch (item.type) {
                             case 'topicSeparator':
-                                return (
-                                    <TopicSeparatorListing
-                                        key={i}
-                                        topicSeparator={item as unknown as TopicSeparator}
-                                        currentUserIsOwner={course!.currentUserIsOwner}
-                                    />
-                                )
+                                return <TopicSeparatorListing
+                                    key={i}
+                                    topicSeparator={item as unknown as TopicSeparator}
+                                    currentUserIsOwner={course!.currentUserIsOwner}
+                                />
                             case 'module':
                                 return <ModuleListing
                                     key={i}
                                     module={item as unknown as Module}
                                     currentUserIsOwner={course!.currentUserIsOwner}
+                                    progressItems={{
+                                        data: getProgressItemsQuery.data,
+                                        isLoading: getProgressItemsQuery.isLoading,
+                                        isError: getProgressItemsQuery.isError
+                                    }}
                                 />
                             case 'resource':
                                 return <ResourceListing
