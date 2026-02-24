@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
 import type { ProfessorCourse, StudentCourse } from "~/types/course";
+import StudentCourseCard from "./StudentCourseCard";
 
 
 export default function StudentView({ courses }: { courses: StudentCourse[] }) {
@@ -11,36 +12,7 @@ export default function StudentView({ courses }: { courses: StudentCourse[] }) {
                 {
                     courses.length != 0 ?
                         courses.map(course => (
-
-                            <div className="col-md-6 col-lg-4">
-                                <div className="card border-2 border-primary h-100 p-3">
-                                    <div className="card-header border-0 bg-white ">
-                                        <h5 className="card-title mb-0">{course.courseTitle}</h5>
-                                        <small>Primer año</small>
-                                    </div>
-                                    <div className="card-body">
-                                        <div className="d-flex justify-content-between align-items-center">
-                                            <div className="d-flex align-items-center text-muted mb-2">
-                                                <i className="bi bi-people-fill me-2"></i>
-                                                <small className="text-uppercase fw-semibold" style={{ letterSpacing: '0.5px' }}>
-                                                    Progreso
-                                                </small>
-                                            </div>
-                                            <div className="fw-bold text-primary h5">
-                                                75%
-                                            </div>
-                                        </div>
-                                        <div className="progress progress-secondary" aria-label="Example 1px high" aria-valuenow={75} aria-valuemin={0} aria-valuemax={100} role="progressbar" style={{ height: '3px' }}>
-                                            <div className="progress-bar w-75"></div>
-                                        </div>
-                                    </div>
-                                    <div className="card-footer border-0 bg-white text-center">
-                                        <NavLink to={`cursos/${course.courseId}`} className="btn btn-primary my-1 w-100">
-                                            <i className="bi bi-box-arrow-in-right"></i> Ir al curso
-                                        </NavLink>
-                                    </div>
-                                </div>
-                            </div>
+                            <StudentCourseCard course={course} />
                         ))
                         :
                         <div>

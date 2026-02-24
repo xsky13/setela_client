@@ -95,6 +95,7 @@ a.unstyled {
 	@extend .text-muted; 
 	@extend .text-uppercase;
 	@extend .fw-semibold;
+	letter-spacing: 0.5px;
 }
 
 .row-eq-height {
@@ -137,4 +138,9 @@ a.unstyled {
 	@extend .bg-transparent;
 	@extend .border-0;
 	@extend .text-center;
+}
+
+.placeholder.placeholder-custom {
+	border-radius: 2px;
+	background-color: #c2c2c2;
 }
