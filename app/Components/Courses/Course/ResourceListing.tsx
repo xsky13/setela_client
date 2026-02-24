@@ -8,13 +8,17 @@ import type { Assignment } from "~/types/assignment";
 import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import type { Exam } from "~/types/exam";
 import { ResourceParentType } from "~/types/resourceTypes";
+import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
+import ToggleFinishedButton from "../ToggleFinishedButton";
 
 export default function ResourceListing({
     resource,
     currentUserIsOwner,
+    progressItems
 }: {
     resource: ResourceListing
     currentUserIsOwner: boolean,
+    progressItems: ProgressQuery
 }) {
     const queryClient = useQueryClient();
     const deleteResourceMutation = useMutation({
@@ -113,10 +117,12 @@ export default function ResourceListing({
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
                 {
-                    resource.parentType == ResourceParentType.Course && <button className="btn btn-light">
-                        <i className='bi bi-check-circle me-2'></i>
-                        Marcar finalizado
-                    </button>
+                    resource.parentType == ResourceParentType.Course && <ToggleFinishedButton
+                        parentType={ProgressParentType.resource}
+                        parentId={resource.id}
+                        courseId={resource.courseId}
+                        progressItems={progressItems}
+                    />
                 }
                 {
                     currentUserIsOwner &&

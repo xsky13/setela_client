@@ -7,13 +7,18 @@ import type { Assignment } from "~/types/assignment";
 import type { FullCourse } from "~/types/course";
 import { formatDate } from "~/utils/date";
 import { getErrors } from "~/utils/error";
+import ToggleFinishedButton from "../ToggleFinishedButton";
+import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
 
 export default function AssignmentListing({
     assignment,
-    currentUserIsOwner
+    currentUserIsOwner,
+    progressItems
 }: {
     assignment: Assignment,
-    currentUserIsOwner: boolean
+    currentUserIsOwner: boolean,
+    progressItems: ProgressQuery
+
 }) {
     const queryClient = useQueryClient();
 
@@ -84,10 +89,12 @@ export default function AssignmentListing({
                 </div>
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-between")}>
-                <button className="btn btn-light">
-                    <i className='bi bi-check-circle me-2'></i>
-                    Marcar finalizado
-                </button>
+                <ToggleFinishedButton
+                    parentType={ProgressParentType.assignment}
+                    parentId={assignment.id}
+                    courseId={assignment.courseId}
+                    progressItems={progressItems}
+                />
                 {
                     currentUserIsOwner &&
                     <div className="d-flex">

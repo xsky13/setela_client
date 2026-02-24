@@ -5,15 +5,19 @@ import api from "~/api";
 import LoadingButton from "~/Components/LoadingButton";
 import type { FullCourse } from "~/types/course";
 import type { Exam, ExamSimple } from "~/types/exam";
+import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
 import { formatDate, getMinutesDifference } from "~/utils/date";
 import { getErrors } from "~/utils/error";
+import ToggleFinishedButton from "../ToggleFinishedButton";
 
 export default function ExamListing({
     exam,
     currentUserIsOwner,
+    progressItems
 }: {
     exam: ExamSimple,
     currentUserIsOwner: boolean,
+    progressItems: ProgressQuery
 }) {
     const queryClient = useQueryClient();
 
@@ -87,10 +91,12 @@ export default function ExamListing({
                 </div>
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-between")}>
-                <button className="btn btn-light">
-                    <i className='bi bi-check-circle me-2'></i>
-                    Marcar finalizado
-                </button>
+                <ToggleFinishedButton
+                    parentType={ProgressParentType.exam}
+                    parentId={exam.id}
+                    courseId={exam.courseId}
+                    progressItems={progressItems}
+                />
                 {
                     currentUserIsOwner &&
                     <div className="d-flex">

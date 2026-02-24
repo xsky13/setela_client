@@ -77,6 +77,7 @@ export type ResourceListing = {
     creationDate: string,
     sysUser: UserSimple,
     displayOrder: number,
-    download: boolean
+    download: boolean,
+    courseId: number
 }
 

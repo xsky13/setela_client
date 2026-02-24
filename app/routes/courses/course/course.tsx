@@ -166,18 +166,33 @@ export default function Course() {
                                     key={i}
                                     resource={item as unknown as ResourceListingType}
                                     currentUserIsOwner={course!.currentUserIsOwner}
+                                    progressItems={{
+                                        data: getProgressItemsQuery.data,
+                                        isLoading: getProgressItemsQuery.isLoading,
+                                        isError: getProgressItemsQuery.isError
+                                    }}
                                 />
                             case 'assignment':
                                 return <AssignmentListing
                                     key={i}
                                     assignment={item as unknown as Assignment}
                                     currentUserIsOwner={course!.currentUserIsOwner}
+                                    progressItems={{
+                                        data: getProgressItemsQuery.data,
+                                        isLoading: getProgressItemsQuery.isLoading,
+                                        isError: getProgressItemsQuery.isError
+                                    }}
                                 />
                             case 'exam':
                                 return <ExamListing
                                     key={i}
                                     exam={item as unknown as ExamSimple}
                                     currentUserIsOwner={course!.currentUserIsOwner}
+                                    progressItems={{
+                                        data: getProgressItemsQuery.data,
+                                        isLoading: getProgressItemsQuery.isLoading,
+                                        isError: getProgressItemsQuery.isError
+                                    }}
                                 />
                             default: ''
                         }
