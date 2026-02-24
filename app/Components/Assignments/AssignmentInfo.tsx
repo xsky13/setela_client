@@ -213,12 +213,15 @@ export default function AssignmentInfo({
                                 </div>
                         }
                     </div>
-                    <AddResourcesModal
-                        type="assignmentSubmission"
-                        parentId={assignmentSubmission.id}
-                        courseId={assignmentData.courseId}
-                        grandparentId={assignmentData.id}
-                    />
+                    {
+                        // user cant update if theres a grade or if its expired
+                        (!expired && !userSubmission?.grade) && <AddResourcesModal
+                            type="assignmentSubmission"
+                            parentId={assignmentSubmission.id}
+                            courseId={assignmentData.courseId}
+                            grandparentId={assignmentData.id}
+                        />
+                    }
                 </li>
             }
             {
@@ -228,7 +231,8 @@ export default function AssignmentInfo({
                     <p className="mt-2">
                         <div className="d-flex gap-2">
                             {
-                                updating ?
+                                // user cant update if theres a grade or if its expired
+                                updating && (!expired && !userSubmission?.grade) ?
                                     <>
                                         <div>
                                             <i className="bi bi-x-circle-fill" onClick={() => setUpdating(false)} role="button" />
@@ -261,7 +265,7 @@ export default function AssignmentInfo({
                                         </form>
                                     </>
                                     :
-                                    <>
+                                    (!expired && !userSubmission?.grade) && <>
                                         <i className="bi bi-pencil text-primary" onClick={() => setUpdating(true)} role="button" />
                                         {assignmentSubmission?.textContent}
                                     </>
