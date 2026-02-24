@@ -175,12 +175,18 @@ export default function GradeModal({
                                             </div>
                                         </div>
                                     </div>
-                                    <GradeForm
-                                        assignmentId={assignment.id}
-                                        maxGrade={assignment.maxGrade}
-                                        assignmentSubmissionId={assignmentSubmissionId}
-                                        grade={assignmentSubmission?.grade}
-                                    />
+                                    {
+                                        assignmentSubmission ?
+                                            <GradeForm
+                                                assignmentId={assignment.id}
+                                                maxGrade={assignment.maxGrade}
+                                                assignmentSubmissionId={assignmentSubmissionId}
+                                                assignmentSubmissionOwnerId={assignmentSubmission.sysUserId}
+                                                grade={assignmentSubmission?.grade}
+                                            />
+                                            :
+                                            <p>Ocurrio un error. Por favor, reinicie la pagina o contactese con un administrador</p>
+                                    }
                                 </>
                         }
                     </div>

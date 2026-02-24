@@ -21,11 +21,13 @@ export default function GradeForm({
     maxGrade,
     assignmentSubmissionId,
     grade,
+    assignmentSubmissionOwnerId
 }: {
     assignmentId: number,
     maxGrade: number,
     assignmentSubmissionId: number,
     grade: GradeSimple | undefined,
+    assignmentSubmissionOwnerId: number
 }) {
     const user = useContext(AuthContext);
     if (!user) throw new Error("El usuario no existe");
@@ -72,7 +74,7 @@ export default function GradeForm({
             value,
             parentType: 'assignmentSubmission',
             parentId: assignmentSubmissionId,
-            studentId: user.id,
+            studentId: assignmentSubmissionOwnerId,
             courseId: Number(params.id)
         });
     }
