@@ -5,7 +5,6 @@ export const formatDate = (dateString?: string) => {
 
     if (isNaN(date.getTime())) return "Fecha no disponible";
     const returnDate = date.toLocaleString('es-AR', {
-        timeZone: 'UTC',
         hour: '2-digit',
         minute: '2-digit',
         day: 'numeric',
