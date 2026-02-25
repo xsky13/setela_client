@@ -144,3 +144,8 @@ a.unstyled {
 	border-radius: 2px;
 	background-color: #c2c2c2;
 }
+
+a.link-unstyled {
+  all: unset;
+  cursor: pointer; 
+}
