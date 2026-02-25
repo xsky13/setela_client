@@ -46,11 +46,6 @@ export default function GradeExamModal({
         }
     }, [isError]);
 
-    useEffect(() => {
-        
-        console.log(examSubmission);
-    }, [examSubmission])
-
 
     const openModal = () => {
         openModalRef.current?.click();
@@ -171,6 +166,7 @@ export default function GradeExamModal({
                                         maxGrade={exam.maxGrade}
                                         examSubmissionId={examSubmissionId}
                                         grade={examSubmission?.grade}
+                                        examOwnerId={examSubmission?.sysUserId}
                                     />
                                 </>
                         }

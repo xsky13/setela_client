@@ -20,15 +20,15 @@ export default function GradeExamForm({
     examId,
     maxGrade,
     examSubmissionId,
+    examOwnerId,
     grade,
 }: {
     examId: number,
     maxGrade: number,
     examSubmissionId: number,
     grade: GradeSimple | undefined,
+    examOwnerId: number | undefined
 }) {
-    const user = useContext(AuthContext);
-    if (!user) throw new Error("El usuario no existe");
     const params = useParams();
     const queryClient = useQueryClient();
     const [value, setValue] = useState<number | undefined>(grade?.value);
@@ -64,11 +64,16 @@ export default function GradeExamForm({
             toast("El valor no puede ser nulo");
             return;
         }
+        if (!examOwnerId) {
+            toast.error("Hubo un error. Por favor, reinicie la pagina e intente de nuevo. Si el error persiste, contáctese con el administrador.");
+            return;
+        }
+        
         gradeExamMutation.mutate({
             value,
             parentType: 'examSubmission',
             parentId: examSubmissionId,
-            studentId: user.id,
+            studentId: examOwnerId,
             courseId: Number(params.id)
         });
     }
