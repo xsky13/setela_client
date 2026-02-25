@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { useContext } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useSearchParams } from "react-router";
 import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
@@ -9,18 +10,35 @@ import { GradeParentType, type Grade, type GradeListing } from "~/types/grade";
 
 export default function Grades() {
     const course = useContext(CourseContext);
+    const [searchParams, setSearchParams] = useSearchParams();
+
     if (!course) throw new Error("El curso no existe. Por favor, intente de nuevo o contactese con el administrador. ");
+
+    if (!searchParams.get('id') && course.currentUserIsOwner) {
+        return <div>
+            <h1>Calificaciones</h1>
+            <p>Para ver las calificaciones de algun estudiante, busque desde la pagina de <NavLink to={`/cursos/${course.id}/participantes`}>participantes</NavLink>.</p>
+        </div>
+    }
 
     const { data: gradesList, isError, isLoading, error } = useQuery<GradeListing[]>({
         queryKey: ['get_grades_for_course', { courseId: course.id }],
-        queryFn: async () => (await api.get(`/grade/${course.id}`)).data,
-        retry: 2
+        queryFn: async () => (await api.get(`/grade/${course.id}${course.currentUserIsOwner ? '/user/' + searchParams.get('id') : ''}`)).data,
+        retry: 0
     });
 
 
     if (isLoading) return <LoadingSegment />
     // TODO: FIGURE OUT ERROR HANDLING
-    if (isError) return <ErrorSegment status={400} />
+    if (isError) {
+        if (isAxiosError(error)) {
+            return <div>
+                <h1>Error</h1>
+                {error.response?.data.error}
+            </div>
+        }
+        return <ErrorSegment status={400} />
+    }
 
     return (
         <div>

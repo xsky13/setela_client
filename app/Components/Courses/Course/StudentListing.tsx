@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { NavLink } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import type { Enrollment } from "~/types/user";
@@ -14,7 +15,7 @@ export default function StudentListing({ student, currentUserIsOwner, courseId }
             /**
              * TODO: use state to list the enrollments so i dont have to invalidate the query
              */
-            await queryClient.invalidateQueries({ queryKey: ['getCourseQuery']});
+            await queryClient.invalidateQueries({ queryKey: ['getCourseQuery'] });
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");
@@ -36,9 +37,23 @@ export default function StudentListing({ student, currentUserIsOwner, courseId }
                 {student.sysUser.name}
             </span>
             {
-                currentUserIsOwner && <div className="text-danger fw-semibold small" role="button" onClick={removeStudent}>
-                    Dar de baja del curso
-
+                currentUserIsOwner &&
+                <div className="d-flex flex-column gap-2">
+                    <div className="text-danger small" role="button" onClick={removeStudent}>
+                        <i className="bi bi-trash me-1" />
+                        Dar de baja del curso
+                    </div>
+                    <NavLink
+                        target="_blank"
+                        to={`/cursos/${courseId}/calificaciones?id=${student.sysUserId}`}
+                        className="link-unstyled"
+                        style={{
+                            fontSize: 'small'
+                        }}
+                    >
+                        <i className="bi bi-box-arrow-up-right me-1" />
+                        Ver notas
+                    </NavLink>
                 </div>
             }
         </div>
