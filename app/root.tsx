@@ -61,7 +61,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 function AppContent({ children }: { children: React.ReactNode }) {
 	const { data: user, isLoading: userLoading, isError, error } = useQuery({
-		queryKey: ['todos'],
+		queryKey: ['get_user'],
 		queryFn: async () => {
 			const response = await api.get('/auth/user')
 			return response.data;

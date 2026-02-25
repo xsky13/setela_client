@@ -11,12 +11,14 @@ export type User = {
 export type UserSimple = {
     id: number;
     name: string;
+    userImageUrl: string,
 }
 
 export type FullUser = {
     id: number;
     name: string;
     email: string;
+    userImageUrl: string,
     roles: UserRole[];
     professorCourses: ProfessorCourse[];
     enrollments: StudentCourse[];
