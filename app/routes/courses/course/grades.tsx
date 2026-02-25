@@ -27,28 +27,20 @@ export default function Grades() {
             <h1>Calificaciones</h1>
             <div>
 
-                <div className="table-container bg-white border rounded-2 overflow-hidden">
-                    <table className="table table-hover align-middle mb-0">
+                <div className="table-container bg-white">
+                    <table className="table align-middle mb-0">
                         <thead className="bg-dark text-white">
                             <tr>
-                                <th scope="col" className="py-3 px-4" style={{ width: '45%' }}>Nombre</th>
-                                <th scope="col" className="py-3 px-4" style={{ width: '25%' }}>Tipo</th>
-                                <th scope="col" className="py-3 px-4 text-center" style={{ width: '15%' }}>Porcentaje</th>
-                                <th scope="col" className="py-3 px-4 text-center" style={{ width: '15%' }}>Calificación</th>
+                                <th scope="col" className="py-3 px-4 subtitle" style={{ width: '45%' }}>Nombre</th>
+                                <th scope="col" className="py-3 px-4 subtitle" style={{ width: '25%' }}>Tipo</th>
+                                <th scope="col" className="py-3 px-4 subtitle text-center" style={{ width: '15%' }}>Porcentaje</th>
+                                <th scope="col" className="py-3 px-4 subtitle text-center" style={{ width: '15%' }}>Calificación</th>
                             </tr>
                         </thead>
                         <tbody>
                             {gradesList?.map((grade, i) => {
                                 const percentage = Math.floor((100 * grade.value) / grade.parentHelper.maxGrade);
                                 const isAssignment = grade.parentType == GradeParentType.AssignmentSubmission;
-
-                                // Determine grade color
-                                let gradeColorClass = '';
-                                if (percentage >= 90) gradeColorClass = 'text-success';
-                                else if (percentage >= 80) gradeColorClass = 'text-primary';
-                                else if (percentage >= 70) gradeColorClass = 'text-warning';
-                                else gradeColorClass = 'text-danger';
-
                                 return (
                                     <tr key={i}>
                                         <td className="py-3 px-4">
@@ -73,12 +65,12 @@ export default function Grades() {
                                             )}
                                         </td>
                                         <td className="py-3 px-4 text-center">
-                                            <span className={`fw-bold fs-5 ${gradeColorClass}`}>
+                                            <span className={`fw-bold fs-5`}>
                                                 {percentage}%
                                             </span>
                                         </td>
                                         <td className="py-3 px-4 text-center">
-                                            <div className={`fw-bold fs-4 ${gradeColorClass}`}>
+                                            <div className={`fw-bold fs-4`}>
                                                 {grade.value}
                                             </div>
                                             <small className="text-muted">
