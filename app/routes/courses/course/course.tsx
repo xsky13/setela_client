@@ -44,6 +44,7 @@ type CourseItem = IOrderable & {
 export default function Course() {
     const course = useContext(CourseContext);
     const user = useContext(AuthContext);
+    const [mode, setMode] = useState<'course' | 'editing'>('course');
     const [courseData, setCourseData] = useState<CourseItem[]>([]);
     const navigate = useNavigate();
 
@@ -90,7 +91,7 @@ export default function Course() {
     }
 
     const getProgressItemsQuery = useQuery<UserProgress[]>({
-        queryKey: ['get_progress_items', { courseId: course?.id}],
+        queryKey: ['get_progress_items', { courseId: course?.id }],
         queryFn: async () => (await api.get(`/userProgress/${course?.id}/get_items`)).data,
         retry: 2
     });
@@ -106,37 +107,48 @@ export default function Course() {
                 {
                     course?.currentUserIsOwner &&
                     <div className="hstack gap-2">
-                        <div className="dropdown">
-                            <button
-                                className="btn btn-primary dropdown-toggle d-flex align-items-center"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                <span className="me-2">Crear</span>
-                            </button>
-                            <ul className="dropdown-menu">
-                                <li><NavLink className="dropdown-item" to="./m/crear">Modulo</NavLink></li>
-                                <li>
-                                    <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
-                                </li>
-                                <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
-                                <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
-                                <li>
-                                    <CreateTopicSeparatorModal courseId={course.id} />
-                                </li>
-                            </ul>
-                        </div>
-                        <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
+                        {
+                            mode != 'editing' &&
+                            <>
+                                <div className="dropdown">
+                                    <button
+                                        className="btn btn-primary dropdown-toggle d-flex align-items-center"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <span className="me-2">Crear</span>
+                                    </button>
+                                    <ul className="dropdown-menu">
+                                        <li><NavLink className="dropdown-item" to="./m/crear">Modulo</NavLink></li>
+                                        <li>
+                                            <AddResourcesModal parentId={course.id} type="course" courseId={course.id} />
+                                        </li>
+                                        <li><NavLink className="dropdown-item" to="./a/crear">Trabajo practico</NavLink></li>
+                                        <li><NavLink className="dropdown-item" to="./e/crear">Examen</NavLink></li>
+                                        <li>
+                                            <CreateTopicSeparatorModal courseId={course.id} />
+                                        </li>
+                                    </ul>
+                                </div>
+                                <NavLink to="editar" className="btn btn-light mx-2"><i className="bi bi-pencil me-1" /> Editar</NavLink>
 
-                        <LoadingButton
-                            loading={deleteCourseMutation.isPending}
-                            onClick={deleteCourse}
-                            className="btn btn-danger"
+                                <LoadingButton
+                                    loading={deleteCourseMutation.isPending}
+                                    onClick={deleteCourse}
+                                    className="btn btn-danger"
+                                >
+                                    <i className="bi bi-trash me-1" />
+                                    Eliminar
+                                </LoadingButton>
+                            </>
+                        }
+                        <button
+                            className={`btn btn-${mode == 'course' ? 'light' : 'dark'} mx-2`}
+                            onClick={() => setMode(prevMode => prevMode == 'course' ? 'editing' : 'course')}
                         >
-                            <i className="bi bi-trash me-1" />
-                            Eliminar
-                        </LoadingButton>
+                            <i className="bi bi-grid-fill me-1"></i>    Modo edicion
+                        </button>
                     </div>
                 }
             </div>

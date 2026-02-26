@@ -10,6 +10,7 @@ import type { Exam } from "~/types/exam";
 import { ResourceParentType } from "~/types/resourceTypes";
 import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
 import ToggleFinishedButton from "../ToggleFinishedButton";
+import MoveComponent from "../MoveComponent";
 
 export default function ResourceListing({
     resource,
@@ -18,7 +19,7 @@ export default function ResourceListing({
 }: {
     resource: ResourceListing
     currentUserIsOwner: boolean,
-    progressItems: ProgressQuery
+    progressItems?: ProgressQuery
 }) {
     const queryClient = useQueryClient();
     const deleteResourceMutation = useMutation({
@@ -117,12 +118,17 @@ export default function ResourceListing({
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
                 {
-                    resource.parentType == ResourceParentType.Course && <ToggleFinishedButton
-                        parentType={ProgressParentType.resource}
-                        parentId={resource.id}
-                        courseId={resource.courseId}
-                        progressItems={progressItems}
-                    />
+                    resource.parentType == ResourceParentType.Course ?
+                        currentUserIsOwner ?
+                            <MoveComponent />
+                            :
+                            <ToggleFinishedButton
+                                parentType={ProgressParentType.resource}
+                                parentId={resource.id}
+                                courseId={resource.courseId}
+                                progressItems={progressItems!}
+                            />
+                        : ''
                 }
                 {
                     currentUserIsOwner &&
