@@ -44,13 +44,18 @@ export default function CreateAssignment() {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget)
-        const formValues = Object.fromEntries(formData.entries()) as unknown as AssignmentFormData
+        const formValues = Object.fromEntries(formData.entries()) as unknown as AssignmentFormData;
 
-        const emptyExists = Object.values(formValues).some(value => value == '');
+        const fakeValues = Object.fromEntries(formData.entries());
+        delete fakeValues.textContent;
+        
+        const emptyExists = Object.values(fakeValues).some(value => value == '');
         if (emptyExists) {
             setErrors(["No puede haber campos vacíos."]);
             return;
-        }
+        } else (setErrors([]))
+
+        Object.keys(formValues).filter(key => key != "textContent");
 
         createAssignmentMutation.mutate({ ...formValues, courseId: Number(params.id) });
     }
