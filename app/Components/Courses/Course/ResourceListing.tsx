@@ -12,6 +12,7 @@ import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
 import ToggleFinishedButton from "../ToggleFinishedButton";
 import MoveComponent from "../MoveComponent";
 import { useOrdering } from "~/context/OrderingContext";
+import { CourseItemType } from "~/types/CourseItemType";
 
 export default function ResourceListing({
     resource,
@@ -123,7 +124,10 @@ export default function ResourceListing({
                     resource.parentType == ResourceParentType.Course ?
                         currentUserIsOwner ?
                             orderService.mode == 'editing' &&
-                            <MoveComponent />
+                            <MoveComponent
+                                itemType={CourseItemType.Resource}
+                                itemId={resource.id}
+                            />
                             :
                             <ToggleFinishedButton
                                 parentType={ProgressParentType.resource}
