@@ -4,9 +4,11 @@ import { NavLink } from "react-router";
 import { toast } from "sonner";
 import api from "~/api";
 import { AuthContext } from "~/context/AuthContext";
-import type { FullCourse } from "~/types/course";
+import { CourseContext } from "~/context/CourseContext";
+import type { CourseDataView, FullCourse } from "~/types/course";
+import AddProfessorModal from "./AddProfessorModal";
 
-export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData: FullCourse, postEnrollmentFunc: (value: boolean) => void }) {
+export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData: CourseDataView, postEnrollmentFunc: (value: boolean) => void }) {
     const user = useContext(AuthContext);
     const queryClient = useQueryClient()
     const [enrollmentStatus, setEnrollmentStatus] = useState(user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ? "enrolled" : "disenrolled");
@@ -19,7 +21,7 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
         async onSuccess() {
             postEnrollmentFunc(false);
             setEnrollmentStatus("disenrolled");
-            await queryClient.invalidateQueries({ queryKey: ['get_user_data']});
+            await queryClient.invalidateQueries({ queryKey: ['get_user_data'] });
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");
@@ -35,7 +37,7 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
         async onSuccess() {
             postEnrollmentFunc(true);
             setEnrollmentStatus("enrolled");
-            await queryClient.invalidateQueries({ queryKey: ['get_user_data']});
+            await queryClient.invalidateQueries({ queryKey: ['get_user_data'] });
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");
@@ -51,7 +53,7 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
     const disenrollStudent = (userId: number) => {
         disenrollStudentMutation.mutate({ userId });
         window.location.reload();
-    }  
+    }
 
     return (
         <div className="position-relative d-flex flex-column flex-shrink-0 p-3 bg-dark text-bg-dark border-top border-4 border-dark position-fixed z-3 h-100 sidebar" >
@@ -68,12 +70,19 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                     <a className="nav-link text-muted dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Profesores</a>
                     {
                         courseData.professors != undefined && <ul className="dropdown-menu" data-bs-theme="dark">
-                        {
-                            courseData.professors.map((professor, i) =>
-                                <li key={i}><span className="dropdown-item">{professor.name}</span></li>
-                            )
-                        }
-                    </ul>
+                            {
+                                courseData.professors.map((professor, i) =>
+                                    <li key={i}><span className="dropdown-item">{professor.name}</span></li>
+                                )
+                            }
+                            {
+                                courseData.currentUserIsOwner &&
+                                <li><div className="p-2">
+                                    <AddProfessorModal course={courseData} />
+                                </div></li>
+
+                            }
+                        </ul>
                     }
                 </li>
                 <li className="nav-item">

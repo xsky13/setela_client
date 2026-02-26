@@ -65,7 +65,7 @@ export default function CourseLayout() {
             <div className="d-flex">
                 <Sidebar
                     postEnrollmentFunc={changeAccess}
-                    courseData={courseData!}
+                    courseData={{ ...courseData!, currentUserIsOwner: isOwner }}
                 />
                 <div className="main p-4 px-5">
                     {
