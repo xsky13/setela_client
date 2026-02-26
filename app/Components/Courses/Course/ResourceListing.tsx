@@ -11,6 +11,7 @@ import { ResourceParentType } from "~/types/resourceTypes";
 import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
 import ToggleFinishedButton from "../ToggleFinishedButton";
 import MoveComponent from "../MoveComponent";
+import { useOrdering } from "~/context/OrderingContext";
 
 export default function ResourceListing({
     resource,
@@ -21,6 +22,7 @@ export default function ResourceListing({
     currentUserIsOwner: boolean,
     progressItems?: ProgressQuery
 }) {
+    const orderService = useOrdering();
     const queryClient = useQueryClient();
     const deleteResourceMutation = useMutation({
         mutationKey: ['delete_resource_command'],
@@ -120,6 +122,7 @@ export default function ResourceListing({
                 {
                     resource.parentType == ResourceParentType.Course ?
                         currentUserIsOwner ?
+                            orderService.mode == 'editing' &&
                             <MoveComponent />
                             :
                             <ToggleFinishedButton

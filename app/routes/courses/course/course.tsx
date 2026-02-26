@@ -20,6 +20,8 @@ import { toast } from 'sonner';
 import { AuthContext } from '~/context/AuthContext';
 import { UserRole } from '~/types/roles';
 import type { UserProgress } from '~/types/userProgress';
+import type { CourseItemType } from '~/types/CourseItemType';
+import { OrderingContext } from '~/context/OrderingContext';
 
 type CourseItem = IOrderable & {
     type: 'topicSeparator' | 'module' | 'exam' | 'assignment' | 'resource';
@@ -44,7 +46,6 @@ type CourseItem = IOrderable & {
 export default function Course() {
     const course = useContext(CourseContext);
     const user = useContext(AuthContext);
-    const [mode, setMode] = useState<'course' | 'editing'>('course');
     const [courseData, setCourseData] = useState<CourseItem[]>([]);
     const navigate = useNavigate();
 
@@ -95,10 +96,19 @@ export default function Course() {
         queryFn: async () => (await api.get(`/userProgress/${course?.id}/get_items`)).data,
         retry: 2
     });
+    const [mode, setMode] = useState<'course' | 'editing'>('course');
+
+    const moveUpwards = (itemType: CourseItemType, itemId: number) => {
+
+    }
+
+    const moveDownwards = (itemType: CourseItemType, itemId: number) => {
+        
+    }
 
 
     return (
-        <div>
+        <OrderingContext value={{ mode, moveUpwards, moveDownwards }}>
             <div className="d-flex justify-content-between">
                 <div>
                     <h1>{course?.title}</h1>
@@ -211,6 +221,6 @@ export default function Course() {
                     })
                 }
             </div>
-        </div>
+        </OrderingContext>
     );
 }
