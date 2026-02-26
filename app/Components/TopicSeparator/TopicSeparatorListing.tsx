@@ -5,12 +5,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "~/api";
 import { toast } from "sonner";
 import { useParams } from "react-router";
+import { useOrdering } from "~/context/OrderingContext";
+import { CourseItemType } from "~/types/CourseItemType";
+import MoveComponent from "../Courses/MoveComponent";
 
 export default function TopicSeparatorListing({ topicSeparator, currentUserIsOwner }: { topicSeparator: TopicSeparator, currentUserIsOwner: boolean }) {
     const [isUpdating, setIsUpdating] = useState(false);
     const [title, setTitle] = useState(topicSeparator.title);
     const queryClient = useQueryClient();
     const params = useParams();
+    const orderService = useOrdering();
+
 
     const updateTopicSeparatorMutation = useMutation<TopicSeparator, Error, { newTitle: string }>({
         mutationFn: async data => (await api.put("/topicSeparator/" + topicSeparator.id, data)).data,
@@ -86,6 +91,13 @@ export default function TopicSeparatorListing({ topicSeparator, currentUserIsOwn
                     >
                         <i className="bi bi-trash" />
                     </LoadingButton>
+                    {
+                        orderService.mode == 'editing' &&
+                        <MoveComponent
+                            itemType={CourseItemType.TopicSeparator}
+                            itemId={topicSeparator.id}
+                        />
+                    }
                 </div>
             }
         </div>

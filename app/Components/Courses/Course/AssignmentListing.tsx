@@ -9,6 +9,9 @@ import { formatDate } from "~/utils/date";
 import { getErrors } from "~/utils/error";
 import ToggleFinishedButton from "../ToggleFinishedButton";
 import { ProgressParentType, type ProgressQuery } from "~/types/userProgress";
+import { useOrdering } from "~/context/OrderingContext";
+import MoveComponent from "../MoveComponent";
+import { CourseItemType } from "~/types/CourseItemType";
 
 export default function AssignmentListing({
     assignment,
@@ -21,6 +24,7 @@ export default function AssignmentListing({
 
 }) {
     const queryClient = useQueryClient();
+    const orderService = useOrdering();
 
     const changeVisibilityMutation = useMutation<Assignment, Error, { visible: boolean }>({
         mutationKey: ['edit_assignment_visibility_command'],
@@ -89,12 +93,21 @@ export default function AssignmentListing({
                 </div>
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-between")}>
-                <ToggleFinishedButton
-                    parentType={ProgressParentType.assignment}
-                    parentId={assignment.id}
-                    courseId={assignment.courseId}
-                    progressItems={progressItems}
-                />
+                {
+                    currentUserIsOwner ?
+                        orderService.mode == 'editing' &&
+                        <MoveComponent
+                            itemType={CourseItemType.Assignment}
+                            itemId={assignment.id}
+                        />
+                        :
+                        <ToggleFinishedButton
+                            parentType={ProgressParentType.assignment}
+                            parentId={assignment.id}
+                            courseId={assignment.courseId}
+                            progressItems={progressItems}
+                        />
+                }
                 {
                     currentUserIsOwner &&
                     <div className="d-flex">

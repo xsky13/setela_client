@@ -8,6 +8,9 @@ import type { FullCourse, Module, ResourceListing } from "~/types/course";
 import { ProgressParentType, type UserProgress, type ProgressQuery } from "~/types/userProgress";
 import { getErrors } from "~/utils/error";
 import ToggleFinishedButton from "../ToggleFinishedButton";
+import { useOrdering } from "~/context/OrderingContext";
+import { CourseItemType } from "~/types/CourseItemType";
+import MoveComponent from "../MoveComponent";
 
 export default function ModuleListing({
     module,
@@ -19,6 +22,7 @@ export default function ModuleListing({
     progressItems: ProgressQuery
 }) {
     const queryClient = useQueryClient();
+    const orderService = useOrdering();
 
     const deleteModuleMutation = useMutation<any, Error>({
         mutationKey: ['delete_module_command'],
@@ -93,12 +97,21 @@ export default function ModuleListing({
                 <NavLink to={`./m/${module.id}`} className="h5 card-title text-decoration-none">{module.title}</NavLink>
             </div>
             <div className={"d-flex flex-column " + (currentUserIsOwner && "justify-content-end")}>
-                <ToggleFinishedButton 
-                    parentType={ProgressParentType.module}
-                    parentId={module.id}
-                    courseId={module.courseId}
-                    progressItems={progressItems}
-                />
+                {
+                    currentUserIsOwner ?
+                        orderService.mode == 'editing' &&
+                        <MoveComponent
+                            itemType={CourseItemType.Module}
+                            itemId={module.id}
+                        />
+                        :
+                        <ToggleFinishedButton
+                            parentType={ProgressParentType.module}
+                            parentId={module.id}
+                            courseId={module.courseId}
+                            progressItems={progressItems}
+                        />
+                }
                 {
                     currentUserIsOwner &&
                     <div className="d-flex">
