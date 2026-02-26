@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import '../styles/courseStyles.css';
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from 'react-router';
 import AssignmentListing from '~/Components/Courses/Course/AssignmentListing';
 import ExamListing from '~/Components/Courses/Course/ExamListing';
@@ -22,6 +22,21 @@ import { UserRole } from '~/types/roles';
 import type { UserProgress } from '~/types/userProgress';
 import { CourseItemType } from '~/types/CourseItemType';
 import { OrderingContext } from '~/context/OrderingContext';
+import { getErrors } from '~/utils/error';
+
+type SentObject = {
+    id: number,
+    newOrder: number
+}
+
+type DataObject = {
+    courseId: number,
+    topicSeparators: SentObject[],
+    modules: SentObject[],
+    assignments: SentObject[],
+    exams: SentObject[],
+    resources: SentObject[],
+}
 
 type CourseItem = IOrderable & {
     type: CourseItemType;
@@ -96,22 +111,24 @@ export default function Course() {
         queryFn: async () => (await api.get(`/userProgress/${course?.id}/get_items`)).data,
         retry: 2
     });
-    const [mode, setMode] = useState<'course' | 'editing'>('editing');
+    const [mode, setMode] = useState<'course' | 'editing'>('course');
 
     const moveUpwards = (itemType: CourseItemType, itemId: number) => {
         setCourseData(prevData => {
             const currentIndex = prevData.findIndex(item => item.type === itemType && item.id === itemId);
             if (currentIndex <= 0) return prevData;
 
-            const currentItem = prevData[currentIndex];
-            const targetItem = prevData[currentIndex - 1];
-
             const newData = [...prevData];
 
-            newData[currentIndex] = { ...currentItem, displayOrder: targetItem.displayOrder };
-            newData[currentIndex - 1] = { ...targetItem, displayOrder: currentItem.displayOrder };
+            const itemGoinUp = { ...newData[currentIndex] };
+            const itemToReplace = { ...newData[currentIndex - 1] };
 
-            [newData[currentIndex - 1], newData[currentIndex]] = [newData[currentIndex], newData[currentIndex - 1]];
+            const savedOrder = itemGoinUp.displayOrder;
+            itemGoinUp.displayOrder = itemToReplace.displayOrder;
+            itemToReplace.displayOrder = savedOrder;
+
+            newData[currentIndex - 1] = itemGoinUp;
+            newData[currentIndex] = itemToReplace;
 
             return newData;
         });
@@ -122,20 +139,69 @@ export default function Course() {
             const currentIndex = prevData.findIndex(item => item.type === itemType && item.id === itemId);
             if (currentIndex >= prevData.length - 1) return prevData;
 
-            const currentItem = prevData[currentIndex];
-            const targetItem = prevData[currentIndex + 1];
-
             const newData = [...prevData];
 
-            newData[currentIndex] = { ...currentItem, displayOrder: targetItem.displayOrder };
-            newData[currentIndex + 1] = { ...targetItem, displayOrder: currentItem.displayOrder };
+            const itemGoingDown = { ...newData[currentIndex] };
+            const itemToReplace = { ...newData[currentIndex + 1] };
 
-            [newData[currentIndex + 1], newData[currentIndex]] = [newData[currentIndex], newData[currentIndex + 1]];
+            const savedOrder = itemGoingDown.displayOrder;
+            itemGoingDown.displayOrder = itemToReplace.displayOrder;
+            itemToReplace.displayOrder = savedOrder;
+
+            newData[currentIndex + 1] = itemGoingDown;
+            newData[currentIndex] = itemToReplace;
 
             return newData;
         });
     }
 
+    const changeOrderMutation = useMutation<{ success: boolean }, Error, DataObject>({
+        mutationFn: async data => (await api.post("/ordering", data)).data,
+        onError: error => {
+            const errors = getErrors(error);
+            toast.error(<div>
+                <span className="fw-semibold">Hubo un error:</span>
+                {
+                    errors.map(e => <p>{e}</p>)
+                }
+            </div>)
+        },
+        onSuccess: data => {
+
+        }
+    });
+
+    const handleOrderChange = () => {
+        const dataObject: DataObject = {
+            courseId: course!.id,
+            topicSeparators: [],
+            modules: [],
+            assignments: [],
+            exams: [],
+            resources: [],
+        }
+        for (const item of courseData) {
+            switch (item.type) {
+                case CourseItemType.TopicSeparator:
+                    dataObject.topicSeparators.push({ id: item.id, newOrder: item.displayOrder });
+                    break;
+                case CourseItemType.Module:
+                    dataObject.modules.push({ id: item.id, newOrder: item.displayOrder });
+                    break;
+                case CourseItemType.Assignment:
+                    dataObject.assignments.push({ id: item.id, newOrder: item.displayOrder });
+                    break;
+                case CourseItemType.Exam:
+                    dataObject.exams.push({ id: item.id, newOrder: item.displayOrder });
+                    break;
+                case CourseItemType.Resource:
+                    dataObject.resources.push({ id: item.id, newOrder: item.displayOrder });
+                    break;
+            }
+        }
+
+        changeOrderMutation.mutate(dataObject);
+    }
 
     return (
         <OrderingContext value={{ mode, moveUpwards, moveDownwards }}>
@@ -182,6 +248,16 @@ export default function Course() {
                                     Eliminar
                                 </LoadingButton>
                             </>
+                        }
+                        {
+                            mode == 'editing' &&
+                            <LoadingButton
+                                className='btn btn-primary'
+                                loading={changeOrderMutation.isPending}
+                                onClick={handleOrderChange}
+                            >
+                                Guardar cambios
+                            </LoadingButton>
                         }
                         <button
                             className={`btn btn-${mode == 'course' ? 'light' : 'dark'} mx-2`}
