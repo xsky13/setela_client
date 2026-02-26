@@ -36,15 +36,14 @@ export default function UserList() {
     return (
         <div className="container pt-4">
             <h1>Usuarios</h1>
-            <table className="table table-striped align-middle">
+            <table className="table align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">Nro</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Rol</th>
-                        <th scope="col">Cursos inscriptos</th>
-                        <th scope="col">Cursos dictados</th>
-                        <th scope="col">Acciones</th>
+                        <th scope="col" className="py-3 px-4 subtitle">Nombre</th>
+                        <th scope="col" className="py-3 px-4 subtitle">Rol</th>
+                        <th scope="col" className="py-3 px-4 text-center subtitle">Cursos inscriptos</th>
+                        <th scope="col" className="py-3 px-4 text-center subtitle">Cursos dictados</th>
+                        <th scope="col" className="py-3 px-4 subtitle">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,9 +51,8 @@ export default function UserList() {
                         users && users.length &&
                         users.map((u, i) => (
                             <tr className="" key={i}>
-                                <th className="">{i + 1}</th>
-                                <td className="">{u.name}</td>
-                                <td className="align-middle">
+                                <td className="py-3 px-4 fw-semibold">{u.name}</td>
+                                <td className="py-3 px-4 align-middle">
                                     <div className="d-inline-flex flex-wrap gap-2">
                                         {
                                             u.roles.map((role, j) => {
@@ -78,9 +76,9 @@ export default function UserList() {
                                         }
                                     </div>
                                 </td>
-                                <td className="text-muted fw-bold">{u.enrollments.length}</td>
-                                <td className="text-muted fw-bold">{u.professorCourses.length}</td>
-                                <td className="">
+                                <td className="py-3 px-4 fs-5 text-center serif fw-bold">{u.enrollments.length}</td>
+                                <td className="py-3 px-4 fs-5 text-center serif fw-bold">{u.professorCourses.length}</td>
+                                <td className="py-3 px-4 ">
                                     <EditUserModal user={u} />
                                 </td>
                             </tr>
