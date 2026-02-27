@@ -305,7 +305,6 @@ export default function Assignment() {
                         <table className="table table-striped align-middle">
                             <thead>
                                 <tr>
-                                    <th scope="col">Nro</th>
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Hora de entrega</th>
                                     <th scope="col">Ultima actualizacion</th>

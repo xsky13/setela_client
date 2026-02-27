@@ -63,7 +63,6 @@ export default function ExamSubmissionListing({ examSubmission, exam }: { examSu
 
     return (
         <tr className="">
-            <th scope="row">1</th>
             <td className="fw-semibold">{examSubmission.sysUser.name}</td>
             <td className="text-muted small">
                 {formatDate(examSubmission.startTime)}

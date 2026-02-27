@@ -218,7 +218,6 @@ export default function ExamOwnerView({ exam }: { exam: ExamDataView }) {
                 <table className="table table-striped align-middle">
                     <thead>
                         <tr>
-                            <th scope="col">Nro</th>
                             <th scope="col">Nombre</th>
                             <th scope="col">Hora de comienzo</th>
                             <th scope="col">Hora de entrega</th>

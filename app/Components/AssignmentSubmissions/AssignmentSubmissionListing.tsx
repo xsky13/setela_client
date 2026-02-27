@@ -46,7 +46,6 @@ export default function AssignmentSubmissionListing({ assignmentSubmission, assi
 
     return (
         <tr className="">
-            <th scope="row">1</th>
             <td className="fw-semibold">{assignmentSubmission.sysUser.name}</td>
             <td className="text-muted small">
                 {formatDate(assignmentSubmission.creationDate)}
