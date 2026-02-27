@@ -8,6 +8,7 @@ import { AuthContext } from "~/context/AuthContext";
 import { getErrors } from "~/utils/error";
 import type { Route } from "./+types/cuenta";
 import type { FullUser } from "~/types/user";
+import FormErrors from "~/Components/Error/FormErrors";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -26,6 +27,8 @@ export default function Cuenta() {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [name, setName] = useState(user.name);
     const [error, setError] = useState("");
+
+    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -52,6 +55,21 @@ export default function Cuenta() {
         }
     });
 
+    const changeUserPassword = useMutation<{ success: boolean }, Error, FormData>({
+        mutationFn: async data => {
+            const response = await api.post("user/change_password", data);
+            return response.data;
+        },
+        onSuccess: data => {
+            toast("Sus cambios fueron guardados.");
+            setPasswordErrors([]);
+        },
+        onError: error => {
+            const errors = getErrors(error);
+            setPasswordErrors(errors);
+        }
+    });
+
 
     const handleLoginSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,6 +88,12 @@ export default function Cuenta() {
             setError("");
             updateUserMutation.mutate(formData)
         }
+    }
+
+    const changePassword = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        changeUserPassword.mutate(formData);
     }
     return (
         <div className="d-flex justify-content-center align-items-center">
@@ -163,6 +187,46 @@ export default function Cuenta() {
                             ''
                     }
                 </form>
+
+                <div className="my-5">
+                    <h3>Cambiar contraseña</h3>
+                    <form onSubmit={changePassword}>
+                        <div className="form-floating mb-3">
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="OldPassword"
+                                name="OldPassword"
+                                placeholder="contrasena"
+                            />
+                            <label htmlFor="OldPassword">Contraseña inicial</label>
+                        </div>
+                        <div className="form-floating mb-3">
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="NewPassword"
+                                name="NewPassword"
+                                placeholder="contrasena"
+                            />
+                            <label htmlFor="NewPassword">Nueva contraseña</label>
+                        </div>
+                        <div className="form-floating mb-3">
+                            <input
+                                type="password"
+                                className="form-control"
+                                id="NewPasswordRepeat"
+                                name="NewPasswordRepeat"
+                                placeholder="contrasena"
+                            />
+                            <label htmlFor="NewPasswordRepeat">Repetir contraseña nueva</label>
+                        </div>
+                        <LoadingButton loading={changeUserPassword.isPending} className="btn btn-primary btn-block w-100">Cambiar contraseña</LoadingButton>
+                        {
+                            passwordErrors.length != 0 && <FormErrors serverErrors={passwordErrors} />
+                        }
+                    </form>
+                </div>
             </div>
         </div>
     );
