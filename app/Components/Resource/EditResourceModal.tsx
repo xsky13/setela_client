@@ -17,14 +17,14 @@ export default function EditResourceModal({
     resource: ResourceListing,
     currentUserIsOwner: boolean,
 }) {
-    const [resourceType] = useState(ResourceType.Link);
+    const [resourceType] = useState(resource.resourceType);
     const queryClient = useQueryClient();
     const [linkText, setLinkText] = useState(resource.linkText);
     const [url, setUrl] = useState(resource.url);
     const [error, setError] = useState('');
     const editResourceModalRef = useRef<HTMLDivElement>(null);
 
-    const editResourceMutation = useMutation<ResourceListing, Error, { url: string, linkText: string }>({
+    const editResourceMutation = useMutation<ResourceListing, Error, { url?: string, linkText: string }>({
         mutationKey: ['edit_resource_command'],
         mutationFn: async data => {
             const response = await api.put('/resource/' + resource.id, data);
@@ -36,6 +36,8 @@ export default function EditResourceModal({
             switch (resource.parentType) {
                 case ResourceParentType.Module:
                     queryClient.setQueryData(['getModuleQuery', { moduleId: resource.parentId }], (old: Module) => {
+                        if (!old) return;
+
                         return {
                             ...old,
                             resources: old.resources.map((r: ResourceListing) => r.id == resource.id ? {
@@ -46,6 +48,8 @@ export default function EditResourceModal({
                     break;
                 case ResourceParentType.Course:
                     queryClient.setQueryData(['getCourseQuery', { courseId: resource.parentId }], (old: FullCourse) => {
+                        if (!old) return;
+
                         return {
                             ...old,
                             resources: old.resources.map((r: ResourceListing) => r.id == resource.id ? {
@@ -56,6 +60,8 @@ export default function EditResourceModal({
                     break;
                 case ResourceParentType.Assignment:
                     queryClient.setQueryData(['getAssignmentQuery', { assignmentId: resource.parentId }], (old: Assignment) => {
+                        if (!old) return;
+
                         return {
                             ...old,
                             resources: old.resources.map((r: ResourceListing) => r.id == resource.id ? {
@@ -66,6 +72,7 @@ export default function EditResourceModal({
                     break;
                 case ResourceParentType.Exam:
                     queryClient.setQueryData(['getExamQuery', { examId: Number(resource.parentId) }], (old: Exam) => {
+                        if (!old) return;
                         return {
                             ...old,
                             resources: old.resources.map((r: ResourceListing) => r.id == resource.id ? {
@@ -90,22 +97,22 @@ export default function EditResourceModal({
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (resourceType != ResourceType.Link) {
-            toast("WIP");
-            return;
-        }
-
         if (url == '') {
             setError("URL no puede estar vacío.");
             return;
         }
 
-        const data = {
-            url,
+        const data: { url?: string; linkText: string } = {
+            url: url,
             linkText,
         };
 
+        if (resource.resourceType != ResourceType.Link) 
+            delete data.url;
+
         editResourceMutation.mutate(data);
+        console.log(data);
+        
     }
 
     return (
@@ -162,10 +169,6 @@ export default function EditResourceModal({
                                             default:
                                                 return (
                                                     <>
-                                                        <div className="mb-3">
-                                                            <label htmlFor="file" className="form-label">Elegir archivo para reemplazar</label>
-                                                            <input className="form-control" type="file" id={"file" + resource.id} />
-                                                        </div>
                                                         <div className="form-floating mb-3">
                                                             <input
                                                                 type="text"

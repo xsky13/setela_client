@@ -1,5 +1,7 @@
 import axios, { AxiosError } from "axios";
 
+// http://localhost:5182/api
+// https://localhost:7111/api
 const api = axios.create({
     baseURL: "http://localhost:5182/api",
 });
