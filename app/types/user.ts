@@ -19,6 +19,7 @@ export type FullUser = {
     name: string;
     email: string;
     userImageUrl: string,
+    phoneNumber: string | null,
     roles: UserRole[];
     professorCourses: ProfessorCourse[];
     enrollments: StudentCourse[];

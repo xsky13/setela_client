@@ -24,7 +24,7 @@ export default function Cuenta() {
     if (user == undefined) throw new Error("No hay usuario");
 
     const [email, setEmail] = useState(user.email);
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
     const [name, setName] = useState(user.name);
     const [error, setError] = useState("");
 
@@ -78,6 +78,7 @@ export default function Cuenta() {
 
         formData.append("name", name);
         formData.append("email", email);
+        if (phoneNumber) formData.append("phoneNumber", phoneNumber);
         if (file) formData.append("NewPicture", file);
 
         if (name == "") {
@@ -95,6 +96,9 @@ export default function Cuenta() {
         const formData = new FormData(e.currentTarget);
         changeUserPassword.mutate(formData);
     }
+
+    console.log(user);
+    
     return (
         <div className="d-flex justify-content-center align-items-center">
             <div className="w-25">
@@ -155,8 +159,8 @@ export default function Cuenta() {
                     </div>
                     <div className="form-floating mb-4">
                         <input
-                            type="text"
-                            value={phoneNumber}
+                            type="number"
+                            value={phoneNumber ?? ""}
                             onChange={e => setPhoneNumber(e.target.value)}
                             className="form-control"
                             id="phoneNumber"
