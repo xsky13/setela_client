@@ -63,6 +63,7 @@ export default function Cuenta() {
         onSuccess: data => {
             toast("Sus cambios fueron guardados.");
             setPasswordErrors([]);
+            setFile(undefined);
         },
         onError: error => {
             const errors = getErrors(error);

@@ -1,4 +1,7 @@
 export const getErrors = (error: any) => {
+    if (!error.response) return [error.message ?? "Error desconocido"];
+    
+    if (typeof error.response.data == "string") return [error.response.data];
     if (error.response.data.error) return [error.response.data.error];
 
     if (error.response.data.errors != null && error.response.data.errors != undefined) {

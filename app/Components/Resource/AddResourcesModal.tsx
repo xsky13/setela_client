@@ -12,6 +12,7 @@ import { useSearchParams } from "react-router";
 import type { Assignment, AssignmentSubmissionFull } from "~/types/assignment";
 import type { ExamDataView } from "~/types/exam";
 import { CourseContext } from "~/context/CourseContext";
+import { getErrors } from "~/utils/error";
 
 export default function AddResourcesModal({
     type,
@@ -106,7 +107,8 @@ export default function AddResourcesModal({
             setError('');
         },
         onError(error) {
-            toast(error.message);
+            const errors = getErrors(error);
+            toast(errors[0]);
             console.log(error);
         }
     })

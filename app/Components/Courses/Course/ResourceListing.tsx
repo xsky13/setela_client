@@ -23,7 +23,6 @@ export default function ResourceListing({
     currentUserIsOwner: boolean,
     progressItems?: ProgressQuery
 }) {
-    const orderService = useOrdering();
     const queryClient = useQueryClient();
     const deleteResourceMutation = useMutation({
         mutationKey: ['delete_resource_command'],
@@ -123,7 +122,7 @@ export default function ResourceListing({
                 {
                     resource.parentType == ResourceParentType.Course ?
                         currentUserIsOwner ?
-                            orderService.mode == 'editing' &&
+                            useOrdering().mode == 'editing' &&
                             <MoveComponent
                                 itemType={CourseItemType.Resource}
                                 itemId={resource.id}

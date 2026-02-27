@@ -1,7 +1,20 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const api = axios.create({
     baseURL: "http://localhost:5182/api",
+});
+
+api.interceptors.request.use((config) => {
+    if (config.data instanceof FormData) {
+        for (const [, value] of config.data.entries()) {
+            if (value instanceof File && value.size > 100 * 1024 * 1024) {
+                const error = new AxiosError("El archivo es demasiado grande. Maximo 100MB.");
+                (error as any).isClientError = true;
+                return Promise.reject(error);
+            }
+        }
+    }
+    return config;
 });
 
 api.interceptors.response.use(
@@ -28,7 +41,9 @@ api.interceptors.response.use(
         } else if (error.request) {
             error.message = "No se pudo conectar con el servidor";
         } else {
-            error.message = "Error desconocido al realizar la solicitud";
+            if (!(error as any).isClientError) {
+                error.message = "Error desconocido al realizar la solicitud";
+            }
         }
         return Promise.reject(error);
     }

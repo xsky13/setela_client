@@ -74,11 +74,14 @@ export default function EditAssignment() {
         const formData = new FormData(e.currentTarget)
         const formValues = Object.fromEntries(formData.entries()) as unknown as AssignmentFormData
 
-        const emptyExists = Object.values(formValues).some(value => value == '');
+        const fakeValues = Object.fromEntries(formData.entries());
+        delete fakeValues.textContent;
+        
+        const emptyExists = Object.values(fakeValues).some(value => value == '');
         if (emptyExists) {
             setErrors(["No puede haber campos vacíos."]);
             return;
-        }
+        } else (setErrors([]))
 
         setRedundantFormData({ ...formValues, visible, closed });
 
