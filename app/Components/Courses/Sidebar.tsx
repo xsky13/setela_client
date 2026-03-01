@@ -37,9 +37,7 @@ export default function Sidebar({ courseData }: { courseData: CourseDataView }) 
             return response.data;
         },
         async onSuccess(data) {
-            queryClient.setQueryData(["get_user"], (old: FullUser) => {
-                return { ...old, enrollments: data.enrollments }
-            })
+            await queryClient.invalidateQueries({ queryKey: ["get_user"]});
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");

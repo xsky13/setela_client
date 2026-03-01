@@ -2,6 +2,7 @@ import LoginForm from "~/Components/Auth/LoginForm";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import api from "~/api";
+import RegisterForm from "./RegisterForm";
 
 
 export default function Authenticate() {
@@ -35,7 +36,7 @@ export default function Authenticate() {
                         active == "login" ?
                             <LoginForm />
                             :
-                            ''
+                           <RegisterForm />
                     }
                 </div>
             </div>
