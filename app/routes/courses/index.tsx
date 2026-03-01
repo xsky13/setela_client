@@ -36,6 +36,7 @@ export default function Index() {
         <div className="container pt-5">
             <h1>Cursos</h1>
             {
+                courseData &&
                 courseData.map((course: any, i: number) => (
                     <div key={i} className="overflow-hidden position-relative my-3 rounded-2 border border-2 border-primary pe-3 d-flex">
                         {

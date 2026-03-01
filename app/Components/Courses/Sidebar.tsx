@@ -7,11 +7,13 @@ import { AuthContext } from "~/context/AuthContext";
 import { CourseContext } from "~/context/CourseContext";
 import type { CourseDataView, FullCourse } from "~/types/course";
 import AddProfessorModal from "./AddProfessorModal";
+import type { FullUser } from "~/types/user";
 
-export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData: CourseDataView, postEnrollmentFunc: (value: boolean) => void }) {
+export default function Sidebar({ courseData }: { courseData: CourseDataView }) {
     const user = useContext(AuthContext);
     const queryClient = useQueryClient()
-    const [enrollmentStatus, setEnrollmentStatus] = useState(user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ? "enrolled" : "disenrolled");
+
+    const userEnrolled = user?.enrollments.some(e => e.courseId == courseData.id);
 
     const disenrollStudentMutation = useMutation<any, Error, { userId: number }>({
         mutationFn: async data => {
@@ -19,9 +21,9 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
             return response.data;
         },
         async onSuccess() {
-            postEnrollmentFunc(false);
-            setEnrollmentStatus("disenrolled");
-            await queryClient.invalidateQueries({ queryKey: ['get_user_data'] });
+            queryClient.setQueryData(["get_user"], (old: FullUser) => {
+                return { ...old, enrollments: old.enrollments.filter(e => e.courseId != courseData.id) }
+            })
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");
@@ -29,15 +31,15 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
         },
     });
 
-    const enrollStudentMutation = useMutation<any, Error, { userId: number }>({
+    const enrollStudentMutation = useMutation<FullCourse, Error, { userId: number }>({
         mutationFn: async data => {
             const response = await api.post("/course/" + courseData?.id + "/enroll", data);
             return response.data;
         },
-        async onSuccess() {
-            postEnrollmentFunc(true);
-            setEnrollmentStatus("enrolled");
-            await queryClient.invalidateQueries({ queryKey: ['get_user_data'] });
+        async onSuccess(data) {
+            queryClient.setQueryData(["get_user"], (old: FullUser) => {
+                return { ...old, enrollments: data.enrollments }
+            })
         },
         onError(error) {
             toast("Hubo un error. Por favor intente nuevamente.");
@@ -45,14 +47,12 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
         },
     });
 
-    const enrollStudent = (userId: number) => {
-        enrollStudentMutation.mutate({ userId });
-        window.location.reload();
+    const enrollStudent = () => {
+        enrollStudentMutation.mutate({ userId: user!.id });
     };
 
-    const disenrollStudent = (userId: number) => {
-        disenrollStudentMutation.mutate({ userId });
-        window.location.reload();
+    const disenrollStudent = () => {
+        disenrollStudentMutation.mutate({ userId: user!.id });
     }
 
     return (
@@ -90,10 +90,10 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                 </li>
                 <li className="nav-item">
                     {
-                        enrollmentStatus == "enrolled" ?
+                        userEnrolled ?
                             <span
                                 className="nav-link text-danger"
-                                onClick={() => disenrollStudent(user!.id)}
+                                onClick={disenrollStudent}
                                 role="button"
                             >
                                 {
@@ -107,7 +107,7 @@ export default function Sidebar({ postEnrollmentFunc, courseData }: { courseData
                             :
                             <span
                                 className="nav-link text-secondary"
-                                onClick={() => enrollStudent(user!.id)}
+                                onClick={enrollStudent}
                                 role="button"
                             >
                                 {

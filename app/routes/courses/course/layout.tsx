@@ -24,8 +24,8 @@ export function meta({ }: Route.MetaArgs) {
 export default function CourseLayout() {
     const params = useParams();
     const user = useContext(AuthContext);
-    const [userCanAccessCourse, setUserCanAccessCourse] = useState(false);
-    const [isOwner, setIsOwner] = useState(false);
+
+    const isOwner = (user?.roles.includes(UserRole.admin) || user?.professorCourses.some(c => c.id == courseData?.id)) || false;
 
     const { data: courseData, isError, isLoading, error } = useQuery<FullCourse>({
         queryKey: ['getCourseQuery', { courseId: Number(params.id) }],
@@ -36,21 +36,6 @@ export default function CourseLayout() {
         retry: 0
     });
 
-    const changeAccess = (value: boolean) => !isOwner && setUserCanAccessCourse(value);
-
-    useEffect(() => {
-        if (courseData != undefined) document.title = `${courseData?.title} | Setela`;
-
-        if (user?.roles.includes(UserRole.admin) || user?.professorCourses.some(c => c.id == courseData?.id)) {
-            setIsOwner(true);
-        }
-
-        if (user?.roles.includes(UserRole.admin) || user?.roles.includes(UserRole.professor)) {
-            setUserCanAccessCourse(true);
-        } else if (user?.enrollments.some(e => e.courseId == courseData?.id && e.valid)) {
-            setUserCanAccessCourse(true);
-        }
-    }, [courseData]);
 
     /** 
      * ! POSIBLE BUG: I DONT KNOW IF THE ID PROPERTY OF PROFESSORCOURSE IS FROM THE ACTUAL COURSE OR INTERMEDIARY TABLE
@@ -64,12 +49,12 @@ export default function CourseLayout() {
         courseData!.isActive || user?.roles.includes(UserRole.admin) ?
             <div className="d-flex">
                 <Sidebar
-                    postEnrollmentFunc={changeAccess}
                     courseData={{ ...courseData!, currentUserIsOwner: isOwner }}
                 />
                 <div className="main p-4 px-5">
                     {
-                        userCanAccessCourse ?
+                        user?.enrollments.some(e => e.courseId == courseData?.id && e.valid) ||
+                        (user?.roles.includes(UserRole.admin) || user?.roles.includes(UserRole.professor)) ?
                             <CourseContext value={{ ...courseData!, currentUserIsOwner: isOwner }}>
                                 <Outlet />
                             </CourseContext>

@@ -34,7 +34,7 @@ export default function AddProfessorModal({ course }: { course: CourseDataView }
                 Manejar profesores
             </button>
             {typeof document !== 'undefined' && createPortal(<div ref={modalRef} className="modal fade" id={"gradeSubmissionModal"} tabIndex={-1} aria-labelledby={"gradeSubmissionModalLabel"} aria-hidden="true">
-                <div className="modal-dialog modal-xl" style={{ maxHeight: '50vh' }}>
+                <div className="modal-dialog modal-lg" style={{ maxHeight: '50vh' }}>
                     <div className="modal-content">
                         {
                             isLoading ?
