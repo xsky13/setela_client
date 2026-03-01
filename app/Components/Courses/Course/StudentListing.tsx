@@ -23,6 +23,7 @@ export default function StudentListing({ student, currentUserIsOwner, courseId }
         },
     });
 
+
     const removeStudent = () => {
         if (confirm("Esta seguro que quiere eliminar este estudiante?")) {
             disenrollStudentMutation.mutate({ userId: student.sysUser.id });
@@ -30,12 +31,18 @@ export default function StudentListing({ student, currentUserIsOwner, courseId }
     }
 
     return (
-        <div className="my-3 rounded-2 border border-2 border-primary px-3 py-2 d-flex justify-content-between">
-            <span className="text-uppercase fw-semibold text-muted small">
-                <i className="bi bi-person-circle me-2"></i>
+        <div className="my-3 rounded-2 border  bg-body-tertiary px-3 py-2 d-flex justify-content-between">
+            <div className="d-flex align-items-center gap-3 subtitle small">
+                <div className="avatar-container" style={{ width: 40, height: 40 }}>
+                    <img
+                        src={student.sysUser.userImageUrl}
+                        alt="Profile Picture"
+                        className="avatar-img"
+                    />
+                </div>
 
                 {student.sysUser.name}
-            </span>
+            </div>
             {
                 currentUserIsOwner &&
                 <div className="d-flex flex-column gap-2">

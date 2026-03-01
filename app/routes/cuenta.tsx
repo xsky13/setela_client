@@ -45,6 +45,8 @@ export default function Cuenta() {
             toast("Sus cambios fueron guardados.");
             setServerErrors([]);
 
+            setFile(undefined);
+
             queryClient.setQueryData(['get_user'], (old: FullUser) => {
                 return { ...old, name: data.name, email: data.email, userImageUrl: data.userImageUrl }
             });
