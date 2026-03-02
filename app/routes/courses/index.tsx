@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { useContext } from "react";
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import api from "~/api";
 import ErrorSegment from "~/Components/Error/ErrorSegment";
 import LoadingSegment from "~/Components/Loading/LoadingSegment";
@@ -34,7 +34,13 @@ export default function Index() {
 
     return (
         <div className="container pt-5">
-            <h1>Cursos</h1>
+            <div className="d-flex justify-content-between align-items-center">
+                <h1>Cursos</h1>
+                <NavLink to="crear" className="btn btn-outline-primary">
+                    <i className="bi bi-plus-circle me-2" />
+                    Crear curso
+                </NavLink>
+            </div>
             {
                 courseData &&
                 courseData.map((course: any, i: number) => (

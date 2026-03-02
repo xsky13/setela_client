@@ -21,8 +21,11 @@ import Header from "./Components/Header";
 import { Toaster } from "sonner";
 import { useEffect } from "react";
 
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+
 if (typeof document !== 'undefined') {
-  	import('bootstrap/dist/js/bootstrap.bundle.min.js');
+	import('bootstrap/dist/js/bootstrap.bundle.min.js');
 }
 
 const queryClient = new QueryClient()
@@ -88,6 +91,13 @@ function AppContent({ children }: { children: React.ReactNode }) {
 export default function App() {
 	const navigation = useNavigation();
 	const isNavigating = Boolean(navigation.location);
+
+	const { state } = useNavigation();
+
+	useEffect(() => {
+		state !== "idle" ? NProgress.start() : NProgress.done();
+	}, [state]);
+
 	return <>
 		{
 			isNavigating ? <LoadingScreen /> : <Outlet />
