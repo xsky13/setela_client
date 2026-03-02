@@ -1,13 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useContext, useState } from "react";
+import { Navigate, useNavigate } from "react-router";
 import api from "~/api";
 import FormErrors from "~/Components/Error/FormErrors";
 import LoadingButton from "~/Components/LoadingButton";
+import { AuthContext } from "~/context/AuthContext";
 import { type CourseSimple } from "~/types/course";
+import { UserRole } from "~/types/roles";
 import { getErrors } from "~/utils/error";
 
 export default function CreateCourse() {
+    const user = useContext(AuthContext);
     const [errors, setErrors] = useState<string[]>([]);
     const [description, setDescription] = useState("");
     const [title, setTitle] = useState("");
@@ -36,6 +39,7 @@ export default function CreateCourse() {
 
 
     return (
+        user?.roles.includes(UserRole.admin) ?
         <div className="d-flex flex-column justify-content-center align-items-center pt-5">
             <div className="w-50">
                 <h1>Crear curso</h1>
@@ -73,5 +77,7 @@ export default function CreateCourse() {
                 </form>
             </div>
         </div>
+        :
+        <Navigate to={'/cursos'} />
     )
 }

@@ -8,6 +8,8 @@ import LoadingSegment from "~/Components/Loading/LoadingSegment";
 import { AuthContext } from "~/context/AuthContext";
 import type { Profesor } from "~/types/user";
 import type { Route } from "./+types";
+import { UserRole } from "~/types/roles";
+import type { FullCourse } from "~/types/course";
 
 export function meta({ }: Route.MetaArgs) {
     return [
@@ -36,10 +38,12 @@ export default function Index() {
         <div className="container pt-5">
             <div className="d-flex justify-content-between align-items-center">
                 <h1>Cursos</h1>
-                <NavLink to="crear" className="btn btn-outline-primary">
+                {
+                    user.roles.includes(UserRole.admin) && <NavLink to="crear" className="btn btn-outline-primary">
                     <i className="bi bi-plus-circle me-2" />
                     Crear curso
                 </NavLink>
+                }
             </div>
             {
                 courseData &&

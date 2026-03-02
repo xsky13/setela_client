@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { closeModal } from "~/utils/modal";
 import { CourseContext } from "~/context/CourseContext";
 import type { ResourceListing } from "~/types/course";
+import LoadingSegment from "~/Components/Loading/LoadingSegment";
 
 export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
     const user = useContext(AuthContext);
@@ -28,7 +29,7 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
 
     const userSubmission = exam.examSubmissions.find(e => e.sysUserId === user?.id);
 
-    const { data: examSubmission } = useQuery<ExamSubmission>({
+    const { data: examSubmission, isLoading: examSubmissionLoading } = useQuery<ExamSubmission>({
         queryKey: ['getExamSubmissionForExam', { examId: exam.id }],
         queryFn: async () => {
             const response = await api.get("/examSubmission/" + userSubmission?.id);
@@ -142,81 +143,84 @@ export default function ExamStudentView({ exam }: { exam: ExamDataView }) {
                         />
                         <h4>Mi entrega</h4>
                         {
-                            examSubmission ?
-                                <div className="px-3 py-2 rounded-2 border border-2 border-primary ">
-                                    {
-                                        examSubmission.finished ?
-                                            <div className="hstack gap-2">
-                                                <div className="badge rounded-pill text-bg-primary">
-                                                    <i className="bi bi-check-circle-fill me-2"></i><span>Entregada</span>
-                                                </div>
-                                                {
-                                                    getMinutesDifference(exam.startTime, examSubmission.turnInTime) > getMinutesDifference(exam.startTime, exam.endTime) ?
-                                                        <div className="badge rounded-pill text-bg-danger">
-                                                            <i className="bi bi-exclamation-triangle-fill me-2"></i><span>Tarde {examSubmission.adminExtendedTime && '(tiempo extendido)'}</span>
-                                                        </div>
-                                                        :
-                                                        <div className="badge rounded-pill text-bg-success">
-                                                            <i className="bi bi-check-circle-fill me-2"></i><span>A tiempo</span>
-                                                        </div>
-                                                }
+                            examSubmissionLoading ?
+                                <LoadingSegment />
+                                :
+                                examSubmission ?
+                                    <div className="px-3 py-2 rounded-2 border border-2 border-primary ">
+                                        {
+                                            examSubmission.finished ?
+                                                <div className="hstack gap-2">
+                                                    <div className="badge rounded-pill text-bg-primary">
+                                                        <i className="bi bi-check-circle-fill me-2"></i><span>Entregada</span>
+                                                    </div>
+                                                    {
+                                                        getMinutesDifference(exam.startTime, examSubmission.turnInTime) > getMinutesDifference(exam.startTime, exam.endTime) ?
+                                                            <div className="badge rounded-pill text-bg-danger">
+                                                                <i className="bi bi-exclamation-triangle-fill me-2"></i><span>Tarde {examSubmission.adminExtendedTime && '(tiempo extendido)'}</span>
+                                                            </div>
+                                                            :
+                                                            <div className="badge rounded-pill text-bg-success">
+                                                                <i className="bi bi-check-circle-fill me-2"></i><span>A tiempo</span>
+                                                            </div>
+                                                    }
 
+                                                    {
+                                                        examSubmission.grade ?
+                                                            <div className="badge rounded-pill text-bg-secondary">
+                                                                <i className="bi bi-check-circle-fill me-2"></i><span>Calificada</span>
+                                                            </div>
+                                                            :
+                                                            <div className="badge rounded-pill text-bg-secondary">
+                                                                <i className="bi bi-hourglass me-2"></i><span>Aguardando calificacion</span>
+                                                            </div>
+                                                    }
+                                                </div>
+                                                :
+                                                <div className="badge rounded-pill text-bg-primary">
+                                                    <i className="bi bi-info-circle me-2"></i><span>En proceso</span>
+                                                </div>
+                                        }
+                                        <div className="mt-3">
+                                            <div className="d-flex align-items-center justify-content-between my-2">
+                                                <div className="subtitle">Documentos adjuntos</div>
+                                                <span className="badge text-bg-secondary fs-6">{examSubmission.finished ? examSubmission?.resources?.length : examSubmissionResources.length}</span>
+                                            </div>
+                                            <hr />
+                                            <div className="d-flex align-items-center justify-content-between my-2">
+                                                <div className="subtitle">Revision</div>
+                                                {
+                                                    examSubmission.finished ?
+                                                        <button className="btn btn-outline-primary" onClick={openModal}>
+                                                            <i className="bi bi-arrow-return-right me-2"></i>
+                                                            Ver
+                                                        </button>
+                                                        :
+                                                        <button className="btn btn-outline-primary" onClick={openModal}>
+                                                            <i className="bi bi-arrow-return-right me-2"></i>
+                                                            Continuar
+                                                        </button>
+                                                }
+                                            </div>
+                                            <hr />
+                                            <div className={`my-2 ${examSubmission.grade ? 'd-flex align-items-center justify-content-between' : ''}`}>
+                                                <div className="subtitle">Calificacion:</div>
                                                 {
                                                     examSubmission.grade ?
-                                                        <div className="badge rounded-pill text-bg-secondary">
-                                                            <i className="bi bi-check-circle-fill me-2"></i><span>Calificada</span>
-                                                        </div>
+                                                        <span className="fs-5 fw-semibold text-primary-emphasis">
+                                                            {examSubmission.grade.value}
+                                                            <span style={{ opacity: '50%' }}> / {exam.maxGrade}</span>
+                                                        </span>
                                                         :
-                                                        <div className="badge rounded-pill text-bg-secondary">
-                                                            <i className="bi bi-hourglass me-2"></i><span>Aguardando calificacion</span>
-                                                        </div>
+                                                        <span className="small">Todavía no hay calificación</span>
                                                 }
                                             </div>
-                                            :
-                                            <div className="badge rounded-pill text-bg-primary">
-                                                <i className="bi bi-info-circle me-2"></i><span>En proceso</span>
-                                            </div>
-                                    }
-                                    <div className="mt-3">
-                                        <div className="d-flex align-items-center justify-content-between my-2">
-                                            <div className="subtitle">Documentos adjuntos</div>
-                                            <span className="badge text-bg-secondary fs-6">{examSubmission.finished ? examSubmission?.resources?.length : examSubmissionResources.length}</span>
-                                        </div>
-                                        <hr />
-                                        <div className="d-flex align-items-center justify-content-between my-2">
-                                            <div className="subtitle">Revision</div>
-                                            {
-                                                examSubmission.finished ?
-                                                    <button className="btn btn-outline-primary" onClick={openModal}>
-                                                        <i className="bi bi-arrow-return-right me-2"></i>
-                                                        Ver
-                                                    </button>
-                                                    :
-                                                    <button className="btn btn-outline-primary" onClick={openModal}>
-                                                        <i className="bi bi-arrow-return-right me-2"></i>
-                                                        Continuar
-                                                    </button>
-                                            }
-                                        </div>
-                                        <hr />
-                                        <div className={`my-2 ${examSubmission.grade ? 'd-flex align-items-center justify-content-between' : ''}`}>
-                                            <div className="subtitle">Calificacion:</div>
-                                            {
-                                                examSubmission.grade ?
-                                                    <span className="fs-5 fw-semibold text-primary-emphasis">
-                                                        {examSubmission.grade.value}
-                                                        <span style={{ opacity: '50%' }}> / {exam.maxGrade}</span>
-                                                    </span>
-                                                    :
-                                                    <span className="small">Todavía no hay calificación</span>
-                                            }
                                         </div>
                                     </div>
-                                </div>
-                                :
-                                <div className="text-muted">
-                                    <i className="bi bi-info-circle me-2"></i><span>Todavia no ha creado una entrega.</span>
-                                </div>
+                                    :
+                                    <div className="text-muted">
+                                        <i className="bi bi-info-circle me-2"></i><span>Todavia no ha creado una entrega.</span>
+                                    </div>
                         }
                     </div>
                 </div>
